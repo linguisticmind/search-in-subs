@@ -1,0 +1,589 @@
+#!/usr/bin/env bash
+
+# search-in-subs - search for words in subtitle files
+# copyright (c) 2023  Alex Rogers (https://github.com/linguisticmind)
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+version=0.1.0
+
+function re_esc { <<<"$1" sed -E 's/[](){}<>.*?+|^$/[]/\\&/g'; }
+
+getopt -T > /dev/null
+[[ $? != 4 ]] && { printf '[%s] %s\n' "${BASH_SOURCE##*/}" 'Enhanced getopt is required to run this script.' >&2; exit 1; }
+
+help='search-in-subs [<options>] -t <search term> ... [<file> ...]
+
+-t, --search-term=<search term>      Text to search for.
+
+-g, --default-glob=<glob pattern>    A shell glob pattern to use when no <file> 
+                                     arguments are specified.
+
+-v, --verbose                        Print the filename even if there were no 
+                                     matches found in that file.
+
+-V, --no-verbose                     Print filenames only for files that had 
+                                     matches.
+
+-i, --inverse                        Only print the names of the files where no 
+                                     matches were found.
+
+-I, --no-inverse                     Do not supress printing of matches and 
+                                     names of the files where matches were 
+                                     found.
+
+-q, --quiet                          Do not print any matches or filenames.
+
+-Q, --no-quiet                       Do not suppress printing of matches or 
+                                     filenames.
+
+-r, --regex                          Use regular expressions instead of fixed 
+                                     strings in <search term>s.
+
+-R, --no-regex                       Use fixed strings instead of regular 
+                                     expressions in <search term>s.
+
+-c, --match-case                     Make the search case-sensitive.
+
+-C, --no-match-case                  Make the search case-insensitive.
+
+-e, --exact-whitespace               Match whitespace characters exactly as 
+                                     specified in the <search term>.
+
+-E, --no-exact-whitespace            Treat all whitespace characters the same 
+                                     during search - ignoring the type of 
+                                     whitespace character, and how many of them 
+                                     appear in a sequence.
+
+-s, --stats                          Show match statistics after search.
+
+-S, --no-stats                       Do not show match statistics after search.
+
+-h, --stats-headers                  Show headers in the statistics table.
+
+-H, --stats-no-headers               Do not show headers in the statistics 
+                                     table.
+
+-m, --stats-headers-compact          Compactify headers in the statistics table.
+
+-M, --stats-headers-no-compact       Do not compactify headers in the 
+                                     statistics table.
+
+-n, --stats-headers-file-numbers     Show file numbers in the headers of the 
+                                     statistics table.
+
+-N, --stats-headers-no-file-numbers  Do not show file numbers in the headers of 
+                                     the statistics table.
+
+-w, --stats-wrap-filenames           Wrap filenames in the statistics table.
+
+-W, --stats-no-wrap-filenames        Do not wrap filenames in the statistics 
+                                     table.
+
+--color                              Colorize the output.
+
+--no-color                           Disable colorization of the output.
+
+--help                               Print help.
+
+--version                            Print version information.
+'
+
+opts=$(IFS=' ' getopt -n "${BASH_SOURCE##*/}" -o 't:,g:,v,V,i,I,q,Q,r,R,c,C,e,E,s,S,h,H,m,M,n,N,w,W,' -l 'search-term:,default-glob:,verbose,no-verbose,inverse,no-inverse,quiet,no-quiet,regex,no-regex,match-case,no-match-case,exact-whitespace,no-exact-whitespace,stats,no-stats,stats-headers,stats-no-headers,stats-headers-compact,stats-headers-no-compact,stats-headers-file-numbers,stats-headers-no-file-numbers,stats-wrap-filenames,stats-no-wrap-filenames,color,no-color,help,version,' -- "$@")
+
+[[ $? != 0 ]] && exit 1
+
+eval set -- "$opts"
+
+opt_search_term=()
+opt_default_glob='*.srt'
+opt_verbose=
+opt_inverse=
+opt_quiet=
+opt_regex=
+opt_match_case=
+opt_exact_whitespace=
+opt_stats=
+opt_stats_headers=1
+opt_stats_headers_compact=
+opt_stats_headers_file_numbers=1
+opt_stats_wrap_filenames=1
+opt_color=1
+
+test -f "${XDG_CONFIG_HOME:-$HOME/.config}"/search-in-subs/config.bash && source "$_"
+
+while true; do
+  case $1 in
+    -t | --search-term ) opt_search_term+=("$2"); shift 2 ;;
+    -g | --default-glob ) opt_default_glob="$2"; shift 2 ;;
+    -v | --verbose ) opt_verbose=1; shift ;;
+    -V | --no-verbose ) opt_verbose=; shift ;;
+    -i | --inverse ) opt_inverse=1; shift ;;
+    -I | --no-inverse ) opt_inverse=; shift ;;
+    -q | --quiet ) opt_quiet=1; shift ;;
+    -Q | --no-quiet ) opt_quiet=; shift ;;
+    -r | --regex ) opt_regex=1; shift ;;
+    -R | --no-regex ) opt_regex=; shift ;;
+    -c | --match-case ) opt_match_case=1; shift ;;
+    -C | --no-match-case ) opt_match_case=; shift ;;
+    -e | --exact-whitespace ) opt_exact_whitespace=1; shift ;;
+    -E | --no-exact-whitespace ) opt_exact_whitespace=; shift ;;
+    -s | --stats ) opt_stats=1; shift ;;
+    -S | --no-stats ) opt_stats=; shift ;;
+    -h | --stats-headers ) opt_stats_headers=1; shift ;;
+    -H | --stats-no-headers ) opt_stats_headers=; shift ;;
+    -m | --stats-headers-compact ) opt_stats_headers_compact=1; shift ;;
+    -M | --stats-headers-no-compact ) opt_stats_headers_compact=; shift ;;
+    -n | --stats-headers-file-numbers ) opt_stats_headers_file_numbers=1; shift ;;
+    -N | --stats-headers-no-file-numbers ) opt_stats_headers_file_numbers=; shift ;;
+    -w | --stats-wrap-filenames ) opt_stats_wrap_filenames=1; shift ;;
+    -W | --stats-no-wrap-filenames ) opt_stats_wrap_filenames=; shift ;;
+    --color ) opt_color=1; shift ;;
+    --no-color ) opt_color=; shift ;;
+    --help ) printf '%s\n' "$help"; exit ;;
+    --version ) printf '%s\n' "$version"; exit ;;
+    -- ) shift; break ;;
+    * ) printf '[%s] %s\n' "${BASH_SOURCE##*/}" 'Internal error: unable to parse option `'"$1"'`.' >&2; exit 1 ;;
+  esac
+done
+
+shopt -s nullglob extglob globstar
+
+if [[ ! $opt_search_term ]]; then
+  printf \
+    ${opt_color:+'\x1b[31m'}'[%s] %s'${opt_color:+'\x1b[39m'}'\n' \
+    "${BASH_SOURCE##*/}" \
+    'No search term was specified. Use `-t, --search-term` to specify one or more search terms.' >&2
+  exit 1
+fi
+
+[[ $# = 0 ]] && set -- $opt_default_glob
+
+if [[ $# = 0 ]]; then
+  printf \
+    ${opt_color:+'\x1b[31m'}'[%s] %s'${opt_color:+'\x1b[39m'}'\n' \
+    "${BASH_SOURCE##*/}" \
+    'No files were passed to the script and none matched the default glob '\'"${opt_default_glob//\'/\'\\\'\'}"\''.' >&2
+  exit 1
+fi
+
+search_term_re=
+
+for search_term in "${opt_search_term[@]}"; do
+  [[ ! $opt_regex ]] && search_term="$(re_esc "$search_term")"
+  [[ ! $opt_exact_whitespace ]] && search_term="${search_term// /[[:space:]]+}" 
+  search_term_re+="$search_term"'|'
+done
+
+search_term_re="${search_term_re%|}"
+
+[[ ! $opt_match_case ]] && case_insensitive=1
+
+sed_script_cleanup='1 s/^\xef\xbb\xbf//; s/\r$//; s/\s+$//' # Remove byte order mark, carriage returns and trailing whitespace
+
+declare -A \
+  stats_number_subtitles_total \
+  stats_number_subtitles_matched \
+  stats_number_subtitles_unmatched \
+  stats_percentage_subtitles_matched
+
+had_errors=
+had_matches=
+
+for (( i=1; i<=$#; i++ )); do
+
+  if [[ ! -e "${!i}" ]]; then
+    printf \
+      ${opt_color:+'\x1b[33m'}'[%s] %s'${opt_color:+'\x1b[39m'}'\n' \
+      "${BASH_SOURCE##*/}" \
+      'File '\'"${!i//\'/\'\\\'\'}"\'' does not exist. Skipping.' >&2
+    had_errors=1
+    shift
+    ((i--))
+    continue
+  elif [[ ! -f "${!i}" ]]; then
+    printf \
+      ${opt_color:+'\x1b[33m'}'[%s] %s'${opt_color:+'\x1b[39m'}'\n' \
+      "${BASH_SOURCE##*/}" \
+      \'"${!i//\'/\'\\\'\'}"\'' is not a file. Skipping.' >&2
+    had_errors=1
+    shift
+    ((i--))
+    continue
+  fi
+
+  if [[ $opt_stats ]]; then
+    stats_number_subtitles_total[${!i}]=$(sed -nE -e "$sed_script_cleanup" -e '/^[[:digit:]]+$/ p' "${!i}" | wc -l)
+    stats_number_subtitles_matched[${!i}]=0
+  fi
+
+  file_has_matches=
+
+  while read -rd '' subtitle; do
+
+    had_matches=1
+
+    [[ $opt_stats ]] && ((stats_number_subtitles_matched[${!i}]++))
+
+    [[ ! $opt_quiet && ! $opt_inverse && ! $file_has_matches ]] &&
+      printf ${opt_color:+'\x1b[38;5;34m'}'%s'${opt_color:+'\x1b[39m'}'\n\n' "${!i}" 
+
+    file_has_matches=1
+
+    [[ ! $opt_quiet && ! $opt_inverse ]] && printf '%s\n\n' "$subtitle"
+
+  done < <(
+
+    sed -E "$sed_script_cleanup" "${!i}" | sed -nE '
+
+      /^[[:digit:]]+$/ {
+        h
+        n
+        /^[[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3} --> [[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3}$/ {
+          H
+          {
+            :a
+            n
+            H
+            /^$/! b a
+          }
+          x
+          s/\n+$/\x0/
+          h
+          s/^([[:digit:]]+\n[[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3} --> [[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3}).*$/'${opt_color:+'\x1b[2m'}'\1'${opt_color:+'\x1b[22m'}'/
+          x
+          s/^[[:digit:]]+\n[[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3} --> [[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3}\n//
+          /'"$search_term_re"'/M'${case_insensitive:+'I'}' {
+            s/'"$search_term_re"'/'${opt_color:+'\x1b[7m'}'&'${opt_color:+'\x1b[27m'}'/gM'${case_insensitive:+'I'}'
+            s/<b>/'${opt_color:+'\x1b[1m'}'/g
+            s/<\/b>/'${opt_color:+'\x1b[22m'}'/g
+            s/<i>/'${opt_color:+'\x1b[3m'}'/g
+            s/<\/i>/'${opt_color:+'\x1b[23m'}'/g
+            s/<u>/'${opt_color:+'\x1b[4m'}'/g
+            s/<\/u>/'${opt_color:+'\x1b[24m'}'/g
+            s/<s>/'${opt_color:+'\x1b[9m'}'/g
+            s/<\/s>/'${opt_color:+'\x1b[29m'}'/g
+            H
+            x
+            p
+          }
+        }
+      }
+
+    '
+
+  )
+
+  if [[ ! $opt_quiet && ! $file_has_matches && ( $opt_verbose || $opt_inverse ) ]]; then
+    printf ${opt_color:+'\x1b[2m'}'%s'${opt_color:+'\x1b[22m'}'\n' "${!i}" 
+    [[ $opt_stats && $i = $# ]] && printf '\n'
+  fi
+
+  if [[ $opt_stats ]]; then
+    stats_number_subtitles_unmatched[${!i}]=$((${stats_number_subtitles_total[${!i}]} - ${stats_number_subtitles_matched[${!i}]}))
+    stats_percentage_subtitles_matched[${!i}]=$(printf '%d / %d * 100\n' "${stats_number_subtitles_matched[${!i}]}" "${stats_number_subtitles_total[${!i}]}" | bc -l)
+  fi
+
+done
+
+if [[ $opt_stats ]]; then
+
+  declare -A stats_totals
+  
+  stats_totals[number_files_matched]=0
+  stats_totals[number_files_total]="$#"
+  stats_totals[number_files_unmatched]=
+  stats_totals[percentage_files_matched]=
+
+  stats_totals[number_subtitles_matched]=0
+  stats_totals[number_subtitles_total]=0
+  stats_totals[number_subtitles_unmatched]=0
+  stats_totals[percentage_subtitles_matched]=
+
+  for file; do
+
+    [[ ${stats_number_subtitles_matched[$file]} -gt 0 ]] && ((stats_totals[number_files_matched]++))
+    if [[ ${stats_number_subtitles_matched[$file]} ]]; then
+      stats_totals[number_subtitles_matched]=$((${stats_totals[number_subtitles_matched]} + ${stats_number_subtitles_matched[$file]}))
+    fi
+    if [[ ${stats_number_subtitles_total[$file]} ]]; then
+      stats_totals[number_subtitles_total]=$((${stats_totals[number_subtitles_total]} + ${stats_number_subtitles_total[$file]}))
+    fi
+    if [[ ${stats_number_subtitles_unmatched[$file]} ]]; then
+      stats_totals[number_subtitles_unmatched]=$((${stats_totals[number_subtitles_unmatched]} + ${stats_number_subtitles_unmatched[$file]}))
+    fi
+
+  done
+
+  stats_totals[number_files_unmatched]=$((${stats_totals[number_files_total]} - ${stats_totals[number_files_matched]}))
+  if [[ ${stats_totals[number_files_total]} != 0 ]]; then
+    stats_totals[percentage_files_matched]=$(printf '%d / %d * 100\n' "${stats_totals[number_files_matched]}" "${stats_totals[number_files_total]}" | bc -l)
+  fi
+
+  if [[ ${stats_totals[number_subtitles_total]} != 0 ]]; then
+    stats_totals[percentage_subtitles_matched]=$(printf '%d / %d * 100\n' "${stats_totals[number_subtitles_matched]}" "${stats_totals[number_subtitles_total]}" | bc -l)
+  fi
+
+  declare -A stats_averages
+
+  stats_averages[number_subtitles_matched]=
+  stats_averages[number_subtitles_total]=
+  stats_averages[number_subtitles_unmatched]=
+  stats_averages[percentage_subtitles_matched]=
+
+  if [[ ${stats_totals[number_files_matched]} != 0 ]]; then
+    stats_averages[number_subtitles_matched]=$((${stats_totals[number_subtitles_matched]} / ${stats_totals[number_files_matched]}))
+  fi
+  if [[ ${stats_totals[number_files_total]} != 0 ]]; then
+    stats_averages[number_subtitles_total]=$((${stats_totals[number_subtitles_total]} / ${stats_totals[number_files_total]}))
+  fi
+  if [[ ${stats_averages[number_subtitles_matched]} ]]; then
+    stats_averages[number_subtitles_unmatched]=$((${stats_averages[number_subtitles_total]} - ${stats_averages[number_subtitles_matched]}))
+    stats_averages[percentage_subtitles_matched]=$(printf '%d / %d * 100\n' "${stats_averages[number_subtitles_matched]}" "${stats_averages[number_subtitles_total]}" | bc -l)
+  fi
+
+  stats_table_contents=() # This array will include most of the contents of the stats table except for the top header, and the last two rows of the table that contain averages and totals.
+
+  declare -A table_headings
+  
+  if [[ ! $opt_stats_headers_compact ]]; then
+
+    file_number_format_width=7
+
+    if [[ ${#stats_totals[number_files_total]} -gt 6 ]]; then # `6` because, except for the file numbers, the longest string of text that ever appears in the left vertical header of the stats table is 'Average', which is 7 characters long. The subtracted 1 is for the dot that follows the number.
+      file_number_format_width=$((${#stats_totals[number_files_total]} + 1))
+    fi
+
+    table_headings[file]='Files'
+    table_headings[matched]='Matched'
+    table_headings[total]='Total'
+    table_headings[unmatched]='Unmatched'
+    table_headings[matched_percentage]='Matched %'
+    table_headings[average]='Average'
+
+  else
+
+    file_number_format_width=1
+
+    if [[ $opt_stats_headers_file_numbers ]]; then
+      file_number_format_width="${#stats_totals[number_files_total]}"
+    fi
+
+    table_headings[file]='F'
+    table_headings[matched]='M'
+    table_headings[total]='T'
+    table_headings[unmatched]='U'
+    table_headings[matched_percentage]='M%'
+    table_headings[average]='A'
+
+  fi
+ 
+  mapfile -d '' stats_files_quoted < <(ls --zero --sort=none --quoting-style=shell-escape --color=never "$@")
+
+  for i in $(seq 1 "$#"); do
+
+    stats_table_contents+=(
+
+      ${opt_stats_headers:+"${opt_stats_headers_file_numbers:+$(
+        [[ ! $opt_stats_headers_compact ]] && v="$i"'.' || v="$i"
+        printf ${opt_color:+'\x1b[2;48;5;234m'}'%'"$file_number_format_width"'s'${opt_color:+'\x1b[49;22m'} "$v"
+      )}"}
+
+      "$(
+        v="${stats_files_quoted[$((i - 1))]}"
+        if [[ ! $opt_stats_wrap_filenames ]]; then
+          [[ ${stats_number_subtitles_matched[${!i}]} != 0 ]] && c=('38;5;34' '39') || c=('2' '22') 
+          printf ${opt_color:+'\x1b['"${c[0]}"'m'}'%s'${opt_color:+'\x1b['"${c[1]}"'m'} "$v"
+        else
+          printf '%s' "$v"
+        fi
+      )"
+
+      "$(
+        v="${stats_number_subtitles_matched[${!i}]}"
+        [[ $v != 0 ]] && c=('38;5;34' '39') || c=('2' '22')
+        printf ${opt_color:+'\x1b['"${c[0]}"'m'}'%s'${opt_color:+'\x1b['"${c[1]}"'m'} "$v"
+      )"
+
+      ${opt_color:+$'\x1b[2m'}'/'${opt_color:+$'\x1b[22m'}
+      "$(
+        v="${stats_number_subtitles_total[${!i}]}"
+        [[ $v != 0 ]] && c=('38;5;33' '39') || c=('2' '22')
+        printf ${opt_color:+'\x1b['"${c[0]}"'m'}'%s'${opt_color:+'\x1b['"${c[1]}"'m'} "$v"
+      )"
+
+      "$(
+        v="${stats_number_subtitles_unmatched[${!i}]}"
+        [[ $v != 0 ]] && c=('38;5;208' '39') || c=('2' '22')
+        printf ${opt_color:+$'\x1b[2m'}'('${opt_color:+'\x1b[2m'}${opt_color:+'\x1b['"${c[0]}"'m'}'%s'${opt_color:+'\x1b['"${c[1]}"'m'}${opt_color:+$'\x1b[2m'}')'${opt_color:+'\x1b[22m'} "$v"
+      )"
+
+      "$(
+        v="${stats_percentage_subtitles_matched[${!i}]}"
+        [[ $v != 0 ]] && c=('38;5;220' '39') || c=('2' '22')
+        printf ${opt_color:+'\x1b['"${c[0]}"'m'}'%.2f%%'${opt_color:+'\x1b['"${c[1]}"'m'} "$v"
+      )"
+
+    )
+
+  done
+
+  printf \
+    \
+    ${opt_stats_headers:+'%s\t'}'%s\t%s\t%s\t%s\t%s\t%s\n' \
+    \
+    ${opt_stats_headers:+${opt_color:+$'\x1b[2;48;5;234m'}''} \
+      ${opt_stats_headers:+"${table_headings[file]}"} \
+      ${opt_stats_headers:+"${table_headings[matched]}"} \
+      ${opt_stats_headers:+''} \
+      ${opt_stats_headers:+"${table_headings[total]}"} \
+      ${opt_stats_headers:+"${table_headings[unmatched]}"} \
+      ${opt_stats_headers:+"${table_headings[matched_percentage]}"}${opt_stats_headers:+$'\x1b[49;22m'} \
+    \
+    "${stats_table_contents[@]}" \
+    \
+    ${opt_stats_headers:+${opt_color:+$'\x1b[2;48;5;234m'}"$(
+      printf '%'"$file_number_format_width"'s' "${table_headings[average]}"
+    )"${opt_color:+$'\x1b[49;22m'}} \
+      '' \
+      "$(
+        v="${stats_averages[number_subtitles_matched]}"
+        [[ $v != 0 && $v ]] && c=('38;5;34' '39') || c=('2' '22')
+        printf ${opt_color:+'\x1b['"${c[0]}"'m'}'%s'${opt_color:+'\x1b['"${c[1]}"'m'} "${v:--}"
+      )" \
+      ${opt_color:+$'\x1b[2m'}'/'${opt_color:+$'\x1b[22m'} \
+      "$(
+        v="${stats_averages[number_subtitles_total]}"
+        [[ $v != 0 && $v ]] && c=('38;5;33' '39') || c=('2' '22')
+        printf ${opt_color:+'\x1b['"${c[0]}"'m'}'%s'${opt_color:+'\x1b['"${c[1]}"'m'} "${v:--}"
+      )" \
+      "$(
+        v="${stats_averages[number_subtitles_unmatched]}"
+        [[ $v != 0 && $v ]] && c=('38;5;208' '39') || c=('2' '22')
+        printf ${opt_color:+$'\x1b[2m'}'('${opt_color:+'\x1b[2m'}${opt_color:+'\x1b['"${c[0]}"'m'}'%s'${opt_color:+'\x1b['"${c[1]}"'m'}${opt_color:+$'\x1b[2m'}')'${opt_color:+'\x1b[22m'} "${v:--}"
+      )" \
+      "$(
+        v="${stats_averages[percentage_subtitles_matched]}"
+        [[ $v != 0 && $v ]] && c=('38;5;220' '39') || c=('2' '22')
+        [[ $v ]] && f='%.2f%%' || f='%s'
+        printf ${opt_color:+'\x1b['"${c[0]}"'m'}"$f"${opt_color:+'\x1b['"${c[1]}"'m'} "${v:--}"
+      )" \
+    \
+    ${opt_stats_headers:+${opt_color:+$'\x1b[2;48;5;234m'}"$(
+      printf '%'"$file_number_format_width"'s' "${table_headings[total]}"
+    )"${opt_color:+$'\x1b[49;22m'}} \
+      "$(
+        printf \
+          '%s %s %s %s %s' \
+          "$(
+            v="${stats_totals[number_files_matched]}"
+            [[ $v != 0 ]] && c=('38;5;34' '39') || c=('2' '22')
+            printf ${opt_color:+'\x1b['"${c[0]}"'m'}'%s'${opt_color:+'\x1b['"${c[1]}"'m'} "$v"
+          )" \
+          ${opt_color:+$'\x1b[2m'}'/'${opt_color:+$'\x1b[22m'} \
+          "$(
+            v="${stats_totals[number_files_total]}"
+            [[ $v != 0 ]] && c=('38;5;33' '39') || c=('2' '22')
+            printf ${opt_color:+'\x1b['"${c[0]}"'m'}'%s'${opt_color:+'\x1b['"${c[1]}"'m'} "$v"
+          )" \
+          "$(
+            v="${stats_totals[number_files_unmatched]}"
+            [[ $v != 0 ]] && c=('38;5;208' '39') || c=('2' '22')
+            printf ${opt_color:+$'\x1b[2m'}'('${opt_color:+'\x1b[2m'}${opt_color:+'\x1b['"${c[0]}"'m'}'%s'${opt_color:+'\x1b['"${c[1]}"'m'}${opt_color:+$'\x1b[2m'}')'${opt_color:+'\x1b[22m'} "$v"
+          )" \
+          "$(
+            v="${stats_totals[percentage_files_matched]}"
+            [[ $v != 0 && $v ]] && c=('38;5;220' '39') || c=('2' '22')
+            [[ $v ]] && f='%.2f%%' || f='%s'
+            printf ${opt_color:+'\x1b['"${c[0]}"'m'}"$f"${opt_color:+'\x1b['"${c[1]}"'m'} "${v:--}"
+          )"
+      )" \
+      "$(
+        v="${stats_totals[number_subtitles_matched]}"
+        [[ $v != 0 ]] && c=('38;5;34' '39') || c=('2' '22')
+        printf ${opt_color:+'\x1b['"${c[0]}"'m'}'%s'${opt_color:+'\x1b['"${c[1]}"'m'} "$v"
+      )" \
+      ${opt_color:+$'\x1b[2m'}'/'${opt_color:+$'\x1b[22m'} \
+      "$(
+        v="${stats_totals[number_subtitles_total]}"
+        [[ $v != 0 ]] && c=('38;5;33' '39') || c=('2' '22')
+        printf ${opt_color:+'\x1b['"${c[0]}"'m'}'%s'${opt_color:+'\x1b['"${c[1]}"'m'} "$v"
+      )" \
+      "$(
+        v="${stats_totals[number_subtitles_unmatched]}"
+        [[ $v != 0 ]] && c=('38;5;208' '39') || c=('2' '22')
+        printf ${opt_color:+$'\x1b[2m'}'('${opt_color:+'\x1b[2m'}${opt_color:+'\x1b['"${c[0]}"'m'}'%s'${opt_color:+'\x1b['"${c[1]}"'m'}${opt_color:+$'\x1b[2m'}')'${opt_color:+'\x1b[22m'} "$v"
+      )" \
+      "$(
+        v="${stats_totals[percentage_subtitles_matched]}"
+        [[ $v != 0 && $v ]] && c=('38;5;220' '39') || c=('2' '22')
+        [[ $v ]] && f='%.2f%%' || f='%s'
+        printf ${opt_color:+'\x1b['"${c[0]}"'m'}"$f"${opt_color:+'\x1b['"${c[1]}"'m'} "${v:--}"
+      )" \
+    | \
+    COLUMNS="$COLUMNS" column \
+      --separator $'\t' \
+      --output-separator ${opt_color:+${opt_stats_wrap_filenames:+$'\x1b[0m'}}' '${opt_color:+${opt_stats_wrap_filenames:+$'\x1b[0m'}} \
+      --table \
+      --table-noheadings \
+      --table-columns ${opt_stats_headers:+'#,'}'F,M,/,T,U,%,' \
+      ${opt_stats_wrap_filenames:+--table-wrap 'F,'} \
+      --table-right 'M,T,U,%,' \
+      | \
+      sed -E -e '' \
+        ${opt_color:+${opt_stats_headers:+-e '
+          # Fixing colorization of the left vertical header on lines where no file number is printed.
+          s/^ {'"$file_number_format_width"'}/\x1b[2;48;5;234m&\x1b[49;22m/
+        '}} \
+        | \
+        sed -E -e '' \
+        ${opt_color:+${opt_stats_wrap_filenames:+-e '
+          # Fixing colorization of filenames when wrapping is enabled. Copies ANSI escape sequences from the Matched column.
+          1 s/\x1b\[0m//g
+          :a
+          /^(\x1b\[[[:digit:];]*m[^\x1b]*\x1b\[[[:digit:];]*m\x1b\[0m \x1b\[0m)([^\x1b]*)(\x1b\[0m \x1b\[0m[[:space:]]*\x1b\[)([[:digit:];]*)(m[[:digit:]]*\x1b\[)([[:digit:];]*)(.*)$/ {
+            h
+            s/^(\x1b\[[[:digit:];]*m[^\x1b]*\x1b\[[[:digit:];]*m\x1b\[0m \x1b\[0m)([^\x1b]*)(\x1b\[0m \x1b\[0m[[:space:]]*\x1b\[)([[:digit:];]*)(m[[:digit:]]*\x1b\[)([[:digit:];]*)(.*)$/\1\x1b[\4m\2\x1b[\6m\3\4\5\6\7/
+            x
+            s/^(\x1b\[[[:digit:];]*m[^\x1b]*\x1b\[[[:digit:];]*m\x1b\[0m \x1b\[0m)([^\x1b]*)(\x1b\[0m \x1b\[0m[[:space:]]*\x1b\[)([[:digit:];]*)(m[[:digit:]]*\x1b\[)([[:digit:];]*)(.*)$/\4 \6/
+            x
+            n
+            :b
+            /^\x1b\[[[:digit:];]*m[[:space:]]*(Average|Total)\x1b\[[[:digit:];]*m\x1b\[0m \x1b\[0m/ {
+              n
+              b b
+            }
+            /^(\x1b\[[[:digit:];]*m[^\x1b]*\x1b\[[[:digit:];]*m\x1b\[0m \x1b\[0m)([^\x1b]*)(\x1b\[0m \x1b\[0m[[:space:]]*\x1b\[)([[:digit:];]*)(m[[:digit:]]*\x1b\[)([[:digit:];]*)(.*)$/! {
+              G
+              s/^(\x1b\[[[:digit:];]*m[^\x1b]*\x1b\[[[:digit:];]*m\x1b\[0m \x1b\[0m)([^\x1b]*)(\x1b\[0m \x1b\[0m.*)\n([[:digit:];]*) ([[:digit:];]*)$/\1\x1b[\4m\2\x1b[5m\3/
+              n
+              b b
+            }
+            b a
+          }
+        '}}
+
+fi
+
+if [[ $had_errors ]]; then
+  printf \
+    ${opt_color:+'\x1b[33m'}'[%s] %s'${opt_color:+'\x1b[39m'}'\n' \
+    "${BASH_SOURCE##*/}" \
+    'Some files were not files or did not exist. See output above.' >&2
+  exit 1
+fi
+
+if [[ ! $had_matches ]]; then
+  exit 2
+fi

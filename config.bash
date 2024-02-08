@@ -1,0 +1,14 @@
+#opt_search_term=()
+#opt_default_glob='*.srt'
+#opt_verbose=
+#opt_inverse=
+#opt_quiet=
+#opt_regex=
+#opt_match_case=
+#opt_exact_whitespace=
+#opt_stats=
+#opt_stats_headers=1
+#opt_stats_headers_compact=
+#opt_stats_headers_file_numbers=1
+#opt_stats_wrap_filenames=1
+#opt_color=1

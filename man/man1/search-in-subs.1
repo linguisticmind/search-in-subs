@@ -1,0 +1,234 @@
+.TH SEARCH-IN-SUBS 1 2023 SEARCH-IN-SUBS\ 0.1.0
+
+.SH NAME
+search-in-subs \- search for words in subtitle files
+
+.SH SYNOPSIS
+.SY
+\fBsearch-in-subs\fR [<options>] \fB-t\fR <search term> ... [<file> ...]
+.YS
+
+.SH DESCRIPTION
+\fBsearch-in-subs\fR allows the user to search for text in SRT subtitle files. 
+
+At least one search term must be specified to run a search (see \fB-t, --search-term\fR). If no <file> argument is given, a glob pattern set with the \fB-g, --default-glob\fR option is used to match subtitle files.
+
+The built-in value of \fB-g, --default-glob\fR is `*.srt`, which matches all files with the `.srt` extension in the current working directory. That value can be changed to any other glob pattern in the configuration file (see FILES below).
+
+Shell options `nullglob`, `extglob` and `globstar` are enabled internally in \fBsearch-in-subs\fR, so shell globbing can be used to its full capacity when setting \fB-g, --default-glob\fR. For example, to match all `.srt` files in the current working directory recursively, including all of its subdirectories, one could set \fB-g, --default-glob\fR to `**/*.srt`.
+
+\fBsearch-in-subs\fR can also gather statistics on searches that it runs. Try running a search with the \fB-s, --stats\fR option set. For more information, see STATISTICS below.
+
+.SH OPTIONS
+
+.TP
+.B -t, --search-term\fR=<search term>
+Text to search for. Can be a fixed string or a regular expression depending on the \fB-r, --regex\fR / \fB-R, --no-regex\fR options.
+
+At least one search term must be given to perform a search. Setting this option multiple times sets multiple search terms.
+
+.TP
+.B -g, --default-glob\fR=<glob pattern>
+A shell glob pattern to use when no <file> arguments are specified. The default is `*.srt`.
+
+Shell options `nullglob`, `extglob` and `globstar` are enabled internally in \fBsearch-in-subs\fR, thus the default glob pattern is sensitive to those options.  
+
+.TP
+.B -v, --verbose
+Print the filename even if there were no matches found in that file.
+
+.TP
+.B -V, --no-verbose
+Print filenames only for files that had matches. This is the default.
+
+.TP
+.B -i, --inverse
+Only print the names of the files where no matches were found.
+
+.TP
+.B -I, --no-inverse
+Do not supress printing of matches and names of the files where matches were found. This is the default.
+
+.TP
+.B -q, --quiet
+Do not print any matches or filenames. Useful, for example, if one only wishes to see the statistics or the exit code.
+
+.TP
+.B -Q, --no-quiet
+Do not suppress printing of matches or filenames. This is the default.
+
+.TP
+.B -r, --regex
+Use regular expressions instead of fixed strings in <search term>s.
+
+Also see REGULAR EXPESSIONS below.
+
+.TP
+.B -R, --no-regex
+Use fixed strings instead of regular expressions in <search term>s. This is the default.
+
+.TP
+.B -c, --match-case
+Make the search case-sensitive.
+
+.TP
+.B -C, --no-match-case
+Make the search case-insensitive. This is the default.
+
+.TP
+.B -e, --exact-whitespace
+Match whitespace characters exactly as specified in the <search term>.
+
+.TP
+.B -E, --no-exact-whitespace
+Treat all whitespace characters the same during search \- ignoring the type of whitespace character, and how many of them appear in a sequence. This is the default.
+
+Whitespace characters are: space, newline, carriage return, horizontal tab, vertical tab and form feed (POSIX Extended Regular Expressions `[:space:]` character class).
+
+.TP
+.B -s, --stats
+Show match statistics after search.
+
+See STATISTICS below for more information.
+
+.TP
+.B -S, --no-stats
+Do not show match statistics after search. This is the default.
+
+.TP
+.B -h, --stats-headers
+Show headers in the statistics table. This is the default.
+
+.TP
+.B -H, --stats-no-headers
+Do not show headers in the statistics table.
+
+.TP
+.B -m, --stats-headers-compact
+Compactify headers in the statistics table.
+
+.TP
+.B -M, --stats-headers-no-compact
+Do not compactify headers in the statistics table. This is the default.
+
+.TP
+.B -n, --stats-headers-file-numbers
+Show file numbers in the headers of the statistics table. This is the default.
+
+.TP
+.B -N, --stats-headers-no-file-numbers
+Do not show file numbers in the headers of the statistics table.
+
+.TP
+.B -w, --stats-wrap-filenames
+Wrap filenames in the statistics table. This is the default.
+
+The table always fits the width of the terminal screen, but filenames may be printed on multiple lines.
+
+.TP
+.B -W, --stats-no-wrap-filenames
+Do not wrap filenames in the statistics table.
+
+Files are always printed one per row, regardless of whether the table fits the width of the terminal screen.
+
+.TP
+.B --color
+Colorize the output. This is the default.
+
+.TP
+.B --no-color
+Disable colorization of the output.
+
+.TP
+.B --help
+Print help.
+
+.TP
+.B --version
+Print version information.
+
+.SH REGULAR EXPRESSIONS
+
+The regular expressions used are POSIX Extended Regular Expressions as implemented in GNU sed. More information on POSIX Regular Expressions can be found at <https://www.gnu.org/software/grep/manual/html_node/Regular-Expressions.html>.
+
+.SH STATISTICS
+
+If the \fB-s, --stats\fR option is enabled, \fBsearch-in-subs\fR gathers statistics on the search that it performs and displays those statistics in a table at the end of the output.
+
+The \fBMatched\fR, \fBTotal\fR, \fBUnmatched\fR and \fBMatched %\fR columns of that table contain the following data: 
+
+In the file rows: 
+
+.TS
+l l .
+\fBMatched\fR	Number of subtitles in the file that had matches.
+\fBTotal\fR	Total number of subtitles in the file.
+\fBUnmatched\fR	Number of subtitles in the file that did not have matches.
+\fBMatched %\fR	Percentage of subtitles in the file that had matches.
+.TE
+
+In the \fBAverage\fR row: 
+
+.TS
+l l .
+\fBMatched\fR	Average number of subtitles per file that had matches.
+\fBTotal\fR	Average number of subtitles per file.
+\fBUnmatched\fR	Average number of subtitles per file that did not have matches.
+\fBMatched %\fR	Average percentage of subtitles per file that had matches.
+.TE
+
+In the \fBTotal\fR row: 
+
+.TS
+l l .
+\fBMatched\fR	Total number of subtitles in all files that had matches.
+\fBTotal\fR	Total number of subtitles in all files.
+\fBUnmatched\fR	Total number of subtitles in all files that did not have matches.
+\fBMatched %\fR	Total percentage of subtitles in all files that had matches.
+.TE
+
+In the \fBFile\fR column of the \fBTotal\fR row, information is presented in the following format:
+
+\fB<Matched>\fR / \fB<Total>\fR (\fB<Unmatched>\fR) \fB<Matched %>\fR
+
+Where the <placeholder> values represent the following:
+
+.TS
+l l .
+\fB<Matched>\fR	Total number of files that had matches.
+\fB<Total>\fR	Total number of files.
+\fB<Unmatched>\fR	Total number of files that did not have matches.
+\fB<Matched %>\fR	Percentage of files that had matches.
+.TE
+
+
+.SH FILES
+
+A configuration file can be used to set default options.
+
+The configuration file's location is \fI$XDG_CONFIG_HOME/search-in-subs/config.bash\fR. If \fIXDG_CONFIG_HOME\fR is not set, it defaults to \fI~/.config\fR.
+
+.SH EXIT CODES
+
+\fBsearch-in-subs\fR returns the following exit codes:
+
+.TS
+l l .
+\fB0\fR	Success. No errors have occured, and at least one match was found.
+\fB1\fR	An error has occured.
+\fB2\fR	No matches were found (but no errors have occurred). If an error occurs, its exit code takes precedence.
+.TE
+
+.SH AUTHOR
+
+Alex Rogers <https://github.com/linguisticmind>
+
+.SH HOMEPAGE
+
+<https://github.com/linguisticmind/search-in-subs>
+
+.SH COPYRIGHT
+
+Copyright © 2023 Alex Rogers. License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
+
+This is free software: you are free to change and redistribute it. There is NO WARRANTY, to the extent permitted by law.
