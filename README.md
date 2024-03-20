@@ -2,7 +2,32 @@
 
 `search-in-subs` is a Bash script that allows you search for text in SRT subtitle files and gather statistics on the searches it performs.
 
-[![Mindful Technology - search-in-subs: search for words in subtitle files](https://img.youtube.com/vi/hvcq7WZEIC4/0.jpg)](https://www.youtube.com/watch?v=hvcq7WZEIC4)
+[![Mindful Technology - search-in-subs: search for text in subtitle files on the command line](https://img.youtube.com/vi/hvcq7WZEIC4/0.jpg)](https://www.youtube.com/watch?v=hvcq7WZEIC4)
+
+## Changelog
+
+<table>
+    <tr>
+        <th>Version</th>
+        <th>Date</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td>
+            <a href="https://github.com/linguisticmind/search-in-subs/releases/tag/v0.1.1">0.1.1</a>
+        </td>
+        <td>
+           2024-03-20
+        </td>
+        <td>
+            <p>
+                Fixed a bug that prevented the last subtitle in the file from getting included in the search.
+            </p>
+        </td>
+    </tr>
+</table>
+
+[Read more](CHANGELOG.md)
 
 ## Installation
 

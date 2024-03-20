@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-version=0.1.0
+version=0.1.1
 
 function re_esc { <<<"$1" sed -E 's/[](){}<>.*?+|^$/[]/\\&/g'; }
 
@@ -254,11 +254,14 @@ for (( i=1; i<=$#; i++ )); do
           H
           {
             :a
-            n
-            H
-            /^$/! b a
+            $ ! {
+              n
+              H
+              /^$/! b a
+            }
           }
           x
+          s/[^\n]$/\n/
           s/\n+$/\x0/
           h
           s/^([[:digit:]]+\n[[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3} --> [[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3}).*$/'${opt_color:+'\x1b[2m'}'\1'${opt_color:+'\x1b[22m'}'/
