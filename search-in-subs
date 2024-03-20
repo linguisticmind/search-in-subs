@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-version=0.1.1
+version=0.2.0
 
 function re_esc { <<<"$1" sed -E 's/[](){}<>.*?+|^$/[]/\\&/g'; }
 
@@ -25,82 +25,133 @@ getopt -T > /dev/null
 
 help='search-in-subs [<options>] -t <search term> ... [<file> ...]
 
--t, --search-term=<search term>      Text to search for.
+-t, --search-term=<search term>          Text to search for.
 
--g, --default-glob=<glob pattern>    A shell glob pattern to use when no <file> 
-                                     arguments are specified.
+-g, --default-glob=<glob pattern>        A shell glob pattern to use when no 
+                                         <file> arguments are specified.
 
--v, --verbose                        Print the filename even if there were no 
-                                     matches found in that file.
+-v, --verbose                            Print the filename even if there were 
+                                         no matches found in that file.
 
--V, --no-verbose                     Print filenames only for files that had 
-                                     matches.
+-V, --no-verbose                         Print filenames only for files that 
+                                         had matches.
 
--i, --inverse                        Only print the names of the files where no 
-                                     matches were found.
+-i, --inverse                            Only print the names of the files 
+                                         where no matches were found.
 
--I, --no-inverse                     Do not supress printing of matches and 
-                                     names of the files where matches were 
-                                     found.
+-I, --no-inverse                         Do not supress printing of matches and 
+                                         names of the files where matches were 
+                                         found.
 
--q, --quiet                          Do not print any matches or filenames.
+-q, --quiet                              Do not print any matches or filenames.
 
--Q, --no-quiet                       Do not suppress printing of matches or 
-                                     filenames.
+-Q, --no-quiet                           Do not suppress printing of matches or 
+                                         filenames.
 
--r, --regex                          Use regular expressions instead of fixed 
-                                     strings in <search term>s.
+-r, --regex                              Use regular expressions instead of 
+                                         fixed strings in <search term>s.
 
--R, --no-regex                       Use fixed strings instead of regular 
-                                     expressions in <search term>s.
+-R, --no-regex                           Use fixed strings instead of regular 
+                                         expressions in <search term>s.
 
--c, --match-case                     Make the search case-sensitive.
+-c, --match-case                         Make the search case-sensitive.
 
--C, --no-match-case                  Make the search case-insensitive.
+-C, --no-match-case                      Make the search case-insensitive.
 
--e, --exact-whitespace               Match whitespace characters exactly as 
-                                     specified in the <search term>.
+-e, --exact-whitespace                   Match whitespace characters exactly as 
+                                         specified in the <search term>.
 
--E, --no-exact-whitespace            Treat all whitespace characters the same 
-                                     during search - ignoring the type of 
-                                     whitespace character, and how many of them 
-                                     appear in a sequence.
+-E, --no-exact-whitespace                Treat all whitespace characters the 
+                                         same during search - ignoring the type 
+                                         of whitespace character, and how many 
+                                         of them appear in a sequence.
 
--s, --stats                          Show match statistics after search.
+-s, --stats                              Show match statistics after search.
 
--S, --no-stats                       Do not show match statistics after search.
+-S, --no-stats                           Do not show match statistics after 
+                                         search.
 
--h, --stats-headers                  Show headers in the statistics table.
+-h, --stats-headers                      Show headers in the statistics table.
 
--H, --stats-no-headers               Do not show headers in the statistics 
-                                     table.
+-H, --stats-no-headers                   Do not show headers in the statistics 
+                                         table.
 
--m, --stats-headers-compact          Compactify headers in the statistics table.
+-m, --stats-headers-compact              Compactify headers in the statistics 
+                                         table.
 
--M, --stats-headers-no-compact       Do not compactify headers in the 
-                                     statistics table.
+-M, --stats-headers-no-compact           Do not compactify headers in the 
+                                         statistics table.
 
--n, --stats-headers-file-numbers     Show file numbers in the headers of the 
-                                     statistics table.
+-n, --stats-headers-file-numbers         Show file numbers in the headers of 
+                                         the statistics table.
 
--N, --stats-headers-no-file-numbers  Do not show file numbers in the headers of 
-                                     the statistics table.
+-N, --stats-headers-no-file-numbers      Do not show file numbers in the 
+                                         headers of the statistics table.
 
--w, --stats-wrap-filenames           Wrap filenames in the statistics table.
+-w, --stats-wrap-filenames               Wrap filenames in the statistics table.
 
--W, --stats-no-wrap-filenames        Do not wrap filenames in the statistics 
-                                     table.
+-W, --stats-no-wrap-filenames            Do not wrap filenames in the 
+                                         statistics table.
 
---color                              Colorize the output.
+-p, --edl-play                           Play search results in mpv.
 
---no-color                           Disable colorization of the output.
+-P, --edl-no-play                        Do not play search results in mpv.
 
---help                               Print help.
+-k, --edl-play-keep-temporary            Keep temporary EDL files that are 
+                                         created to play search results in mpv.
 
---version                            Print version information.
+-K, --edl-play-no-keep-temporary         Do not keep temporary EDL files that 
+                                         are created to play search results in 
+                                         mpv.
+
+-b, --edl-play-before=<value>            Add a specified amount of time before 
+                                         each segment when generating EDL files.
+
+-a, --edl-play-after=<value>             Add a specified amount of time after 
+                                         each segment when generating EDL files.
+
+-f, --edl-save-files-relative[=<value>]  Save EDL files that use relative paths 
+                                         to refer to source files.
+
+-F, --edl-save-files-absolute[=<value>]  Save EDL files that use absolute paths 
+                                         to refer to source files.
+
+-d, --edl-save-mkdir                     Create the EDL save directory (the 
+                                         <path> value of --edl-save-files-* 
+                                         options) if it does not exist.
+
+-D, --edl-save-no-mkdir                  Do not create the EDL save directory 
+                                         (the <path> value of 
+                                         --edl-save-files-* options) if it does 
+                                         not exist.
+
+-y, --edl-save-overwrite                 Allow overwriting existing files when 
+                                         saving EDL files.
+
+-Y, --edl-save-no-overwrite              Allow overwriting existing files when 
+                                         saving EDL files.
+
+-o, --edl-ignore-missing                 Omit segments with missing videos when 
+                                         generating EDL files.
+
+-O, --edl-no-ignore-missing              Do not omit segments with missing 
+                                         videos when generating EDL files.
+
+-u, --edl-structure=<value>              Determines the structure of the set of 
+                                         generated EDL files.
+
+--mpv-opts=<value>                       Options to mpv player.
+
+--color                                  Colorize the output.
+
+--no-color                               Disable colorization of the output.
+
+--help                                   Print help.
+
+--version                                Print version information.
 '
 
-opts=$(IFS=' ' getopt -n "${BASH_SOURCE##*/}" -o 't:,g:,v,V,i,I,q,Q,r,R,c,C,e,E,s,S,h,H,m,M,n,N,w,W,' -l 'search-term:,default-glob:,verbose,no-verbose,inverse,no-inverse,quiet,no-quiet,regex,no-regex,match-case,no-match-case,exact-whitespace,no-exact-whitespace,stats,no-stats,stats-headers,stats-no-headers,stats-headers-compact,stats-headers-no-compact,stats-headers-file-numbers,stats-headers-no-file-numbers,stats-wrap-filenames,stats-no-wrap-filenames,color,no-color,help,version,' -- "$@")
+opts=$(IFS=' ' getopt -n "${BASH_SOURCE##*/}" -o 't:,g:,v,V,i,I,q,Q,r,R,c,C,e,E,s,S,h,H,m,M,n,N,w,W,p,P,k,K,b:,a:,u:,f::,F::,d,D,y,Y,o,O,' -l 'search-term:,default-glob:,verbose,no-verbose,inverse,no-inverse,quiet,no-quiet,regex,no-regex,match-case,no-match-case,exact-whitespace,no-exact-whitespace,stats,no-stats,stats-headers,stats-no-headers,stats-headers-compact,stats-headers-no-compact,stats-headers-file-numbers,stats-headers-no-file-numbers,stats-wrap-filenames,stats-no-wrap-filenames,edl-play,edl-no-play,edl-play-keep-temporary,edl-play-no-keep-temporary,edl-play-before:,edl-play-after:,edl-structure:,edl-save-files-relative::,edl-save-files-absolute::,edl-save-mkdir,edl-save-no-mkdir,edl-save-overwrite,edl-save-no-overwrite,edl-ignore-missing,edl-no-ignore-missing,mpv-opts:,color,no-color,help,version,' -- "$@")
 
 [[ $? != 0 ]] && exit 1
 
@@ -119,9 +170,33 @@ opt_stats_headers=1
 opt_stats_headers_compact=
 opt_stats_headers_file_numbers=1
 opt_stats_wrap_filenames=1
+opt_edl_play=
+opt_edl_play_keep_temporary=
+opt_edl_play_before=0
+opt_edl_play_after=0
+opt_edl_structure='flat'
+unset opt_edl_save_files_relative
+unset opt_edl_save_files_absolute
+opt_edl_save_mkdir=
+opt_edl_save_overwrite=
+opt_edl_ignore_missing=1
+opt_mpv_opts=()
+opt_mpv_opts_append=1
 opt_color=1
 
-test -f "${XDG_CONFIG_HOME:-$HOME/.config}"/search-in-subs/config.bash && source "$_"
+config_file="${XDG_CONFIG_HOME:-$HOME/.config}"'/search-in-subs/config.bash'
+test -f "$config_file" && source "$_"
+
+if [[ ${opt_edl_save_files_relative+_} && ${opt_edl_save_files_absolute+_} ]]; then
+  printf \
+    ${opt_color:+'\x1b[31m'}'[%s] %s'${opt_color:+'\x1b[39m'}'\n' \
+    "${BASH_SOURCE##*/}" \
+    'Invalid configuration: `opt_edl_save_files_relative` (`-f, --edl-save-files-relative`) and `opt_edl_save_files_absolute` (`-F, --edl-save-files-absolute`) may not be set simultaneously, but both were set in the configuration file ('\'"${config_file//\'/\'\\\'\'}"\''). Please edit the configuration file and adjust the configuration accordingly.' >&2
+  exit 1
+fi
+
+cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}"/search-in-subs
+cache_edl_dir="$cache_dir"'/edl'
 
 while true; do
   case $1 in
@@ -149,6 +224,33 @@ while true; do
     -N | --stats-headers-no-file-numbers ) opt_stats_headers_file_numbers=; shift ;;
     -w | --stats-wrap-filenames ) opt_stats_wrap_filenames=1; shift ;;
     -W | --stats-no-wrap-filenames ) opt_stats_wrap_filenames=; shift ;;
+    -p | --edl-play ) opt_edl_play=1; shift ;;
+    -P | --edl-no-play ) opt_edl_play=; shift ;;
+    -k | --edl-play-keep-temporary ) opt_edl_play_keep_temporary=1; shift ;;
+    -K | --edl-play-no-keep-temporary ) opt_edl_play_keep_temporary=; shift ;;
+    -b | --edl-play-before ) opt_edl_play_before="$2"; shift 2 ;;
+    -a | --edl-play-after ) opt_edl_play_after="$2"; shift 2 ;;
+    -u | --edl-structure ) opt_edl_structure="$2"; shift 2 ;;
+    -f | --edl-save-files-relative ) opt_edl_save_files_relative="$2"; unset opt_edl_save_files_absolute; shift 2 ;;
+    -F | --edl-save-files-absolute ) opt_edl_save_files_absolute="$2"; unset opt_edl_save_files_relative; shift 2 ;;
+    -d | --edl-save-mkdir ) opt_edl_save_mkdir=1; shift ;;
+    -D | --edl-save-no-mkdir ) opt_edl_save_mkdir=; shift ;;
+    -y | --edl-save-overwrite ) opt_edl_save_overwrite=1; shift ;;
+    -Y | --edl-save-no-overwrite ) opt_edl_save_overwrite=; shift ;;
+    -o | --edl-ignore-missing ) opt_edl_ignore_missing=1; shift ;;
+    -O | --edl-no-ignore-missing ) opt_edl_ignore_missing=; shift ;;
+    --mpv-opts )
+      [[ $2 =~ ^(:{0,2})(.*)$ ]]
+      case ${BASH_REMATCH[1]} in
+        : ) opt_mpv_opts_append= ;;
+        :: ) opt_mpv_opts_append=1 ;;
+      esac
+      [[ ! $opt_mpv_opts_append ]] && opt_mpv_opts=()
+      while read -rd '' arg; do
+        opt_mpv_opts+=("$arg")
+      done < <(<<<"${BASH_REMATCH[2]}" xargs printf '%s\0')
+      shift 2
+    ;;
     --color ) opt_color=1; shift ;;
     --no-color ) opt_color=; shift ;;
     --help ) printf '%s\n' "$help"; exit ;;
@@ -159,6 +261,40 @@ while true; do
 done
 
 shopt -s nullglob extglob globstar
+
+edl_name='search_results.edl'
+
+if [[ ${opt_edl_save_files_relative+_} || ${opt_edl_save_files_absolute+_} ]]; then
+
+  edl_save_files="$opt_edl_save_files_relative""$opt_edl_save_files_absolute"
+
+  case $edl_save_files in
+    */*.edl )  edl_path="${edl_save_files%/*}" edl_name="${edl_save_files##*/}" ;;
+    *.edl )                                    edl_name="${edl_save_files##*/}" ;;
+    !(*.edl) ) edl_path="${edl_save_files%/}"                                   ;;
+  esac
+
+  [[ ! $edl_path ]] && edl_path="$PWD"
+
+fi
+
+edl_subdir=
+edl_chapters_in_subdir=
+
+case $opt_edl_structure in
+  flat ) edl_subdir= edl_chapters_in_subdir=;;
+  subdir ) edl_subdir="$edl_name"'.files' edl_chapters_in_subdir=1;;
+  subdir_hidden ) edl_subdir='.'"$edl_name"'.files' edl_chapters_in_subdir=1;;
+  subdir_except_chapters ) edl_subdir="$edl_name"'.files' edl_chapters_in_subdir=;;
+  subdir_hidden_except_chapters ) edl_subdir='.'"$edl_name"'.files' edl_chapters_in_subdir=;;
+  * )
+    printf \
+      ${opt_color:+'\x1b[31m'}'[%s] %s'${opt_color:+'\x1b[39m'}'\n' \
+      "${BASH_SOURCE##*/}" \
+      'Invalid argument to `-u, --edl-structure`: '\'"${opt_edl_structure//\'/\'\\\'\'}"\''. Allowed values are `flat`, `subdir`, `subdir_hidden`, `subdir_except_chapters` and `subdir_hidden_except_chapters`.' >&2
+    exit 1
+  ;;
+esac
 
 if [[ ! $opt_search_term ]]; then
   printf \
@@ -201,7 +337,64 @@ declare -A \
 had_errors=
 had_matches=
 
+function generate_edl_line {
+
+  lua \
+    <(printf '%s\n' '
+
+      filename = arg[1]
+      timecodes_parts = {arg[2]:match("(%d%d):(%d%d):(%d%d),(%d%d%d)%s+%-%->%s+(%d%d):(%d%d):(%d%d),(%d%d%d)")}
+      chapter_title = arg[3]
+      before, after = string.format("%.3f", arg[4]), string.format("%.3f", arg[5])
+      file_duration = arg[6]
+
+      a = timecodes_parts[1] * 3600 + timecodes_parts[2] * 60 + (timecodes_parts[3] .. "." .. timecodes_parts[4]) - before 
+      b = timecodes_parts[5] * 3600 + timecodes_parts[6] * 60 + (timecodes_parts[7] .. "." .. timecodes_parts[8]) + after
+
+      if a < 0 then a = 0 end
+      if file_duration ~= nil and b > tonumber(file_duration) then b = file_duration end
+
+      print(string.format("%%%s%%%s,%s,%s,title=%%%s%%%s", #filename, filename, a, b - a, #chapter_title, chapter_title))
+
+    ') \
+      "$1" "$2" "$3" "$opt_edl_play_before" "$opt_edl_play_after" ${4:+"$4"}
+
+}
+
+function calc_segment_length {
+
+  lua \
+    <(printf '%s\n' '
+
+      timecodes_parts = {arg[1]:match("(%d%d):(%d%d):(%d%d),(%d%d%d)%s+%-%->%s+(%d%d):(%d%d):(%d%d),(%d%d%d)")}
+      before = string.format("%.0f", arg[2] * 1000) 
+      after = string.format("%.0f", arg[3] * 1000)
+      if arg[4] ~= nil then
+        file_duration = string.format("%.0f", arg[4] * 1000)
+      end
+
+      a = ((timecodes_parts[1] * 3600 + timecodes_parts[2] * 60 + timecodes_parts[3]) .. timecodes_parts[4]) - before
+      b = ((timecodes_parts[5] * 3600 + timecodes_parts[6] * 60 + timecodes_parts[7]) .. timecodes_parts[8]) + after
+
+      if a < 0 then a = 0 end
+      if file_duration ~= nil and b > tonumber(file_duration) then b = file_duration end
+
+      print(b - a)
+
+    ') \
+      "$1" "$opt_edl_play_before" "$opt_edl_play_after" ${2:+"$2"}
+
+}
+
+[[ $opt_edl_play && ! (${opt_edl_save_files_relative+_} || ${opt_edl_save_files_absolute+_}) && ! -d "$cache_edl_dir" ]] && mkdir -p "$cache_edl_dir"
+
+missing_video_files=()
+
+chapter_end=0
+
 for (( i=1; i<=$#; i++ )); do
+
+  video_file_missing=
 
   if [[ ! -e "${!i}" ]]; then
     printf \
@@ -228,11 +421,73 @@ for (( i=1; i<=$#; i++ )); do
     stats_number_subtitles_matched[${!i}]=0
   fi
 
+  if [[ ($opt_edl_play || \
+        (${opt_edl_save_files_relative+_} || ${opt_edl_save_files_absolute+_})) ]]; then 
+
+      [[ ${!i} = /* ]] && video_file="${!i}" subtitle_file="${!i}" || video_file="$PWD"'/'"${!i}" subtitle_file="$PWD"'/'"${!i}"
+
+      video_file="${video_file%.srt}"
+      video_file="${video_file%.@(aa|aar|ab|abk|ae|ave|af|afr|ak|aka|am|amh|an|arg|ar|ara|as|asm|av|ava|ay|aym|az|aze|ba|bak|be|bel|bg|bul|bh|bih|bi|bis|bm|bam|bn|ben|bo|tib|bod|tib|br|bre|bs|bos|ca|cat|ce|che|ces|cze|ch|cha|co|cos|cr|cre|cs|cze|cu|chu|cv|chv|cy|wel|cym|wel|da|dan|de|ger|deu|ger|dv|div|dz|dzo|ee|ewe|el|gre|ell|gre|en|eng|eo|epo|es|spa|et|est|eu|baq|eus|baq|fa|per|fas|per|ff|ful|fi|fin|fj|fij|fo|fao|fr|fre|fra|fre|fy|fry|ga|gle|gd|gla|gl|glg|gn|grn|gu|guj|gv|glv|ha|hau|he|heb|hi|hin|ho|hmo|hr|hrv|ht|hat|hu|hun|hy|arm|hye|arm|hz|her|ia|ina|id|ind|ie|ile|ig|ibo|ii|iii|ik|ipk|io|ido|is|ice|isl|ice|it|ita|iu|iku|ja|jpn|jv|jav|ka|geo|kat|geo|kg|kon|ki|kik|kj|kua|kk|kaz|kl|kal|km|khm|kn|kan|ko|kor|kr|kau|ks|kas|ku|kur|kv|kom|kw|cor|ky|kir|la|lat|lb|ltz|lg|lug|li|lim|ln|lin|lo|lao|lt|lit|lu|lub|lv|lav|mg|mlg|mh|mah|mi|mao|mk|mac|mkd|mac|ml|mal|mn|mon|mr|mar|mri|mao|ms|may|msa|may|mt|mlt|my|bur|mya|bur|na|nau|nb|nob|nd|nde|ne|nep|ng|ndo|nl|dut|nld|dut|nn|nno|no|nor|nr|nbl|nv|nav|ny|nya|oc|oci|oj|oji|om|orm|or|ori|os|oss|pa|pan|pi|pli|pl|pol|ps|pus|pt|por|qu|que|rm|roh|rn|run|ro|rum|ron|rum|ru|rus|rw|kin|sa|san|sc|srd|sd|snd|se|sme|sg|sag|si|sin|sk|slo|sl|slv|slk|slo|sm|smo|sn|sna|so|som|sq|alb|sqi|alb|sr|srp|ss|ssw|st|sot|su|sun|sv|swe|sw|swa|ta|tam|te|tel|tg|tgk|th|tha|ti|tir|tk|tuk|tl|tgl|tn|tsn|to|ton|tr|tur|ts|tso|tt|tat|tw|twi|ty|tah|ug|uig|uk|ukr|ur|urd|uz|uzb|ve|ven|vi|vie|vo|vol|wa|wln|wo|wol|xh|xho|yi|yid|yo|yor|za|zha|zh|chi|zho|chi|zu|zul)}"
+
+      candidates=("$video_file"!(?(.*).srt))
+
+      video_files=()
+      audio_files=()
+
+      for candidate in "${candidates[@]}"; do
+        mime_type=$(file --dereference --brief --mime-type "$candidate")
+        case $mime_type in
+          video/* ) video_files+=("$candidate");;
+          audio/* ) audio_files+=("$candidate");;
+        esac
+      done
+
+      if [[ ${#video_files[@]} -gt 0 ]]; then
+        video_file="${video_files[0]}"
+      elif [[ ${#audio_files[@]} -gt 0 ]]; then
+        video_file="${audio_files[0]}"
+      else
+        video_file=
+      fi
+
+      video_file_duration=
+
+      if [[ $video_file ]]; then
+       
+        [[ $opt_edl_play_after != 0 ]] && video_file_duration=$(printf '%.3f' "$(ffprobe -v 'error' -show_entries 'format=duration' -of 'default=noprint_wrappers=1:nokey=1' "$video_file")")
+
+        if [[ ${opt_edl_save_files_relative+_} ]]; then
+          video_file=$(realpath --no-symlinks --relative-to="$edl_path"${edl_subdir:+/"$edl_subdir"} "$video_file")
+          subtitle_file=$(realpath --no-symlinks --relative-to="$edl_path"${edl_subdir:+/"$edl_subdir"} "$subtitle_file")
+        fi
+
+      else
+        missing_video_files+=("${!i}")
+        video_file_missing=1
+      fi
+
+  fi
+
   file_has_matches=
 
   while read -rd '' subtitle; do
 
     had_matches=1
+    
+    if [[ ($opt_edl_play || \
+          (${opt_edl_save_files_relative+_} || ${opt_edl_save_files_absolute+_})) && \
+          ( \
+            ! ($opt_edl_ignore_missing && ${#missing_video_files[@]} -gt 0) || \
+            ! $video_file_missing \
+          ) ]]; then 
+      timecodes=$(<<<"$subtitle" sed -nE '2 { s/\x1b\[[[:digit:];]+m//g; p }')
+      chapter_title=$(<<<"$subtitle" sed -nE '3 { s/\x1b\[[[:digit:];]+m//g; p }')
+      chapter_start="$chapter_end"
+      chapter_end=$((chapter_start + $(calc_segment_length "$timecodes" ${video_file_duration:+"$video_file_duration"})))
+      chapters+=("$(printf '[CHAPTER]\nTIMEBASE=1/1000\nSTART=%s\nEND=%s\ntitle=%s' "$chapter_start" "$chapter_end" "$chapter_title")")
+      video_edl_lines+=("$(generate_edl_line "$video_file" "$timecodes" "$chapter_title" ${video_file_duration:+"$video_file_duration"})")
+      subtitles_edl_lines+=("$(generate_edl_line "$subtitle_file" "$timecodes" "$chapter_title" ${video_file_duration:+"$video_file_duration"})")
+    fi
 
     [[ $opt_stats ]] && ((stats_number_subtitles_matched[${!i}]++))
 
@@ -299,6 +554,111 @@ for (( i=1; i<=$#; i++ )); do
   fi
 
 done
+
+function clear_cache_edl { (shopt -s dotglob; compgen -G "$cache_edl_dir"'/*' > /dev/null && rm -r "$cache_edl_dir"/*) }
+
+if [[ $had_matches && \
+      ($opt_edl_play || \
+      (${opt_edl_save_files_relative+_} || ${opt_edl_save_files_absolute+_})) ]]; then
+
+  if [[ ${#missing_video_files[@]} -gt 0 ]]; then
+    if [[ $opt_edl_ignore_missing ]]; then
+      missing_video_files_warning=1 
+      [[ ${#missing_video_files[@]} = $# ]] && all_video_files_missing_warning=1
+    else
+      missing_video_files_error=1
+    fi
+  fi
+
+  if [[ ! $all_video_files_missing_warning && ! $missing_video_files_error ]]; then
+
+    [[ ${opt_edl_save_files_relative+_} || ${opt_edl_save_files_absolute+_} ]] && edl_dest_dir="$edl_path" || edl_dest_dir="$cache_edl_dir"
+
+    [[ ! (${opt_edl_save_files_relative+_} || ${opt_edl_save_files_absolute+_}) ]] && clear_cache_edl
+
+    if [[ (${opt_edl_save_files_relative+_} || ${opt_edl_save_files_absolute+_}) && \
+          ! -d "$edl_dest_dir" ]]; then
+
+      if [[ $opt_edl_save_mkdir ]]; then
+        mkdir -p "$edl_dest_dir"
+      else
+        printf \
+          ${opt_color:+'\x1b[31m'}'[%s] %s'${opt_color:+'\x1b[39m'}'\n' \
+          "${BASH_SOURCE##*/}" \
+          'EDL save directory '\'"${edl_dest_dir//\'/\'\\\'\'}"\'' does not exist. Make sure to pass a path to an existing directory, or set `-d, --edl-save-mkdir` to create a directory automatically.' >&2
+        exit 1
+      fi
+
+    fi
+
+    edl_main_edl="$edl_dest_dir"'/'"$edl_name"
+    edl_video_edl="$edl_dest_dir"'/'${edl_subdir:+"$edl_subdir"/}"${edl_name%.edl}"'-video.edl'
+    edl_subtitles_edl="$edl_dest_dir"'/'${edl_subdir:+"$edl_subdir"/}"${edl_name%.edl}"'-subtitles.edl'
+    edl_chapters_ffmetadata="$edl_dest_dir"'/'${edl_subdir:+${edl_chapters_in_subdir:+"$edl_subdir"/}}"${edl_name%.edl}"'-chapters.ffmetadata'
+
+    if [[ (${opt_edl_save_files_relative+_} || ${opt_edl_save_files_absolute+_}) && \
+          ! $opt_edl_save_overwrite ]]; then
+
+      existing_files=()
+      
+      for file in "$edl_main_edl" ${edl_subdir:+"$edl_dest_dir"/"$edl_subdir"} "$edl_video_edl" "$edl_subtitles_edl" "$edl_chapters_ffmetadata"; do
+        [[ -e "$file" ]] && existing_files+=("$file")
+      done
+
+      if [[ ${#existing_files[@]} -gt 0 ]]; then
+        printf \
+          ${opt_color:+'\x1b[31m'}'[%s] %s''\n' \
+          "${BASH_SOURCE##*/}" \
+          'The following files already exist:' >&2
+        ls -1d "${existing_files[@]}" >&2
+        printf \
+          '%s'${opt_color:+'\x1b[39m'}'\n' \
+          'Set `-y, --edl-save-overwrite` to overwrite.' >&2
+        exit 1
+      fi
+
+    fi
+
+    [[ $edl_subdir && ! -d "$edl_dest_dir"'/'"$edl_subdir" ]] && mkdir "$edl_dest_dir"'/'"$edl_subdir"
+
+    {
+
+      printf '%s\n\n' '# mpv EDL v0'
+      printf '%s\n' \
+        '!no_chapters' \
+        "$(lua <(printf '%s\n' 'print(string.format("%%%s%%%s", #arg[1], arg[1]))') ${edl_subdir:+"$edl_subdir"/}"${edl_name%.edl}"'-video.edl')" \
+        '!new_stream' \
+        '!no_chapters' \
+        "$(lua <(printf '%s\n' 'print(string.format("%%%s%%%s", #arg[1], arg[1]))') ${edl_subdir:+"$edl_subdir"/}"${edl_name%.edl}"'-subtitles.edl')"
+
+    } > "$edl_main_edl"
+
+    {
+
+      printf '%s\n\n' '# mpv EDL v0'
+      printf '%s\n' "${video_edl_lines[@]}"
+
+    } > "$edl_video_edl"
+
+    {
+
+      printf '%s\n\n' '# mpv EDL v0'
+      printf '%s\n' "${subtitles_edl_lines[@]}"
+
+    } > "$edl_subtitles_edl"
+   
+    {
+    
+      printf '%s\n\n' ';FFMETADATA1'
+      printf '%s\n\n' "${chapters[@]}"
+
+    } > "$edl_chapters_ffmetadata" 
+
+    [[ $opt_edl_play ]] && play_edl=1
+
+  fi
+
+fi
 
 if [[ $opt_stats ]]; then
 
@@ -589,4 +949,48 @@ fi
 
 if [[ ! $had_matches ]]; then
   exit 2
+fi
+
+if [[ $missing_video_files_warning ]]; then
+
+  printf \
+    ${opt_color:+'\x1b[33m'}'[%s] %s''\n' \
+    "${BASH_SOURCE##*/}" \
+    'No video files corresponding to the following subtitle files could be identified:' >&2
+  ls -1d "${missing_video_files[@]}" >&2
+  printf ${opt_color:+'\x1b[39m'} >&2
+
+  if [[ $all_video_files_missing_warning ]]; then
+
+    printf \
+      ${opt_color:+'\x1b[33m'}'[%s] %s'${opt_color:+'\x1b[39m'}'\n' \
+      "${BASH_SOURCE##*/}" \
+      'No EDL files were generated because no video files could be found.' >&2
+
+  fi
+
+fi
+
+if [[ $missing_video_files_error ]]; then
+
+  printf \
+    ${opt_color:+'\x1b[31m'}'[%s] %s''\n' \
+    "${BASH_SOURCE##*/}" \
+    'No video files corresponding to the following subtitle files could be identified:' >&2
+  ls -1d "${missing_video_files[@]}" >&2
+  printf \
+    '%s'${opt_color:+'\x1b[39m'}'\n' \
+    'Set `-o, --edl-ignore-missing` to skip segments with missing video files.' >&2
+  exit 3
+
+fi
+
+if [[ $play_edl ]]; then
+
+  mpv "${opt_mpv_opts[@]}" --chapters-file="$edl_chapters_ffmetadata" "$edl_main_edl"
+
+  if [[ ! $opt_edl_play_keep_temporary ]]; then
+    clear_cache_edl
+  fi
+
 fi

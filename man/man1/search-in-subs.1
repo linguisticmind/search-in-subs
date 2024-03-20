@@ -1,4 +1,4 @@
-.TH SEARCH-IN-SUBS 1 2023 SEARCH-IN-SUBS\ 0.1.1
+.TH SEARCH-IN-SUBS 1 2023 SEARCH-IN-SUBS\ 0.2.0
 
 .SH NAME
 search-in-subs \- search for words in subtitle files
@@ -19,7 +19,40 @@ Shell options `nullglob`, `extglob` and `globstar` are enabled internally in \fB
 
 \fBsearch-in-subs\fR can also gather statistics on searches that it runs. Try running a search with the \fB-s, --stats\fR option set. For more information, see STATISTICS below.
 
+.SS mpv EDL generation
+
+\fBsearch-in-subs\fR can generate EDL files for \fBmpv\fR player, and play the search results using it. To use this functionality, \fBmpv\fR, \fBffmpeg\fR and \fBlua\fR must be installed and available on system's PATH.
+
+In order to generate the EDL files, a video or audio file must exist in the same directory as the subtitle file(s) on which the search is performed. The video or audio file must have the same name as the subtitle file, minus the `.srt` extension and potentially a secondary extension containing a language code, e.g. `.en.srt`. If both video and audio files are found, video files take precedence. If multiple video or audio files are found, the first one will be chosen for use in the generated EDL files.
+
+See \fB--edl-*\fR options below for more information.
+
+More information on mpv EDL format can be found at <https://github.com/mpv-player/mpv/blob/master/DOCS/edl-mpv.rst>.
+
 .SH OPTIONS
+
+Enhanced \fBgetopt\fR syntax applies when passing options. There is one important point to highlight when it comes to passing options with required vs optional arguments.
+
+In case of a short option, if an option takes a *required* argument, the argument may be written as a separate parameter, *or* directly after the option character. If an option takes an *optional* argument, however, the argument *must* be written directly after the option character.
+
+In case of a long option, if an option takes a *required* argument, the argument may be written as a separate parameter, *or* directly after the option name, separated by an equals sign (`=`). If an option takes an *optional* argument, however, the argument *must* be writtent directly after the option name, separated by an equals sign (`=`).
+
+.TS
+tab(|);
+l l l .
+|Short option|Long option
+Required argument|\fB-o\fR <value>|\fB--option\fR <value>
+|\fB-o\fR<value>|\fB--option\fR=<value>
+Optional argument|\fB-o\fR[<value>]|\fB--option\fR[=<value>]
+.TE
+
+Options that take optional arguments can be recognized in the options list below by their <value> and the preceding equals sign being enclosed in square brackets:
+
+.EX
+\fB-o, --option\fR[=<value>]
+.EE
+
+.SS General
 
 .TP
 .B -t, --search-term\fR=<search term>
@@ -85,6 +118,8 @@ Treat all whitespace characters the same during search \- ignoring the type of w
 
 Whitespace characters are: space, newline, carriage return, horizontal tab, vertical tab and form feed (POSIX Extended Regular Expressions `[:space:]` character class).
 
+.SS Statistics
+
 .TP
 .B -s, --stats
 Show match statistics after search.
@@ -130,6 +165,102 @@ The table always fits the width of the terminal screen, but filenames may be pri
 Do not wrap filenames in the statistics table.
 
 Files are always printed one per row, regardless of whether the table fits the width of the terminal screen.
+
+.SS mpv EDL generation
+
+.TP
+.B -p, --edl-play
+Play search results in \fBmpv\fR.
+
+Unless \fB-f, --edl-save-files-relative\fR or \fB-F, --edl-save-files-absolute\fR is used together with this option, temporary EDL files are generated and saved in the cache directory (see FILES for more information). The \fB-k, --edl-keep-temporary\fR and \fB-K, --edl-no-keep-temporary\fR options control whether or the temporary EDL files are deleted or kept after \fBmpv\fR player closes.
+
+If \fB-f, --edl-save-files-relative\fR or \fB-F, --edl-save-files-absolute\fR is used together with \fB-p, --edl-play\fR, then temporary files are not generated and the saved EDL files are played.
+
+.TP
+.B -P, --edl-no-play
+Do not play search results in \fBmpv\fR. This is the default.
+
+.TP
+.B -k, --edl-play-keep-temporary
+Keep temporary EDL files that are created to play search results in \fBmpv\fR.
+
+.TP
+.B -K, --edl-play-no-keep-temporary
+Do not keep temporary EDL files that are created to play search results in \fBmpv\fR. This is the default.
+
+The temporary files are deleted right after \fBmpv\fR player closes.
+
+.TP
+.B -b, --edl-play-before\fR=<value>
+Add a specified amount of time before each segment when generating EDL files. <value> is in seconds. Precise values with a decimal separator are allowed. The default <value> is `0`.
+
+.TP
+.B -a, --edl-play-after\fR=<value>
+Add a specified amount of time after each segment when generating EDL files. <value> is in seconds. Precise values with a decimal separator are allowed. The default <value> is `0`.
+
+.TP
+.B -f, --edl-save-files-relative\fR[={<path>[/]|<path>/<name>.edl|<name>.edl}] \" <value>
+Save EDL files that use relative paths to refer to source files. The default <value> is ``.
+
+If <path> is not given, the EDL files are saved to the current working directory. If <name> is not given, the name `search_results.edl` will be used.
+
+`.edl` extension after <name> is required because it serves to distinguish a directory called "<name>" from a name of an EDL file. To save to a directory whose name ends in `.edl` (without specifying <name>.edl), add a trailing forward slash (`/`) after <path>.
+
+.TP
+.B -F, --edl-save-files-absolute\fR[={<path>[/]|<path>/<name>.edl|<name>.edl}] \" <value>
+Save EDL files that use absolute paths to refer to source files. The default <value> is ``.
+
+See \fB-f, --edl-save-files-relative\fR for information on usage of <path> and <name> values.
+
+.TP
+.B -d, --edl-save-mkdir
+Create the EDL save directory (the <path> value of \fB--edl-save-files-*\fR options) if it does not exist.
+
+.TP
+.B -D, --edl-save-no-mkdir
+Do not create the EDL save directory (the <path> value of \fB--edl-save-files-*\fR options) if it does not exist. This is the default.
+
+.TP
+.B -y, --edl-save-overwrite
+Allow overwriting existing files when saving EDL files.
+
+.TP
+.B -Y, --edl-save-no-overwrite
+Allow overwriting existing files when saving EDL files. This is the default.
+
+.TP
+.B -o, --edl-ignore-missing
+Omit segments with missing videos when generating EDL files. This is the default.
+
+If set, a warning message is shown listing subtitle files for which no corresponding video file could be identified, but EDL files are still generated if at least one relevant video file was able to be found.
+
+.TP
+.B -O, --edl-no-ignore-missing
+Do not omit segments with missing videos when generating EDL files.
+
+If set, an error message is shown listing subtitle files for which no corresponding video file could be identified, In this case, no EDL files are generated, and \fBsearch-in-subs\fR exits with exit code `3`.
+
+.TP
+.B -u, --edl-structure\fR=<value>
+Determines the structure of the set of generated EDL files. <value> can be `flat`, `subdir`, `subdir_hidden`, `subdir_except_chapters` or `subdir_hidden_except_chapters`. The default <value> is `flat`.
+
+.TP
+.B --mpv-opts=[:[:]]<opts>
+Options to \fBmpv\fR player.
+
+<opts> is an option string that follows \fBxargs\fR quoting. It can be preceded by a single colon, double colon, or nothing.
+
+The leading colons control whether <opts> get appended to previously set options, or replace them.
+
+The phrase 'previously set options' refers to either the default value of <opts> set by \fBsearch-in-subs\fR itself (``), or a value set in the configuration file.
+
+When a single colon (`:`) is used, <opts> replace the previously set options.
+
+When a double colon (`::`) is used, <opts> are appended to the previously set options.
+
+When the leading colons are omitted, whether <opts> replace the previously set options, or are appended to them is determined by an *additonal* value that is yet again set either by \fBsearch-in-subs\fR itself (append), or in the configuration file.
+
+.SS Other
 
 .TP
 .B --color
@@ -208,6 +339,10 @@ A configuration file can be used to set default options.
 
 The configuration file's location is \fI$XDG_CONFIG_HOME/search-in-subs/config.bash\fR. If \fIXDG_CONFIG_HOME\fR is not set, it defaults to \fI~/.config\fR.
 
+Temporary EDL files that are generated when using the \fB-p, --edl-play\fR option are stored in a cache directory.
+
+The cache directory's location is \fI$XDG_CACHE_HOME/search-in-subs\fR. If \fIXDG_CACHE_HOME\fR is not set, it defaults to \fI~/.cache\fR.
+
 .SH EXIT CODES
 
 \fBsearch-in-subs\fR returns the following exit codes:
@@ -215,8 +350,9 @@ The configuration file's location is \fI$XDG_CONFIG_HOME/search-in-subs/config.b
 .TS
 l l .
 \fB0\fR	Success. No errors have occured, and at least one match was found.
-\fB1\fR	An error has occured.
-\fB2\fR	No matches were found (but no errors have occurred). If an error occurs, its exit code takes precedence.
+\fB1\fR	A general error has occured.
+\fB2\fR	No matches were found.
+\fB3\fR	EDL generation failed. Can only occur if \fB-O, --edl-no-ignore-missing\fR is set.
 .TE
 
 .SH AUTHOR
