@@ -138,7 +138,7 @@ OPTIONS
               one only wishes to see the statistics or the exit code.
 
        -Q, --no-quiet
-              Do  not  suppress printing of matches or filenames. This is the
+              Do  not  suppress  printing of matches or filenames. This is the
               default.
 
        -r, --regex
@@ -229,8 +229,8 @@ REGULAR EXPRESSIONS
 
 STATISTICS
        If the -s, --stats option is enabled, search-in-subs gathers statistics
-       on  the search that it performs and displays those statistics in a ta‐
-       ble at the end of the output.
+       on the search that it performs and displays those statistics in a table
+       at the end of the output.
 
        The Matched, Total, Unmatched and Matched % columns of that table  con‐
        tain the following data:
@@ -296,7 +296,7 @@ COPYRIGHT
        This  is  free  software:  you  are free to change and redistribute it.
        There is NO WARRANTY, to the extent permitted by law.
 
-SEARCH-IN-SUBS 0.1.0                 2023                    SEARCH-IN-SUBS(1)
+SEARCH-IN-SUBS 0.1.1                 2023                    SEARCH-IN-SUBS(1)
 ```
 
 ## License
