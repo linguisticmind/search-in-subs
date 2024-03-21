@@ -1,4 +1,4 @@
-.TH SEARCH-IN-SUBS 1 2023 SEARCH-IN-SUBS\ 0.2.0
+.TH SEARCH-IN-SUBS 1 2023 SEARCH-IN-SUBS\ 0.2.1
 
 .SH NAME
 search-in-subs \- search for words in subtitle files
@@ -211,6 +211,12 @@ If <path> is not given, the EDL files are saved to the current working directory
 Save EDL files that use absolute paths to refer to source files. The default <value> is ``.
 
 See \fB-f, --edl-save-files-relative\fR for information on usage of <path> and <name> values.
+
+.TP
+.B --edl-no-save-files
+Do not save EDL files, but generate temporary files instead. This is the default.
+
+This option disables \fB-f, --edl-save-files-relative\fR / \fB-F, --edl-save-files-absolute\fR.
 
 .TP
 .B -d, --edl-save-mkdir

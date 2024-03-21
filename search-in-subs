@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-version=0.2.0
+version=0.2.1
 
 function re_esc { <<<"$1" sed -E 's/[](){}<>.*?+|^$/[]/\\&/g'; }
 
@@ -116,6 +116,9 @@ help='search-in-subs [<options>] -t <search term> ... [<file> ...]
 -F, --edl-save-files-absolute[=<value>]  Save EDL files that use absolute paths 
                                          to refer to source files.
 
+--edl-no-save-files                      Do not save EDL files, but generate 
+                                         temporary files instead.
+
 -d, --edl-save-mkdir                     Create the EDL save directory (the 
                                          <path> value of --edl-save-files-* 
                                          options) if it does not exist.
@@ -140,7 +143,7 @@ help='search-in-subs [<options>] -t <search term> ... [<file> ...]
 -u, --edl-structure=<value>              Determines the structure of the set of 
                                          generated EDL files.
 
---mpv-opts=<value>                       Options to mpv player.
+--mpv-opts=[:[:]]<opts>                  Options to mpv player.
 
 --color                                  Colorize the output.
 
@@ -151,7 +154,7 @@ help='search-in-subs [<options>] -t <search term> ... [<file> ...]
 --version                                Print version information.
 '
 
-opts=$(IFS=' ' getopt -n "${BASH_SOURCE##*/}" -o 't:,g:,v,V,i,I,q,Q,r,R,c,C,e,E,s,S,h,H,m,M,n,N,w,W,p,P,k,K,b:,a:,u:,f::,F::,d,D,y,Y,o,O,' -l 'search-term:,default-glob:,verbose,no-verbose,inverse,no-inverse,quiet,no-quiet,regex,no-regex,match-case,no-match-case,exact-whitespace,no-exact-whitespace,stats,no-stats,stats-headers,stats-no-headers,stats-headers-compact,stats-headers-no-compact,stats-headers-file-numbers,stats-headers-no-file-numbers,stats-wrap-filenames,stats-no-wrap-filenames,edl-play,edl-no-play,edl-play-keep-temporary,edl-play-no-keep-temporary,edl-play-before:,edl-play-after:,edl-structure:,edl-save-files-relative::,edl-save-files-absolute::,edl-save-mkdir,edl-save-no-mkdir,edl-save-overwrite,edl-save-no-overwrite,edl-ignore-missing,edl-no-ignore-missing,mpv-opts:,color,no-color,help,version,' -- "$@")
+opts=$(IFS=' ' getopt -n "${BASH_SOURCE##*/}" -o 't:,g:,v,V,i,I,q,Q,r,R,c,C,e,E,s,S,h,H,m,M,n,N,w,W,p,P,k,K,b:,a:,u:,f::,F::,d,D,y,Y,o,O,' -l 'search-term:,default-glob:,verbose,no-verbose,inverse,no-inverse,quiet,no-quiet,regex,no-regex,match-case,no-match-case,exact-whitespace,no-exact-whitespace,stats,no-stats,stats-headers,stats-no-headers,stats-headers-compact,stats-headers-no-compact,stats-headers-file-numbers,stats-headers-no-file-numbers,stats-wrap-filenames,stats-no-wrap-filenames,edl-play,edl-no-play,edl-play-keep-temporary,edl-play-no-keep-temporary,edl-play-before:,edl-play-after:,edl-structure:,edl-save-files-relative::,edl-save-files-absolute::,edl-no-save-files,edl-save-mkdir,edl-save-no-mkdir,edl-save-overwrite,edl-save-no-overwrite,edl-ignore-missing,edl-no-ignore-missing,mpv-opts:,color,no-color,help,version,' -- "$@")
 
 [[ $? != 0 ]] && exit 1
 
@@ -233,6 +236,7 @@ while true; do
     -u | --edl-structure ) opt_edl_structure="$2"; shift 2 ;;
     -f | --edl-save-files-relative ) opt_edl_save_files_relative="$2"; unset opt_edl_save_files_absolute; shift 2 ;;
     -F | --edl-save-files-absolute ) opt_edl_save_files_absolute="$2"; unset opt_edl_save_files_relative; shift 2 ;;
+    --edl-no-save-files ) unset opt_edl_save_files_absolute opt_edl_save_files_relative; shift ;;
     -d | --edl-save-mkdir ) opt_edl_save_mkdir=1; shift ;;
     -D | --edl-save-no-mkdir ) opt_edl_save_mkdir=; shift ;;
     -y | --edl-save-overwrite ) opt_edl_save_overwrite=1; shift ;;
@@ -989,7 +993,8 @@ if [[ $play_edl ]]; then
 
   mpv "${opt_mpv_opts[@]}" --chapters-file="$edl_chapters_ffmetadata" "$edl_main_edl"
 
-  if [[ ! $opt_edl_play_keep_temporary ]]; then
+  if [[ ! (${opt_edl_save_files_relative+_} || ${opt_edl_save_files_absolute+_}) && \
+        ! $opt_edl_play_keep_temporary ]]; then
     clear_cache_edl
   fi
 

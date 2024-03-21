@@ -39,14 +39,17 @@ Video tutorials:
     </tr>
     <tr>
         <td>
-            <a href="https://github.com/linguisticmind/search-in-subs/releases/tag/v0.2.0">0.2.0</a>
+            <a href="https://github.com/linguisticmind/search-in-subs/releases/tag/v0.2.1">0.2.1</a>
         </td>
         <td>
-           2024-03-20 
+           2024-03-21
         </td>
         <td>
             <p>
-                Added mpv integration.
+                Added `--edl-no-save-files`.
+            </p>
+            <p>
+                Fixed a bug where `search-in-subs` attempted to clear cache while using a `--edl-save-files-*` option. This also resulted in an erroneous exit code.
             </p>
         </td>
     </tr>
@@ -355,6 +358,13 @@ OPTIONS
               See -f, --edl-save-files-relative for information  on  usage  of
               <path> and <name> values.
 
+       --edl-no-save-files
+              Do  not  save  EDL  files, but generate temporary files instead.
+              This is the default.
+
+              This option disables -f, --edl-save-files-relative / -F,  --edl-
+              save-files-absolute.
+
        -d, --edl-save-mkdir
               Create  the  EDL save directory (the <path> value of --edl-save-
               files-* options) if it does not exist.
@@ -447,6 +457,7 @@ STATISTICS
        In the file rows:
 
        Matched     Number of subtitles in the file that had matches.
+
        Total       Total number of subtitles in the file.
        Unmatched   Number of subtitles in the file that did not have matches.
        Matched %   Percentage of subtitles in the file that had matches.
@@ -511,7 +522,7 @@ COPYRIGHT
        This is free software: you are free  to  change  and  redistribute  it.
        There is NO WARRANTY, to the extent permitted by law.
 
-SEARCH-IN-SUBS 0.2.0                 2023                    SEARCH-IN-SUBS(1)
+SEARCH-IN-SUBS 0.2.1                 2023                    SEARCH-IN-SUBS(1)
 ```
 
 ## License
