@@ -15,10 +15,10 @@
         </td>
         <td>
             <p>
-                Added `--edl-no-save-files`.
+                Added <code>--edl-no-save-files</code>.
             </p>
             <p>
-                Fixed a bug where `search-in-subs` attempted to clear cache while using a `--edl-save-files-*` option. This also resulted in an erroneous exit code.
+                Fixed a bug where <code>search-in-subs</code> attempted to clear cache while using a <code>--edl-save-files-&ast;</code> option. This also resulted in an erroneous exit code.
             </p>
         </td>
     </tr>
