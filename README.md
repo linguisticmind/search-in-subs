@@ -39,17 +39,14 @@ Video tutorials:
     </tr>
     <tr>
         <td>
-            <a href="https://github.com/linguisticmind/search-in-subs/releases/tag/v0.2.1">0.2.1</a>
+            <a href="https://github.com/linguisticmind/search-in-subs/releases/tag/v0.2.2">0.2.2</a>
         </td>
         <td>
-           2024-03-21
+           2024-03-22
         </td>
         <td>
             <p>
-                Added <code>--edl-no-save-files</code>.
-            </p>
-            <p>
-                Fixed a bug where <code>search-in-subs</code> attempted to clear cache while using a <code>--edl-save-files-&ast;</code> option. This also resulted in an erroneous exit code.
+                Improved <code>lua</code> binary identification. <code>lua5.4</code> is now preferred, <code>lua</code> becoming a fallback.
             </p>
         </td>
     </tr>
@@ -59,7 +56,11 @@ Video tutorials:
 
 ## Dependencies
 
-`search-in-subs` requires that [`mpv`](https://mpv.io/), [`ffmpeg`](https://ffmpeg.org/) and [`lua`](https://www.lua.org/) be installed to use [mpv EDL](https://github.com/mpv-player/mpv/blob/master/DOCS/edl-mpv.rst) generation functionality.
+`search-in-subs` requires that [`mpv`](https://mpv.io/), [`ffmpeg`](https://ffmpeg.org/) and [`lua`](https://www.lua.org/) (v5.4) be installed to use [mpv EDL](https://github.com/mpv-player/mpv/blob/master/DOCS/edl-mpv.rst) generation functionality.
+
+On Debian, run `sudo apt install mpv ffmpeg lua5.4` to install these dependencies.
+
+`lua` 5.4 is the version of `lua` that `search-in-subs` was tested with. `search-in-subs` first checks `PATH` for a binary called `lua5.4`, and if that is not available, it uses `lua` as a fallback binary name.
 
 `search-in-subs` was written and tested on Debian 12, and takes advantage of standard utilities that come with the system. In order to run `search-in-subs` on other systems, make sure that the following are installed and available on system's `PATH`:
 
@@ -144,7 +145,7 @@ DESCRIPTION
    mpv EDL generation
        search-in-subs can generate EDL files for  mpv  player,  and  play  the
        search results using it. To use this functionality, mpv, ffmpeg and lua
-       must be installed and available on system's PATH.
+       (v5.4) must be installed and available on system's PATH.
 
        In order to generate the EDL files, a video or audio file must exist in
        the  same directory as the subtitle file(s) on which the search is per‐

@@ -8,6 +8,19 @@
     </tr>
     <tr>
         <td>
+            <a href="https://github.com/linguisticmind/search-in-subs/releases/tag/v0.2.2">0.2.2</a>
+        </td>
+        <td>
+           2024-03-22
+        </td>
+        <td>
+            <p>
+                Improved <code>lua</code> binary identification. <code>lua5.4</code> is now preferred, <code>lua</code> becoming a fallback.
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
             <a href="https://github.com/linguisticmind/search-in-subs/releases/tag/v0.2.1">0.2.1</a>
         </td>
         <td>
@@ -18,7 +31,7 @@
                 Added <code>--edl-no-save-files</code>.
             </p>
             <p>
-                Fixed a bug where <code>search-in-subs</code> attempted to clear cache while using a <code>--edl-save-files-&ast;</code> option. This also resulted in an erroneous exit code.
+                Fixed a bug where <code>search-in-subs</code> attempted to clear cache while using an <code>--edl-save-files-&ast;</code> option. This also resulted in an erroneous exit code.
             </p>
         </td>
     </tr>

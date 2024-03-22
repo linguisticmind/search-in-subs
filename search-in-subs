@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-version=0.2.1
+version=0.2.2
 
 function re_esc { <<<"$1" sed -E 's/[](){}<>.*?+|^$/[]/\\&/g'; }
 
@@ -341,9 +341,11 @@ declare -A \
 had_errors=
 had_matches=
 
+type -P 'lua5.4' > /dev/null && lua_bin='lua5.4' || lua_bin='lua'
+
 function generate_edl_line {
 
-  lua \
+  "$lua_bin" \
     <(printf '%s\n' '
 
       filename = arg[1]
@@ -367,7 +369,7 @@ function generate_edl_line {
 
 function calc_segment_length {
 
-  lua \
+  "$lua_bin" \
     <(printf '%s\n' '
 
       timecodes_parts = {arg[1]:match("(%d%d):(%d%d):(%d%d),(%d%d%d)%s+%-%->%s+(%d%d):(%d%d):(%d%d),(%d%d%d)")}
@@ -630,10 +632,10 @@ if [[ $had_matches && \
       printf '%s\n\n' '# mpv EDL v0'
       printf '%s\n' \
         '!no_chapters' \
-        "$(lua <(printf '%s\n' 'print(string.format("%%%s%%%s", #arg[1], arg[1]))') ${edl_subdir:+"$edl_subdir"/}"${edl_name%.edl}"'-video.edl')" \
+        "$("$lua_bin" <(printf '%s\n' 'print(string.format("%%%s%%%s", #arg[1], arg[1]))') ${edl_subdir:+"$edl_subdir"/}"${edl_name%.edl}"'-video.edl')" \
         '!new_stream' \
         '!no_chapters' \
-        "$(lua <(printf '%s\n' 'print(string.format("%%%s%%%s", #arg[1], arg[1]))') ${edl_subdir:+"$edl_subdir"/}"${edl_name%.edl}"'-subtitles.edl')"
+        "$("$lua_bin" <(printf '%s\n' 'print(string.format("%%%s%%%s", #arg[1], arg[1]))') ${edl_subdir:+"$edl_subdir"/}"${edl_name%.edl}"'-subtitles.edl')"
 
     } > "$edl_main_edl"
 

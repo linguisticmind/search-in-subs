@@ -1,4 +1,4 @@
-.TH SEARCH-IN-SUBS 1 2023 SEARCH-IN-SUBS\ 0.2.1
+.TH SEARCH-IN-SUBS 1 2023 SEARCH-IN-SUBS\ 0.2.2
 
 .SH NAME
 search-in-subs \- search for words in subtitle files
@@ -21,7 +21,7 @@ Shell options `nullglob`, `extglob` and `globstar` are enabled internally in \fB
 
 .SS mpv EDL generation
 
-\fBsearch-in-subs\fR can generate EDL files for \fBmpv\fR player, and play the search results using it. To use this functionality, \fBmpv\fR, \fBffmpeg\fR and \fBlua\fR must be installed and available on system's PATH.
+\fBsearch-in-subs\fR can generate EDL files for \fBmpv\fR player, and play the search results using it. To use this functionality, \fBmpv\fR, \fBffmpeg\fR and \fBlua\fR (v5.4) must be installed and available on system's PATH.
 
 In order to generate the EDL files, a video or audio file must exist in the same directory as the subtitle file(s) on which the search is performed. The video or audio file must have the same name as the subtitle file, minus the `.srt` extension and potentially a secondary extension containing a language code, e.g. `.en.srt`. If both video and audio files are found, video files take precedence. If multiple video or audio files are found, the first one will be chosen for use in the generated EDL files.
 
