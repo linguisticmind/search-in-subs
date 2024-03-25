@@ -42,7 +42,7 @@ Video tutorials:
             <a href="https://github.com/linguisticmind/search-in-subs/releases/tag/v0.2.3">0.2.3</a>
         </td>
         <td>
-           -
+           2024-03-25
         </td>
         <td>
             <p>
