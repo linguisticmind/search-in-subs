@@ -8,6 +8,19 @@
     </tr>
     <tr>
         <td>
+            <a href="https://github.com/linguisticmind/search-in-subs/releases/tag/v0.2.3">0.2.3</a>
+        </td>
+        <td>
+           -
+        </td>
+        <td>
+            <p>
+                Now, if a directory is passed as an argument to <code>search-in-subs</code>, files matching the default glob pattern in that directory are added to the search.
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
             <a href="https://github.com/linguisticmind/search-in-subs/releases/tag/v0.2.2">0.2.2</a>
         </td>
         <td>

@@ -39,14 +39,14 @@ Video tutorials:
     </tr>
     <tr>
         <td>
-            <a href="https://github.com/linguisticmind/search-in-subs/releases/tag/v0.2.2">0.2.2</a>
+            <a href="https://github.com/linguisticmind/search-in-subs/releases/tag/v0.2.3">0.2.3</a>
         </td>
         <td>
-           2024-03-22
+           -
         </td>
         <td>
             <p>
-                Improved <code>lua</code> binary identification. <code>lua5.4</code> is now preferred, <code>lua</code> becoming a fallback.
+                Now, if a directory is passed as an argument to <code>search-in-subs</code>, files matching the default glob pattern in that directory are added to the search.
             </p>
         </td>
     </tr>
@@ -116,15 +116,17 @@ NAME
        search-in-subs - search for words in subtitle files
 
 SYNOPSIS
-        search-in-subs [<options>] -t <search term> ... [<file> ...]
+        search-in-subs [<options>] -t <search term> ... [<file|dir> ...]
 
 DESCRIPTION
        search-in-subs  allows  the  user  to  search  for text in SRT subtitle
        files.
 
        At least one search term must be specified to run  a  search  (see  -t,
-       --search-term). If no <file> argument is given, a glob pattern set with
-       the -g, --default-glob option is used to match subtitle files.
+       --search-term).  If no <file|dir> argument is given, a glob pattern set
+       with the -g, --default-glob option is used to match subtitle files.  If
+       a  <file|dir>  argument is a directory, files matching the default glob
+       pattern in that directory are added to the search.
 
        The built-in value of -g, --default-glob is `*.srt`, which matches  all
        files  with the `.srt` extension in the current working directory. That
@@ -198,15 +200,16 @@ OPTIONS
               ting this option multiple times sets multiple search terms.
 
        -g, --default-glob=<glob pattern>
-              A shell glob pattern to use when no <file> arguments are  speci‐
-              fied. The default is `*.srt`.
+              A shell glob pattern to use when  no  <file|dir>  arguments  are
+              specified, or when a <file|dir> argument is a directory. The de‐
+              fault is `*.srt`.
 
-              Shell  options  `nullglob`, `extglob` and `globstar` are enabled
-              internally in search-in-subs, thus the default glob  pattern  is
+              Shell options `nullglob`, `extglob` and `globstar`  are  enabled
+              internally  in  search-in-subs, thus the default glob pattern is
               sensitive to those options.
 
        -v, --verbose
-              Print  the  filename even if there were no matches found in that
+              Print the filename even if there were no matches found  in  that
               file.
 
        -V, --no-verbose
@@ -217,25 +220,25 @@ OPTIONS
               Only print the names of the files where no matches were found.
 
        -I, --no-inverse
-              Do  not supress printing of matches and names of the files where
+              Do not supress printing of matches and names of the files  where
               matches were found. This is the default.
 
        -q, --quiet
-              Do not print any matches or filenames. Useful, for  example,  if
+              Do  not  print any matches or filenames. Useful, for example, if
               one only wishes to see the statistics or the exit code.
 
        -Q, --no-quiet
-              Do  not  suppress  printing of matches or filenames. This is the
+              Do not suppress printing of matches or filenames.  This  is  the
               default.
 
        -r, --regex
-              Use regular expressions instead  of  fixed  strings  in  <search
+              Use  regular  expressions  instead  of  fixed strings in <search
               term>s.
 
               Also see REGULAR EXPESSIONS below.
 
        -R, --no-regex
-              Use  fixed  strings  instead  of  regular expressions in <search
+              Use fixed strings instead  of  regular  expressions  in  <search
               term>s. This is the default.
 
        -c, --match-case
@@ -245,16 +248,16 @@ OPTIONS
               Make the search case-insensitive. This is the default.
 
        -e, --exact-whitespace
-              Match whitespace characters exactly as specified in the  <search
+              Match  whitespace characters exactly as specified in the <search
               term>.
 
        -E, --no-exact-whitespace
-              Treat  all whitespace characters the same during search - ignor‐
-              ing the type of whitespace character, and how many of  them  ap‐
+              Treat all whitespace characters the same during search -  ignor‐
+              ing  the  type of whitespace character, and how many of them ap‐
               pear in a sequence. This is the default.
 
               Whitespace characters are: space, newline, carriage return, hor‐
-              izontal tab, vertical tab and form feed (POSIX Extended  Regular
+              izontal  tab, vertical tab and form feed (POSIX Extended Regular
               Expressions `[:space:]` character class).
 
    Statistics
@@ -276,11 +279,11 @@ OPTIONS
               Compactify headers in the statistics table.
 
        -M, --stats-headers-no-compact
-              Do  not  compactify headers in the statistics table. This is the
+              Do not compactify headers in the statistics table. This  is  the
               default.
 
        -n, --stats-headers-file-numbers
-              Show file numbers in the headers of the statistics  table.  This
+              Show  file  numbers in the headers of the statistics table. This
               is the default.
 
        -N, --stats-headers-no-file-numbers
@@ -289,13 +292,13 @@ OPTIONS
        -w, --stats-wrap-filenames
               Wrap filenames in the statistics table. This is the default.
 
-              The  table  always  fits  the  width of the terminal screen, but
+              The table always fits the width  of  the  terminal  screen,  but
               filenames may be printed on multiple lines.
 
        -W, --stats-no-wrap-filenames
               Do not wrap filenames in the statistics table.
 
-              Files are always printed one per row, regardless of whether  the
+              Files  are always printed one per row, regardless of whether the
               table fits the width of the terminal screen.
 
    mpv EDL generation
@@ -303,14 +306,14 @@ OPTIONS
               Play search results in mpv.
 
               Unless -f, --edl-save-files-relative or -F, --edl-save-files-ab‐
-              solute is used together with this option,  temporary  EDL  files
-              are  generated  and  saved in the cache directory (see FILES for
-              more information). The -k, --edl-keep-temporary and  -K,  --edl-
-              no-keep-temporary  options  control whether or the temporary EDL
+              solute  is  used  together with this option, temporary EDL files
+              are generated and saved in the cache directory  (see  FILES  for
+              more  information).  The -k, --edl-keep-temporary and -K, --edl-
+              no-keep-temporary options control whether or the  temporary  EDL
               files are deleted or kept after mpv player closes.
 
-              If -f, --edl-save-files-relative or  -F,  --edl-save-files-abso‐
-              lute  is used together with -p, --edl-play, then temporary files
+              If  -f,  --edl-save-files-relative or -F, --edl-save-files-abso‐
+              lute is used together with -p, --edl-play, then temporary  files
               are not generated and the saved EDL files are played.
 
        -P, --edl-no-play
@@ -321,7 +324,7 @@ OPTIONS
               in mpv.
 
        -K, --edl-play-no-keep-temporary
-              Do  not keep temporary EDL files that are created to play search
+              Do not keep temporary EDL files that are created to play  search
               results in mpv. This is the default.
 
               The temporary files are deleted right after mpv player closes.
@@ -332,7 +335,7 @@ OPTIONS
               imal separator are allowed. The default <value> is `0`.
 
        -a, --edl-play-after=<value>
-              Add a specified amount of time after each segment when  generat‐
+              Add  a specified amount of time after each segment when generat‐
               ing EDL files. <value> is in seconds. Precise values with a dec‐
               imal separator are allowed. The default <value> is `0`.
 
@@ -341,13 +344,13 @@ OPTIONS
               Save EDL files that use relative paths to refer to source files.
               The default <value> is ``.
 
-              If <path> is not given, the EDL files are saved to  the  current
-              working  directory. If <name> is not given, the name `search_re‐
+              If  <path>  is not given, the EDL files are saved to the current
+              working directory. If <name> is not given, the name  `search_re‐
               sults.edl` will be used.
 
-              `.edl` extension after <name> is required because it  serves  to
-              distinguish  a  directory  called "<name>" from a name of an EDL
-              file. To save to a directory whose name ends in `.edl`  (without
+              `.edl`  extension  after <name> is required because it serves to
+              distinguish a directory called "<name>" from a name  of  an  EDL
+              file.  To save to a directory whose name ends in `.edl` (without
               specifying <name>.edl), add a trailing forward slash (`/`) after
               <path>.
 
@@ -356,18 +359,18 @@ OPTIONS
               Save EDL files that use absolute paths to refer to source files.
               The default <value> is ``.
 
-              See -f, --edl-save-files-relative for information  on  usage  of
+              See  -f,  --edl-save-files-relative  for information on usage of
               <path> and <name> values.
 
        --edl-no-save-files
-              Do  not  save  EDL  files, but generate temporary files instead.
+              Do not save EDL files, but  generate  temporary  files  instead.
               This is the default.
 
-              This option disables -f, --edl-save-files-relative / -F,  --edl-
+              This  option disables -f, --edl-save-files-relative / -F, --edl-
               save-files-absolute.
 
        -d, --edl-save-mkdir
-              Create  the  EDL save directory (the <path> value of --edl-save-
+              Create the EDL save directory (the <path> value  of  --edl-save-
               files-* options) if it does not exist.
 
        -D, --edl-save-no-mkdir
@@ -378,31 +381,31 @@ OPTIONS
               Allow overwriting existing files when saving EDL files.
 
        -Y, --edl-save-no-overwrite
-              Allow  overwriting existing files when saving EDL files. This is
+              Allow overwriting existing files when saving EDL files. This  is
               the default.
 
        -o, --edl-ignore-missing
-              Omit segments with missing videos  when  generating  EDL  files.
+              Omit  segments  with  missing  videos when generating EDL files.
               This is the default.
 
-              If  set,  a  warning message is shown listing subtitle files for
-              which no corresponding video file could be identified,  but  EDL
-              files  are  still  generated if at least one relevant video file
+              If set, a warning message is shown listing  subtitle  files  for
+              which  no  corresponding video file could be identified, but EDL
+              files are still generated if at least one  relevant  video  file
               was able to be found.
 
        -O, --edl-no-ignore-missing
-              Do not omit segments with missing  videos  when  generating  EDL
+              Do  not  omit  segments  with missing videos when generating EDL
               files.
 
-              If  set,  an  error  message is shown listing subtitle files for
-              which no corresponding video file could be identified,  In  this
-              case,  no EDL files are generated, and search-in-subs exits with
+              If set, an error message is shown  listing  subtitle  files  for
+              which  no  corresponding video file could be identified, In this
+              case, no EDL files are generated, and search-in-subs exits  with
               exit code `3`.
 
        -u, --edl-structure=<value>
-              Determines the structure of the  set  of  generated  EDL  files.
-              <value>  can  be  `flat`, `subdir`, `subdir_hidden`, `subdir_ex‐
-              cept_chapters` or `subdir_hidden_except_chapters`.  The  default
+              Determines  the  structure  of  the  set of generated EDL files.
+              <value> can be `flat`,  `subdir`,  `subdir_hidden`,  `subdir_ex‐
+              cept_chapters`  or  `subdir_hidden_except_chapters`. The default
               <value> is `flat`.
 
        --mpv-opts=[:[:]]<opts>
@@ -415,18 +418,18 @@ OPTIONS
               ously set options, or replace them.
 
               The phrase 'previously set options' refers to either the default
-              value of <opts> set by search-in-subs itself (``),  or  a  value
+              value  of  <opts>  set by search-in-subs itself (``), or a value
               set in the configuration file.
 
               When a single colon (`:`) is used, <opts> replace the previously
               set options.
 
-              When a double colon (`::`) is used, <opts> are appended  to  the
+              When  a  double colon (`::`) is used, <opts> are appended to the
               previously set options.
 
-              When  the leading colons are omitted, whether <opts> replace the
+              When the leading colons are omitted, whether <opts> replace  the
               previously set options, or are appended to them is determined by
-              an  *additonal* value that is yet again set either by search-in-
+              an *additonal* value that is yet again set either by  search-in-
               subs itself (append), or in the configuration file.
 
    Other
@@ -442,8 +445,8 @@ OPTIONS
               Print version information.
 
 REGULAR EXPRESSIONS
-       The regular expressions used are POSIX Extended Regular Expressions  as
-       implemented  in  GNU sed. More information on POSIX Regular Expressions
+       The  regular expressions used are POSIX Extended Regular Expressions as
+       implemented in GNU sed. More information on POSIX  Regular  Expressions
        can     be     found     at     <https://www.gnu.org/software/grep/man‐
        ual/html_node/Regular-Expressions.html>.
 
@@ -452,13 +455,12 @@ STATISTICS
        on the search that it performs and displays those statistics in a table
        at the end of the output.
 
-       The  Matched, Total, Unmatched and Matched % columns of that table con‐
+       The Matched, Total, Unmatched and Matched % columns of that table  con‐
        tain the following data:
 
        In the file rows:
 
        Matched     Number of subtitles in the file that had matches.
-
        Total       Total number of subtitles in the file.
        Unmatched   Number of subtitles in the file that did not have matches.
        Matched %   Percentage of subtitles in the file that had matches.
@@ -477,7 +479,7 @@ STATISTICS
        Unmatched   Total number of subtitles in all files that did not have matches.
        Matched %   Total percentage of subtitles in all files that had matches.
 
-       In the File column of the Total row, information is  presented  in  the
+       In  the  File  column of the Total row, information is presented in the
        following format:
 
        <Matched> / <Total> (<Unmatched>) <Matched %>
@@ -492,14 +494,14 @@ STATISTICS
 FILES
        A configuration file can be used to set default options.
 
-       The   configuration   file's  location  is  $XDG_CONFIG_HOME/search-in-
+       The  configuration  file's  location   is   $XDG_CONFIG_HOME/search-in-
        subs/config.bash. If XDG_CONFIG_HOME is not set, it defaults to ~/.con‐
        fig.
 
-       Temporary  EDL  files  that are generated when using the -p, --edl-play
+       Temporary EDL files that are generated when using  the  -p,  --edl-play
        option are stored in a cache directory.
 
-       The cache directory's location  is  $XDG_CACHE_HOME/search-in-subs.  If
+       The  cache  directory's  location is $XDG_CACHE_HOME/search-in-subs. If
        XDG_CACHE_HOME is not set, it defaults to ~/.cache.
 
 EXIT CODES
@@ -517,13 +519,13 @@ HOMEPAGE
        <https://github.com/linguisticmind/search-in-subs>
 
 COPYRIGHT
-       Copyright  ©  2023  Alex  Rogers.  License GPLv3+: GNU GPL version 3 or
+       Copyright © 2023 Alex Rogers. License GPLv3+:  GNU  GPL  version  3  or
        later <https://gnu.org/licenses/gpl.html>.
 
-       This is free software: you are free  to  change  and  redistribute  it.
+       This  is  free  software:  you  are free to change and redistribute it.
        There is NO WARRANTY, to the extent permitted by law.
 
-SEARCH-IN-SUBS 0.2.1                 2023                    SEARCH-IN-SUBS(1)
+SEARCH-IN-SUBS 0.2.2                 2024                    SEARCH-IN-SUBS(1)
 ```
 
 ## License

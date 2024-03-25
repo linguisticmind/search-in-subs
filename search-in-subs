@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # search-in-subs - search for words in subtitle files
-# copyright (c) 2023  Alex Rogers (https://github.com/linguisticmind)
+# copyright (c) 2024  Alex Rogers (https://github.com/linguisticmind)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-version=0.2.2
+version=0.2.3
 
 function re_esc { <<<"$1" sed -E 's/[](){}<>.*?+|^$/[]/\\&/g'; }
 
@@ -399,6 +399,8 @@ missing_video_files=()
 chapter_end=0
 
 for (( i=1; i<=$#; i++ )); do
+
+  [[ -d "${!i}" ]] && set -- "${@:1:$((i - 1))}" "${!i%+(/)}"/$opt_default_glob "${@:$((i + 1))}"
 
   video_file_missing=
 

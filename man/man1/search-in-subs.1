@@ -1,17 +1,17 @@
-.TH SEARCH-IN-SUBS 1 2023 SEARCH-IN-SUBS\ 0.2.2
+.TH SEARCH-IN-SUBS 1 2024 SEARCH-IN-SUBS\ 0.2.3
 
 .SH NAME
 search-in-subs \- search for words in subtitle files
 
 .SH SYNOPSIS
 .SY
-\fBsearch-in-subs\fR [<options>] \fB-t\fR <search term> ... [<file> ...]
+\fBsearch-in-subs\fR [<options>] \fB-t\fR <search term> ... [<file|dir> ...]
 .YS
 
 .SH DESCRIPTION
 \fBsearch-in-subs\fR allows the user to search for text in SRT subtitle files. 
 
-At least one search term must be specified to run a search (see \fB-t, --search-term\fR). If no <file> argument is given, a glob pattern set with the \fB-g, --default-glob\fR option is used to match subtitle files.
+At least one search term must be specified to run a search (see \fB-t, --search-term\fR). If no <file|dir> argument is given, a glob pattern set with the \fB-g, --default-glob\fR option is used to match subtitle files. If a <file|dir> argument is a directory, files matching the default glob pattern in that directory are added to the search.
 
 The built-in value of \fB-g, --default-glob\fR is `*.srt`, which matches all files with the `.srt` extension in the current working directory. That value can be changed to any other glob pattern in the configuration file (see FILES below).
 
@@ -62,7 +62,7 @@ At least one search term must be given to perform a search. Setting this option 
 
 .TP
 .B -g, --default-glob\fR=<glob pattern>
-A shell glob pattern to use when no <file> arguments are specified. The default is `*.srt`.
+A shell glob pattern to use when no <file|dir> arguments are specified, or when a <file|dir> argument is a directory. The default is `*.srt`.
 
 Shell options `nullglob`, `extglob` and `globstar` are enabled internally in \fBsearch-in-subs\fR, thus the default glob pattern is sensitive to those options.  
 
