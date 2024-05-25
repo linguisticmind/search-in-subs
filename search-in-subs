@@ -309,7 +309,9 @@ if [[ ${opt_edl_save_files_relative+_} || ${opt_edl_save_files_absolute+_} ]]; t
   edl_save_files="$opt_edl_save_files_relative""$opt_edl_save_files_absolute"
 
   case $edl_save_files in
-    */*.edl )  edl_path="${edl_save_files%/*}"    edl_name="${edl_save_files##*/}" ;;
+    '' )                                                                           ;;
+    */*.edl )  edl_path="${edl_save_files%/*}"
+               edl_path="${edl_path:-/}"          edl_name="${edl_save_files##*/}" ;;
     *.edl )                                       edl_name="${edl_save_files##*/}" ;;
     !(*.edl) ) edl_path="${edl_save_files%%+(/)}"
                edl_path="${edl_path:-/}"                                           ;;
