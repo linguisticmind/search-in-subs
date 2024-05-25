@@ -1,4 +1,4 @@
-.TH SEARCH-IN-SUBS 1 2024 SEARCH-IN-SUBS\ 0.2.3
+.TH SEARCH-IN-SUBS 1 2024 SEARCH-IN-SUBS\ 0.2.4
 
 .SH NAME
 search-in-subs \- search for words in subtitle files
@@ -199,16 +199,16 @@ Add a specified amount of time before each segment when generating EDL files. <v
 Add a specified amount of time after each segment when generating EDL files. <value> is in seconds. Precise values with a decimal separator are allowed. The default <value> is `0`.
 
 .TP
-.B -f, --edl-save-files-relative\fR[={<path>[/]|<path>/<name>.edl|<name>.edl}] \" <value>
-Save EDL files that use relative paths to refer to source files. The default <value> is ``.
+.B -f, --edl-save-files-relative\fR[={<path>[/]|<path>/<name>.edl|<name>.edl}]
+Save EDL files that use relative paths to refer to source files. The default value is unset. When omitted, the value is ``.
 
 If <path> is not given, the EDL files are saved to the current working directory. If <name> is not given, the name `search_results.edl` will be used.
 
-`.edl` extension after <name> is required because it serves to distinguish a directory called "<name>" from a name of an EDL file. To save to a directory whose name ends in `.edl` (without specifying <name>.edl), add a trailing forward slash (`/`) after <path>.
+A `.edl` extension after <name> is required because it serves to distinguish a directory called "<name>" from a name of an EDL file. To save to a directory whose name ends in `.edl` (without specifying <name>.edl), add a trailing forward slash (`/`) after <path>.
 
 .TP
-.B -F, --edl-save-files-absolute\fR[={<path>[/]|<path>/<name>.edl|<name>.edl}] \" <value>
-Save EDL files that use absolute paths to refer to source files. The default <value> is ``.
+.B -F, --edl-save-files-absolute\fR[={<path>[/]|<path>/<name>.edl|<name>.edl}]
+Save EDL files that use absolute paths to refer to source files. The default value is unset. When omitted, the value is ``.
 
 See \fB-f, --edl-save-files-relative\fR for information on usage of <path> and <name> values.
 
@@ -232,7 +232,7 @@ Allow overwriting existing files when saving EDL files.
 
 .TP
 .B -Y, --edl-save-no-overwrite
-Allow overwriting existing files when saving EDL files. This is the default.
+Do not allow overwriting existing files when saving EDL files. This is the default.
 
 .TP
 .B -o, --edl-ignore-missing
