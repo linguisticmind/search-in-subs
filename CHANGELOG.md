@@ -8,6 +8,22 @@
     </tr>
     <tr>
         <td>
+            <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.2.5'>0.2.5</a>
+        </td>
+        <td>
+           2024-07-18
+        </td>
+        <td>
+            <p>
+                <b>IMPORTANT</b>: Updated the <code>re_esc</code> function, which previously did not escape backslashes (<code>&bsol;</code>) for use in regular expressions. This would lead to incorrect handling of search terms containing backslashes.
+            </p>
+            <p>
+                Minor stylistic and formatting updates to README, man page, and the main script.
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
             <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.2.4'>0.2.4</a>
         </td>
         <td>

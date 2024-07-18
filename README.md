@@ -18,12 +18,12 @@ Video tutorials:
     <tr>
         <td>
             <a href='https://www.youtube.com/watch?v=M81f6GrqRS4'>
-                <img src='https://img.youtube.com/vi/M81f6GrqRS4/0.jpg' alt="Mindful Technology - search-in-subs v0.2.0: play search results in mpv! (SRT subtitles search)" width='360'>
+                <img src='https://img.youtube.com/vi/M81f6GrqRS4/0.jpg' alt='Mindful Technology - search-in-subs v0.2.0: play search results in mpv! (SRT subtitles search)' width='360'>
             </a>
         </td>
         <td>
             <a href='https://www.youtube.com/watch?v=hvcq7WZEIC4'>
-                <img src='https://img.youtube.com/vi/hvcq7WZEIC4/0.jpg' alt="Mindful Technology - search-in-subs: search for words in subtitle files" width='360'>
+                <img src='https://img.youtube.com/vi/hvcq7WZEIC4/0.jpg' alt='Mindful Technology - search-in-subs: search for words in subtitle files' width='360'>
             </a>
         </td>
     </tr>
@@ -39,33 +39,17 @@ Video tutorials:
     </tr>
     <tr>
         <td>
-            <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.2.4'>0.2.4</a>
+            <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.2.5'>0.2.5</a>
         </td>
         <td>
-           2024-05-25
+           2024-07-18
         </td>
         <td>
             <p>
-                Improved the method of quoting strings for displaying them in messages:
-                <ul>
-                    <li>All instances of using <code>\'"${parameter//\'/\'\\\'\'}"\'</code> were replaced with <code>"${parameter@Q}"</code>.</li>
-                    <li>All instances of using <code>ls -1d "${array[@]}"</code> were replaced with <code>printf '%s\n' "${array[@]@Q}"</code>.</li>
-                </ul>
+                <b>IMPORTANT</b>: Updated the <code>re_esc</code> function, which previously did not escape backslashes (<code>&bsol;</code>) for use in regular expressions. This would lead to incorrect handling of search terms containing backslashes.
             </p>
             <p>
-                Improved handling of removal of trailing forward slashes when passing the <code>&lt;path&gt;[/]</code> value to <code>-f, --edl-save-files-relative</code> and <code>-F, --edl-save-files-absolute</code>, and when passing a directory as a non-option argument:
-                <ul>
-                    <li>Now, not one, but all trailing forward slashes are removed.</li>
-                    <li>If the path consists of forward slashes only (one or more of them), a single forward slash representing the root directory is kept.</li>
-                </ul>
-            </p>
-            <p>
-                Improved formatting of the built-in help message.<br>
-                Improved phrasing regarding the default value of <code>-f, --edl-save-files-relative</code> and <code>-F, --edl-save-files-absolute</code> in the man page.<br>
-                Fixed further inaccuracies and formatting shortcomings in the script's built-in help message, the man page, the README, and the CHANGELOG files.
-            </p>
-            <p>
-                Removed a superfluous <code>IFS=' '</code> from the <code>getopt</code> line.
+                Minor stylistic and formatting updates to README, man page, and the main script.
             </p>
         </td>
     </tr>
@@ -183,6 +167,7 @@ DESCRIPTION
        <https://github.com/mpv-player/mpv/blob/master/DOCS/edl-mpv.rst>.
 
 OPTIONS
+   Passing arguments to options
        Enhanced getopt syntax applies when passing options. There is  one  im‐
        portant  point  to  highlight when it comes to passing options with re‐
        quired vs optional arguments.
@@ -544,7 +529,7 @@ COPYRIGHT
        This  is  free  software:  you  are free to change and redistribute it.
        There is NO WARRANTY, to the extent permitted by law.
 
-SEARCH-IN-SUBS 0.2.4                 2024                    SEARCH-IN-SUBS(1)
+SEARCH-IN-SUBS 0.2.5                 2024                    SEARCH-IN-SUBS(1)
 ```
 
 ## License

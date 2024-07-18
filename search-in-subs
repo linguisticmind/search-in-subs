@@ -16,9 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-version=0.2.4
+version=0.2.5
 
-function re_esc { <<<"$1" sed -E 's/[](){}<>.*?+|^$/[]/\\&/g'; }
+function re_esc { <<<"$1" sed -E 's/[](){}<>.*?+|^$\/[]/\\&/g'; }
 
 getopt -T > /dev/null
 [[ $? != 4 ]] && { printf '[%s] %s\n' "${BASH_SOURCE##*/}" 'Enhanced getopt is required to run this script.' >&2; exit 1; }
@@ -234,7 +234,7 @@ if [[ ${opt_edl_save_files_relative+_} && ${opt_edl_save_files_absolute+_} ]]; t
   exit 1
 fi
 
-cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}"/search-in-subs
+cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}"'/search-in-subs'
 cache_edl_dir="$cache_dir"'/edl'
 
 while true; do
