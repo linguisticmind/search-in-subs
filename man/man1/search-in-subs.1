@@ -37,7 +37,7 @@ Enhanced \fBgetopt\fR syntax applies when passing options. There is one importan
 
 In case of a short option, if an option takes a *required* argument, the argument may be written as a separate parameter, *or* directly after the option character. If an option takes an *optional* argument, however, the argument *must* be written directly after the option character.
 
-In case of a long option, if an option takes a *required* argument, the argument may be written as a separate parameter, *or* directly after the option name, separated by an equals sign (`=`). If an option takes an *optional* argument, however, the argument *must* be writtent directly after the option name, separated by an equals sign (`=`).
+In case of a long option, if an option takes a *required* argument, the argument may be written as a separate parameter, *or* directly after the option name, separated by an equals sign (`=`). If an option takes an *optional* argument, however, the argument *must* be written directly after the option name, separated by an equals sign (`=`).
 
 .TS
 tab(|);
@@ -286,6 +286,16 @@ Print help.
 .B --version
 Print version information.
 
+.SH EXIT STATUS
+
+.TS
+l l .
+\fB0\fR	Success. No errors have occured, and at least one match was found.
+\fB1\fR	A general error has occured.
+\fB2\fR	No matches were found.
+\fB3\fR	EDL generation failed. Can only occur if \fB-O, --edl-no-ignore-missing\fR is set.
+.TE
+
 .SH REGULAR EXPRESSIONS
 
 The regular expressions used are POSIX Extended Regular Expressions as implemented in GNU sed. More information on POSIX Regular Expressions can be found at <https://www.gnu.org/software/grep/manual/html_node/Regular-Expressions.html>.
@@ -340,7 +350,6 @@ l l .
 \fB<Matched %>\fR	Percentage of files that had matches.
 .TE
 
-
 .SH FILES
 
 A configuration file can be used to set default options.
@@ -350,18 +359,6 @@ The configuration file's location is \fI$XDG_CONFIG_HOME/search-in-subs/config.b
 Temporary EDL files that are generated when using the \fB-p, --edl-play\fR option are stored in a cache directory.
 
 The cache directory's location is \fI$XDG_CACHE_HOME/search-in-subs\fR. If \fIXDG_CACHE_HOME\fR is not set, it defaults to \fI~/.cache\fR.
-
-.SH EXIT CODES
-
-\fBsearch-in-subs\fR returns the following exit codes:
-
-.TS
-l l .
-\fB0\fR	Success. No errors have occured, and at least one match was found.
-\fB1\fR	A general error has occured.
-\fB2\fR	No matches were found.
-\fB3\fR	EDL generation failed. Can only occur if \fB-O, --edl-no-ignore-missing\fR is set.
-.TE
 
 .SH AUTHOR
 

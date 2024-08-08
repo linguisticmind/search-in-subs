@@ -18,10 +18,12 @@
 
 version=0.2.5
 
+script_name="${BASH_SOURCE##*/}"
+
 function re_esc { <<<"$1" sed -E 's/[](){}<>.*?+|^$\/[]/\\&/g'; }
 
 getopt -T > /dev/null
-[[ $? != 4 ]] && { printf '[%s] %s\n' "${BASH_SOURCE##*/}" 'Enhanced getopt is required to run this script.' >&2; exit 1; }
+[[ $? != 4 ]] && { printf '[%s] %s\n' "$script_name" 'Enhanced getopt is required to run this script.' >&2; exit 1; }
 
 help='search-in-subs [<options>] -t <search term> ... [<file|dir> ...]
 
@@ -190,7 +192,7 @@ help='search-in-subs [<options>] -t <search term> ... [<file|dir> ...]
         Print version information.
 '
 
-opts=$(getopt -n "${BASH_SOURCE##*/}" -o 't:,g:,v,V,i,I,q,Q,r,R,c,C,e,E,s,S,h,H,m,M,n,N,w,W,p,P,k,K,b:,a:,u:,f::,F::,d,D,y,Y,o,O,' -l 'search-term:,default-glob:,verbose,no-verbose,inverse,no-inverse,quiet,no-quiet,regex,no-regex,match-case,no-match-case,exact-whitespace,no-exact-whitespace,stats,no-stats,stats-headers,stats-no-headers,stats-headers-compact,stats-headers-no-compact,stats-headers-file-numbers,stats-headers-no-file-numbers,stats-wrap-filenames,stats-no-wrap-filenames,edl-play,edl-no-play,edl-play-keep-temporary,edl-play-no-keep-temporary,edl-play-before:,edl-play-after:,edl-structure:,edl-save-files-relative::,edl-save-files-absolute::,edl-no-save-files,edl-save-mkdir,edl-save-no-mkdir,edl-save-overwrite,edl-save-no-overwrite,edl-ignore-missing,edl-no-ignore-missing,mpv-opts:,color,no-color,help,version,' -- "$@")
+opts=$(getopt -n "$script_name" -o 't:,g:,v,V,i,I,q,Q,r,R,c,C,e,E,s,S,h,H,m,M,n,N,w,W,p,P,k,K,b:,a:,u:,f::,F::,d,D,y,Y,o,O,' -l 'search-term:,default-glob:,verbose,no-verbose,inverse,no-inverse,quiet,no-quiet,regex,no-regex,match-case,no-match-case,exact-whitespace,no-exact-whitespace,stats,no-stats,stats-headers,stats-no-headers,stats-headers-compact,stats-headers-no-compact,stats-headers-file-numbers,stats-headers-no-file-numbers,stats-wrap-filenames,stats-no-wrap-filenames,edl-play,edl-no-play,edl-play-keep-temporary,edl-play-no-keep-temporary,edl-play-before:,edl-play-after:,edl-structure:,edl-save-files-relative::,edl-save-files-absolute::,edl-no-save-files,edl-save-mkdir,edl-save-no-mkdir,edl-save-overwrite,edl-save-no-overwrite,edl-ignore-missing,edl-no-ignore-missing,mpv-opts:,color,no-color,help,version,' -- "$@")
 
 [[ $? != 0 ]] && exit 1
 
@@ -229,7 +231,7 @@ test -f "$config_file" && source "$_"
 if [[ ${opt_edl_save_files_relative+_} && ${opt_edl_save_files_absolute+_} ]]; then
   printf \
     ${opt_color:+'\x1b[31m'}'[%s] %s'${opt_color:+'\x1b[39m'}'\n' \
-    "${BASH_SOURCE##*/}" \
+    "$script_name" \
     'Invalid configuration: `opt_edl_save_files_relative` (`-f, --edl-save-files-relative`) and `opt_edl_save_files_absolute` (`-F, --edl-save-files-absolute`) may not be set simultaneously, but both were set in the configuration file ('"${config_file@Q}"'). Please edit the configuration file and adjust the configuration accordingly.' >&2
   exit 1
 fi
@@ -296,7 +298,7 @@ while true; do
     --help ) printf '%s\n' "$help"; exit ;;
     --version ) printf '%s\n' "$version"; exit ;;
     -- ) shift; break ;;
-    * ) printf '[%s] %s\n' "${BASH_SOURCE##*/}" 'Internal error: unable to parse option `'"$1"'`.' >&2; exit 1 ;;
+    * ) printf '[%s] %s\n' "$script_name" 'Internal error: unable to parse option `'"$1"'`.' >&2; exit 1 ;;
   esac
 done
 
@@ -333,7 +335,7 @@ case $opt_edl_structure in
   * )
     printf \
       ${opt_color:+'\x1b[31m'}'[%s] %s'${opt_color:+'\x1b[39m'}'\n' \
-      "${BASH_SOURCE##*/}" \
+      "$script_name" \
       'Invalid argument to `-u, --edl-structure`: '"${opt_edl_structure@Q}"'. Allowed values are `flat`, `subdir`, `subdir_hidden`, `subdir_except_chapters` and `subdir_hidden_except_chapters`.' >&2
     exit 1
   ;;
@@ -342,7 +344,7 @@ esac
 if [[ ! $opt_search_term ]]; then
   printf \
     ${opt_color:+'\x1b[31m'}'[%s] %s'${opt_color:+'\x1b[39m'}'\n' \
-    "${BASH_SOURCE##*/}" \
+    "$script_name" \
     'No search term was specified. Use `-t, --search-term` to specify one or more search terms.' >&2
   exit 1
 fi
@@ -352,7 +354,7 @@ fi
 if [[ $# = 0 ]]; then
   printf \
     ${opt_color:+'\x1b[31m'}'[%s] %s'${opt_color:+'\x1b[39m'}'\n' \
-    "${BASH_SOURCE##*/}" \
+    "$script_name" \
     'No files were passed to the script and none matched the default glob '"${opt_default_glob@Q}"'.' >&2
   exit 1
 fi
@@ -446,7 +448,7 @@ for (( i=1; i<=$#; i++ )); do
   if [[ ! -e "${!i}" ]]; then
     printf \
       ${opt_color:+'\x1b[33m'}'[%s] %s'${opt_color:+'\x1b[39m'}'\n' \
-      "${BASH_SOURCE##*/}" \
+      "$script_name" \
       'File '"${!i@Q}"' does not exist. Skipping.' >&2
     had_errors=1
     shift
@@ -455,7 +457,7 @@ for (( i=1; i<=$#; i++ )); do
   elif [[ ! -f "${!i}" ]]; then
     printf \
       ${opt_color:+'\x1b[33m'}'[%s] %s'${opt_color:+'\x1b[39m'}'\n' \
-      "${BASH_SOURCE##*/}" \
+      "$script_name" \
       "${!i@Q}"' is not a file. Skipping.' >&2
     had_errors=1
     shift
@@ -631,7 +633,7 @@ if [[ $had_matches && \
       else
         printf \
           ${opt_color:+'\x1b[31m'}'[%s] %s'${opt_color:+'\x1b[39m'}'\n' \
-          "${BASH_SOURCE##*/}" \
+          "$script_name" \
           'EDL save directory '"${edl_dest_dir@Q}"' does not exist. Make sure to pass a path to an existing directory, or set `-d, --edl-save-mkdir` to create a directory automatically.' >&2
         exit 1
       fi
@@ -655,7 +657,7 @@ if [[ $had_matches && \
       if [[ ${#existing_files[@]} -gt 0 ]]; then
         printf \
           ${opt_color:+'\x1b[31m'}'[%s] %s''\n' \
-          "${BASH_SOURCE##*/}" \
+          "$script_name" \
           'The following files already exist:' >&2
         printf '%s\n' "${existing_files[@]@Q}" >&2
         printf \
@@ -987,7 +989,7 @@ fi
 if [[ $had_errors ]]; then
   printf \
     ${opt_color:+'\x1b[33m'}'[%s] %s'${opt_color:+'\x1b[39m'}'\n' \
-    "${BASH_SOURCE##*/}" \
+    "$script_name" \
     'Some files were not files or did not exist. See output above.' >&2
   exit 1
 fi
@@ -1000,7 +1002,7 @@ if [[ $missing_video_files_warning ]]; then
 
   printf \
     ${opt_color:+'\x1b[33m'}'[%s] %s''\n' \
-    "${BASH_SOURCE##*/}" \
+    "$script_name" \
     'No video files corresponding to the following subtitle files could be identified:' >&2
   printf '%s\n' "${missing_video_files[@]@Q}" >&2
   printf ${opt_color:+'\x1b[39m'} >&2
@@ -1009,7 +1011,7 @@ if [[ $missing_video_files_warning ]]; then
 
     printf \
       ${opt_color:+'\x1b[33m'}'[%s] %s'${opt_color:+'\x1b[39m'}'\n' \
-      "${BASH_SOURCE##*/}" \
+      "$script_name" \
       'No EDL files were generated because no video files could be found.' >&2
 
   fi
@@ -1020,7 +1022,7 @@ if [[ $missing_video_files_error ]]; then
 
   printf \
     ${opt_color:+'\x1b[31m'}'[%s] %s''\n' \
-    "${BASH_SOURCE##*/}" \
+    "$script_name" \
     'No video files corresponding to the following subtitle files could be identified:' >&2
   printf '%s\n' "${missing_video_files[@]@Q}" >&2
   printf \
