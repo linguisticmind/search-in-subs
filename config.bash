@@ -22,5 +22,5 @@
 #opt_edl_save_overwrite=
 #opt_edl_ignore_missing=1
 #opt_mpv_opts=()
-#opt_mpv_opts_append=1
+#optdata__mpv_opts__append=1
 #opt_color=1

@@ -222,7 +222,7 @@ opt_edl_save_mkdir=
 opt_edl_save_overwrite=
 opt_edl_ignore_missing=1
 opt_mpv_opts=()
-opt_mpv_opts_append=1
+optdata__mpv_opts__append=1
 opt_color=1
 
 config_file="${XDG_CONFIG_HOME:-$HOME/.config}"'/search-in-subs/config.bash'
@@ -284,10 +284,10 @@ while true; do
     --mpv-opts )
       [[ $2 =~ ^(:{0,2})(.*)$ ]]
       case ${BASH_REMATCH[1]} in
-        : ) opt_mpv_opts_append= ;;
-        :: ) opt_mpv_opts_append=1 ;;
+        : ) optdata__mpv_opts__append= ;;
+        :: ) optdata__mpv_opts__append=1 ;;
       esac
-      [[ ! $opt_mpv_opts_append ]] && opt_mpv_opts=()
+      [[ ! $optdata__mpv_opts__append ]] && opt_mpv_opts=()
       while read -rd '' arg; do
         opt_mpv_opts+=("$arg")
       done < <(<<<"${BASH_REMATCH[2]}" xargs printf '%s\0')
