@@ -8,6 +8,38 @@
     </tr>
     <tr>
         <td>
+            <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.2.6'>0.2.6</a>
+        </td>
+        <td>
+            2025-03-22
+        </td>
+        <td>
+            <p>
+                Standardization fixes:
+                <ul>
+                    <li>
+                        Code:
+                        <ul>
+                            <li>Shifted to using a <code>script_name</code> variable set to <code>"${BASH_SOURCE##*/}"</code> to hold the name of the script shown in messages. Prior to this, <code>"${BASH_SOURCE##*/}"</code> was used directly everywhere.</li>
+                            <li>Shifted to using a more semantically clear <code>==</code> comparison operator instead of <code>=</code> in conditional statements. This ensures consistency with comparison operators in other programming languages, and in <a href='https://www.gnu.org/software/bash/manual/bash.html#Shell-Arithmetic'>Bash's own arithmetic expressions</a>.</li>
+                            <li>
+                                <p>
+                                    <b>BREAKING</b>: Shifted to a new naming convention for variables that hold additional data related to options. The new format for the names of such variables is <code>optdata&lowbar;&lowbar;&lt;opt_name&gt;&lowbar;&lowbar;&lt;optdata_name&gt;</code> where <code>&lt;opt_name&gt;</code> is the name of the option, and <code>&lt;optdata_name&gt;</code> is the name of the piece of option data that the variable holds. Note the double underscore (<code>&lowbar;&lowbar;</code>) surrounding the <code>&lt;opt_name&gt;</code>.
+                                </p>
+                                <p>
+                                    This prevents conflating the main option variables (<code>opt_&lt;opt_name&gt;</code>) with the variables that hold additional option data, and allows for easy access to variables from either set via the <code>${!prefix&ast;}</code> and <code>${!prefix@}</code> <a href='https://www.gnu.org/software/bash/manual/bash.html#Shell-Parameter-Expansion'>parameter expansions</a>.
+                                </p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>man page: renamed the <code>exit codes</code> section to <code>exit status</code>, removed superfluous text from it, and moved it after the <code>options</code> section.</li>
+                </ul>
+            </p>
+            <p>man page: fixed a typo</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
             <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.2.5'>0.2.5</a>
         </td>
         <td>
