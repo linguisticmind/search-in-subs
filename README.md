@@ -246,7 +246,7 @@ OPTIONS
 
        -q, --quiet
               Do  not  print any matches or filenames. Useful, for example, if
-              one only wishes to see the statistics or the exit code.
+              one only wishes to see the statistics or the exit status.
 
        -Q, --no-quiet
               Do not suppress printing of matches or filenames.  This  is  the
@@ -355,20 +355,20 @@ OPTIONS
        -b, --edl-play-before=<value>
               Add a specified amount of time before each segment when generat‐
               ing EDL files. <value> is in seconds. Precise values with a dec‐
-              imal separator are allowed. The default <value> is '0'.
+              imal separator are allowed. The default <value> is 0.
 
        -a, --edl-play-after=<value>
               Add  a specified amount of time after each segment when generat‐
               ing EDL files. <value> is in seconds. Precise values with a dec‐
-              imal separator are allowed. The default <value> is '0'.
+              imal separator are allowed. The default <value> is 0.
 
        -f, --edl-save-files-relative[={<path>[/]|<path>/<name>.edl|<name>.edl}]
               Save EDL files that use relative paths to refer to source files.
               The default value is unset. When omitted, the value is ''.
 
               If  <path>  is not given, the EDL files are saved to the current
-              working directory. If <name> is not given, the name  'search_re‐
-              sults.edl' will be used.
+              working  directory.  If  <name>   is   not   given,   the   name
+              'search_results.edl' will be used.
 
               A '.edl' extension after <name> is required because it serves to
               distinguish a directory called "<name>" from a name  of  an  EDL
@@ -422,7 +422,7 @@ OPTIONS
               If  set,  an  error  message is shown listing subtitle files for
               which no corresponding video file could be identified,  In  this
               case,  no EDL files are generated, and search-in-subs exits with
-              exit code '3'.
+              exit status 3.
 
        -u, --edl-structure=<value>
               Determines the structure of the  set  of  generated  EDL  files.
@@ -483,8 +483,8 @@ EXIT STATUS
 
        2      No matches were found.
 
-       3      EDL generation failed. Can only occur  if  -O,  --edl-no-ignore-
-              missing is set.
+       3      EDL     generation     failed.     Can     only     occur     if
+              -O, --edl-no-ignore-missing is set.
 
 REGULAR EXPRESSIONS
        The  regular expressions used are POSIX Extended Regular Expressions as

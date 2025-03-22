@@ -26,7 +26,7 @@ Shell options \%'nullglob', \%'extglob' and \%'globstar' are enabled internally 
 .P
 \%\fBsearch-in-subs\fR can generate EDL files for \%\fBmpv\fR player, and play the search results using it. To use this functionality, \%\fBmpv\fR, \%\fBffmpeg\fR and \%\fBlua\fR\ (v5.4) must be installed and available on system's PATH.
 .P
-In order to generate the EDL files, a video or audio file must exist in the same directory as the subtitle file(s) on which the search is performed. The video or audio file must have the same name as the subtitle file, minus the '.srt' extension and potentially a secondary extension containing a language code, e.g. '.en.srt'. If both video and audio files are found, video files take precedence. If multiple video or audio files are found, the first one will be chosen for use in the generated EDL files.
+In order to generate the EDL files, a video or audio file must exist in the same directory as the subtitle file(s) on which the search is performed. The video or audio file must have the same name as the subtitle file, minus the \%'.srt' extension and potentially a secondary extension containing a language code, e.g. \%'.en.srt'. If both video and audio files are found, video files take precedence. If multiple video or audio files are found, the first one will be chosen for use in the generated EDL files.
 .P
 See \%\fB--edl-*\fR options below for more information.
 .P
@@ -40,7 +40,7 @@ Enhanced \%\fBgetopt\fR syntax applies when passing options. There is one import
 .P
 In case of a short option, if an option takes a *required* argument, the argument may be written as a separate parameter, *or* directly after the option character. If an option takes an *optional* argument, however, the argument *must* be written directly after the option character.
 .P
-In case of a long option, if an option takes a *required* argument, the argument may be written as a separate parameter, *or* directly after the option name, separated by an equals sign ('='). If an option takes an *optional* argument, however, the argument *must* be written directly after the option name, separated by an equals sign ('=').
+In case of a long option, if an option takes a *required* argument, the argument may be written as a separate parameter, *or* directly after the option name, separated by an equals sign \%('='). If an option takes an *optional* argument, however, the argument *must* be written directly after the option name, separated by an equals sign \%('=').
 .
 .TS
 tab(|);
@@ -69,9 +69,9 @@ At least one search term must be given to perform a search. Setting this option 
 .
 .TP
 .B \%-g,\ --default-glob\fR=<glob_pattern>
-A shell glob pattern to use when no \%<file|dir> arguments are specified, or when a \%<file|dir> argument is a directory. The default is '*.srt'.
+A shell glob pattern to use when no \%<file|dir> arguments are specified, or when a \%<file|dir> argument is a directory. The default is \%'*.srt'.
 .sp
-Shell options 'nullglob', 'extglob' and 'globstar' are enabled internally in \%\fBsearch-in-subs\fR, thus the default glob pattern is sensitive to those options.  
+Shell options \%'nullglob', \%'extglob' and \%'globstar' are enabled internally in \%\fBsearch-in-subs\fR, thus the default glob pattern is sensitive to those options.  
 .
 .TP
 .B \%-v,\ --verbose
@@ -91,7 +91,7 @@ Do not supress printing of matches and names of the files where matches were fou
 .
 .TP
 .B \%-q,\ --quiet
-Do not print any matches or filenames. Useful, for example, if one only wishes to see the statistics or the exit code.
+Do not print any matches or filenames. Useful, for example, if one only wishes to see the statistics or the exit status.
 .
 .TP
 .B \%-Q,\ --no-quiet
@@ -199,19 +199,19 @@ The temporary files are deleted right after \%\fBmpv\fR player closes.
 .
 .TP
 .B \%-b,\ --edl-play-before\fR=<value>
-Add a specified amount of time before each segment when generating EDL files. \%<value> is in seconds. Precise values with a decimal separator are allowed. The default \%<value> is '0'.
+Add a specified amount of time before each segment when generating EDL files. \%<value> is in seconds. Precise values with a decimal separator are allowed. The default \%<value> is 0.
 .
 .TP
 .B \%-a,\ --edl-play-after\fR=<value>
-Add a specified amount of time after each segment when generating EDL files. \%<value> is in seconds. Precise values with a decimal separator are allowed. The default \%<value> is '0'.
+Add a specified amount of time after each segment when generating EDL files. \%<value> is in seconds. Precise values with a decimal separator are allowed. The default \%<value> is 0.
 .
 .TP
 .B \%-f,\ --edl-save-files-relative\fR[={<path>[/]|<path>/<name>.edl|<name>.edl}]
 Save EDL files that use relative paths to refer to source files. The default value is unset. When omitted, the value is ''.
 .sp
-If \%<path> is not given, the EDL files are saved to the current working directory. If \%<name> is not given, the name 'search_results.edl' will be used.
+If \%<path> is not given, the EDL files are saved to the current working directory. If \%<name> is not given, the name \%'search_results.edl' will be used.
 .sp
-A '.edl' extension after \%<name> is required because it serves to distinguish a directory called \%"<name>" from a name of an EDL file. To save to a directory whose name ends in '.edl' (without specifying \%"<name>.edl"), add a trailing forward slash ('/') after \%<path>.
+A '.edl' extension after \%<name> is required because it serves to distinguish a directory called \%"<name>" from a name of an EDL file. To save to a directory whose name ends in \%'.edl' (without specifying \%"<name>.edl"), add a trailing forward slash \%('/') after \%<path>.
 .
 .TP
 .B \%-F,\ --edl-save-files-absolute\fR[={<path>[/]|<path>/<name>.edl|<name>.edl}]
@@ -251,7 +251,7 @@ If set, a warning message is shown listing subtitle files for which no correspon
 .B \%-O,\ --edl-no-ignore-missing
 Do not omit segments with missing videos when generating EDL files.
 .sp
-If set, an error message is shown listing subtitle files for which no corresponding video file could be identified, In this case, no EDL files are generated, and \fBsearch-in-subs\fR exits with exit code '3'.
+If set, an error message is shown listing subtitle files for which no corresponding video file could be identified, In this case, no EDL files are generated, and \fBsearch-in-subs\fR exits with exit status 3.
 .
 .TP
 .B \%-u,\ --edl-structure\fR=<value>
@@ -265,7 +265,7 @@ Options to \%\fBmpv\fR player.
 .sp
 The leading colons control whether \%<opts> get appended to previously set options, or replace them.
 .sp
-The phrase 'previously set options' refers to either the default value of \%<opts> set by \fBsearch-in-subs\fR itself (''), or a value set in the configuration file.
+The phrase 'previously set options' refers to either the default value of \%<opts> set by \fBsearch-in-subs\fR itself \%(''), or a value set in the configuration file.
 .sp
 When a single colon \%(':') is used, \%<opts> replace the previously set options.
 .sp
@@ -306,7 +306,7 @@ A general error has occured.
 No matches were found.
 .TP
 3
-EDL generation failed. Can only occur if \fB-O, --edl-no-ignore-missing\fR is set.
+EDL generation failed. Can only occur if \%\fB-O,\ --edl-no-ignore-missing\fR is set.
 .
 .SH REGULAR EXPRESSIONS
 .P
@@ -314,7 +314,7 @@ The regular expressions used are POSIX Extended Regular Expressions as implement
 .
 .SH STATISTICS
 .P
-If the \fB-s, --stats\fR option is enabled, \fBsearch-in-subs\fR gathers statistics on the search that it performs and displays those statistics in a table at the end of the output.
+If the \%\fB-s,\ --stats\fR option is enabled, \%\fBsearch-in-subs\fR gathers statistics on the search that it performs and displays those statistics in a table at the end of the output.
 .P
 The 'Matched', 'Total', 'Unmatched' and 'Matched %' columns of that table contain the following data: 
 .P
