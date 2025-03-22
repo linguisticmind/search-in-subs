@@ -537,13 +537,13 @@ FILES
 
        The   configuration  file's  location  is  "$XDG_CONFIG_HOME/search-in-
        subs/config.bash". If "XDG_CONFIG_HOME" is  not  set,  it  defaults  to
-       "~/.config".
+       "$HOME/.config".
 
        Temporary  EDL  files  that are generated when using the -p, --edl-play
        option are stored in a cache directory.
 
        The cache directory's location is "$XDG_CACHE_HOME/search-in-subs".  If
-       "XDG_CACHE_HOME" is not set, it defaults to "~/.cache".
+       "XDG_CACHE_HOME" is not set, it defaults to "$HOME/.cache".
 
 AUTHOR
        Alex Rogers <https://github.com/linguisticmind>
