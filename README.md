@@ -156,7 +156,7 @@ DESCRIPTION
 
        Shell  options  'nullglob', 'extglob' and 'globstar' are enabled inter‐
        nally in search-in-subs, so shell globbing can be used to its full  ca‐
-       pacity  when  setting  -g,  --default-glob.  For  example, to match all
+       pacity  when  setting  -g, --default-glob.  For  example,  to match all
        '.srt' files in the current working  directory  recursively,  including
        all   of  its  subdirectories,  one  could  set  -g, --default-glob  to
        '**/*.srt'.
@@ -326,16 +326,18 @@ OPTIONS
        -p, --edl-play
               Play search results in mpv.
 
-              Unless -f, --edl-save-files-relative or -F, --edl-save-files-ab‐
-              solute  is  used  together with this option, temporary EDL files
-              are generated and saved in the cache directory  (see  FILES  for
-              more  information).  The -k, --edl-keep-temporary and -K, --edl-
-              no-keep-temporary options control whether or the  temporary  EDL
-              files are deleted or kept after mpv player closes.
+              Unless             -f, --edl-save-files-relative              or
+              -F, --edl-save-files-absolute is used together with this option,
+              temporary EDL files are generated and saved in the cache  direc‐
+              tory     (see     FILES     for     more    information).    The
+              -k, --edl-keep-temporary and -K, --edl-no-keep-temporary options
+              control  whether  or the temporary EDL files are deleted or kept
+              after mpv player closes.
 
-              If  -f,  --edl-save-files-relative or -F, --edl-save-files-abso‐
-              lute is used together with -p, --edl-play, then temporary  files
-              are not generated and the saved EDL files are played.
+              If               -f, --edl-save-files-relative                or
+              -F, --edl-save-files-absolute     is    used    together    with
+              -p, --edl-play, then temporary files are not generated  and  the
+              saved EDL files are played.
 
        -P, --edl-no-play
               Do not play search results in mpv. This is the default.
@@ -360,8 +362,7 @@ OPTIONS
               ing EDL files. <value> is in seconds. Precise values with a dec‐
               imal separator are allowed. The default <value> is '0'.
 
-       -f,                                              --edl-save-files-rela‐
-       tive[={<path>[/]|<path>/<name>.edl|<name>.edl}]
+       -f, --edl-save-files-relative[={<path>[/]|<path>/<name>.edl|<name>.edl}]
               Save EDL files that use relative paths to refer to source files.
               The default value is unset. When omitted, the value is ''.
 
@@ -375,8 +376,7 @@ OPTIONS
               specifying "<name>.edl"), add a trailing forward slash ('/') af‐
               ter <path>.
 
-       -F,                                              --edl-save-files-abso‐
-       lute[={<path>[/]|<path>/<name>.edl|<name>.edl}]
+       -F, --edl-save-files-absolute[={<path>[/]|<path>/<name>.edl|<name>.edl}]
               Save EDL files that use absolute paths to refer to source files.
               The default value is unset. When omitted, the value is ''.
 
@@ -387,47 +387,48 @@ OPTIONS
               Do not save EDL files, but  generate  temporary  files  instead.
               This is the default.
 
-              This  option disables -f, --edl-save-files-relative / -F, --edl-
-              save-files-absolute.
+              This     option     disables     -f, --edl-save-files-relative /
+              -F, --edl-save-files-absolute.
 
        -d, --edl-save-mkdir
-              Create the EDL save directory (the <path> value  of  --edl-save-
-              files-* options) if it does not exist.
+              Create  the  EDL   save   directory   (the   <path>   value   of
+              --edl-save-files-* options) if it does not exist.
 
        -D, --edl-save-no-mkdir
-              Do not create the EDL save directory (the <path> value of --edl-
-              save-files-* options) if it does not exist. This is the default.
+              Do  not  create  the  EDL  save  directory  (the <path> value of
+              --edl-save-files-* options) if it does not exist.  This  is  the
+              default.
 
        -y, --edl-save-overwrite
               Allow overwriting existing files when saving EDL files.
 
        -Y, --edl-save-no-overwrite
-              Do not allow overwriting existing files when saving  EDL  files.
+              Do  not  allow overwriting existing files when saving EDL files.
               This is the default.
 
        -o, --edl-ignore-missing
-              Omit  segments  with  missing  videos when generating EDL files.
+              Omit segments with missing videos  when  generating  EDL  files.
               This is the default.
 
-              If set, a warning message is shown listing  subtitle  files  for
-              which  no  corresponding video file could be identified, but EDL
-              files are still generated if at least one  relevant  video  file
+              If  set,  a  warning message is shown listing subtitle files for
+              which no corresponding video file could be identified,  but  EDL
+              files  are  still  generated if at least one relevant video file
               was able to be found.
 
        -O, --edl-no-ignore-missing
-              Do  not  omit  segments  with missing videos when generating EDL
+              Do not omit segments with missing  videos  when  generating  EDL
               files.
 
-              If set, an error message is shown  listing  subtitle  files  for
-              which  no  corresponding video file could be identified, In this
-              case, no EDL files are generated, and search-in-subs exits  with
+              If  set,  an  error  message is shown listing subtitle files for
+              which no corresponding video file could be identified,  In  this
+              case,  no EDL files are generated, and search-in-subs exits with
               exit code '3'.
 
        -u, --edl-structure=<value>
-              Determines  the  structure  of  the  set of generated EDL files.
-              <value> can be 'flat',  'subdir',  'subdir_hidden',  'subdir_ex‐
-              cept_chapters'  or  'subdir_hidden_except_chapters'. The default
-              <value> is 'flat'.
+              Determines the structure of the  set  of  generated  EDL  files.
+              <value>    can    be    'flat',    'subdir',    'subdir_hidden',
+              'subdir_except_chapters' or 'subdir_hidden_except_chapters'. The
+              default <value> is 'flat'.
 
        --mpv-opts=[:[:]]<opts>
               Options to mpv player.
@@ -439,28 +440,28 @@ OPTIONS
               ously set options, or replace them.
 
               The phrase 'previously set options' refers to either the default
-              value  of  <opts>  set by search-in-subs itself (''), or a value
+              value of <opts> set by search-in-subs itself (''),  or  a  value
               set in the configuration file.
 
               When a single colon (':') is used, <opts> replace the previously
               set options.
 
-              When  a  double colon ('::') is used, <opts> are appended to the
+              When a double colon ('::') is used, <opts> are appended  to  the
               previously set options.
 
-              When the leading colons are omitted, whether <opts> replace  the
+              When  the leading colons are omitted, whether <opts> replace the
               previously set options, or are appended to them is determined by
-              an *additonal* value that is yet again set either by  search-in-
+              an  *additonal* value that is yet again set either by search-in-
               subs itself (append), or in the configuration file.
 
-              The  name  of  the variable that controls this has the following
-              format: optdata__<opt_name>__<optdata_name> where <opt_name>  is
-              the  name  of  the option, and <optdata_name> is the name of the
-              piece of option data that the variable holds. In this case <opt‐
-              data_name>  is  'append'.  So if the option's variable is called
-              'opt_mpv_opts', then the variable  that  controls  what  happens
-              when   the   leading   colons   are   omitted  is  called  'opt‐
-              data__mpv_opts__append'.
+              The name of the variable that controls this  has  the  following
+              format:  optdata__<opt_name>__<optdata_name> where <opt_name> is
+              the name of the option, and <optdata_name> is the  name  of  the
+              piece  of  option  data  that  the  variable holds. In this case
+              <optdata_name> is 'append'.  So  if  the  option's  variable  is
+              called  opt_mpv_opts,  then the variable that controls what hap‐
+              pens  when  the   leading   colons   are   omitted   is   called
+              optdata__mpv_opts__append.
 
    Other
        --color
@@ -475,29 +476,29 @@ OPTIONS
               Print version information.
 
 EXIT STATUS
-       0      Success. No errors have occured, and  at  least  one  match  was
+       0      Success.  No  errors  have  occured,  and at least one match was
               found.
 
        1      A general error has occured.
 
        2      No matches were found.
 
-       3      EDL  generation  failed.  Can only occur if -O, --edl-no-ignore-
+       3      EDL generation failed. Can only occur  if  -O,  --edl-no-ignore-
               missing is set.
 
 REGULAR EXPRESSIONS
-       The regular expressions used are POSIX Extended Regular Expressions  as
-       implemented  in  GNU sed. More information on POSIX Regular Expressions
-       can     be     found     at     <https://www.gnu.org/software/grep/man‐
-       ual/html_node/Regular-Expressions.html>.
+       The  regular expressions used are POSIX Extended Regular Expressions as
+       implemented  in  GNU  sed.  More  information  on  can  be   found   at
+       <https://www.gnu.org/software/sed/manual/
+       sed.html#sed-regular-expressions>.
 
 STATISTICS
        If the -s, --stats option is enabled, search-in-subs gathers statistics
        on the search that it performs and displays those statistics in a table
        at the end of the output.
 
-       The  Matched, Total, Unmatched and Matched % columns of that table con‐
-       tain the following data:
+       The 'Matched', 'Total', 'Unmatched' and 'Matched %' columns of that ta‐
+       ble contain the following data:
 
        In the file rows:
 
@@ -506,26 +507,26 @@ STATISTICS
        Unmatched   Number of subtitles in the file that did not have matches.
        Matched %   Percentage of subtitles in the file that had matches.
 
-       In the Average row:
+       In the 'Average' row:
 
        Matched     Average number of subtitles per file that had matches.
        Total       Average number of subtitles per file.
        Unmatched   Average number of subtitles per file that did not have matches.
        Matched %   Average percentage of subtitles per file that had matches.
 
-       In the Total row:
+       In the 'Total' row:
 
        Matched     Total number of subtitles in all files that had matches.
        Total       Total number of subtitles in all files.
        Unmatched   Total number of subtitles in all files that did not have matches.
        Matched %   Total percentage of subtitles in all files that had matches.
 
-       In the File column of the Total row, information is  presented  in  the
-       following format:
+       In  the  'File'  column of the 'Total' row, information is presented in
+       the following format:
 
        <Matched> / <Total> (<Unmatched>) <Matched %>
 
-       Where the <placeholder> values represent the following:
+       Where the placeholder values represent the following:
 
        <Matched>     Total number of files that had matches.
        <Total>       Total number of files.
@@ -533,11 +534,12 @@ STATISTICS
        <Matched %>   Percentage of files that had matches.
 
 FILES
-       A configuration file can be used to set default options.
+       A configuration file can be used to  change  the  default  behavior  of
+       search-in-subs.
 
-       The   configuration  file's  location  is  "$XDG_CONFIG_HOME/search-in-
-       subs/config.bash". If "XDG_CONFIG_HOME" is  not  set,  it  defaults  to
-       "$HOME/.config".
+       The  configuration file's location is "$XDG_CONFIG_HOME/search-in-subs/
+       config.bash". If "XDG_CONFIG_HOME" is not set, it defaults  to  "$HOME/
+       .config".
 
        Temporary  EDL  files  that are generated when using the -p, --edl-play
        option are stored in a cache directory.
