@@ -41,34 +41,68 @@ Video tutorials:
     </tr>
     <tr>
         <td>
-            <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.2.6'>0.2.6</a>
+            <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.3.0'>0.3.0</a>
         </td>
         <td>
-            2025-03-22
+            2025-03-23
         </td>
         <td>
             <p>
-                Standardization fixes:
+                <p>
+                    <strong>We are at 0.3.0!</strong>
+                </p>
                 <ul>
+                    <li>The new <code>--config</code> option makes configuring <code>search-in-subs</code> more convenient by adding the ability to generate a configuration file and open it for editing.</li>
+                    <li><code>-f, --edl-save-files-relative</code>, <code>-F, --edl-save-files-absolute</code>, <code>--edl-no-save-files</code> were reorganized as <code>-f, --edl-save</code>, <code>-F, --edl-no-save</code>, and <code>--edl-save-paths</code>.</li>
+                    <li><code>--color</code> now takes an optional argument with the value of <code>'always'</code>, <code>'auto'</code>, or <code>'never'</code>. In the <code>'auto'</code> mode, colorization is applied only if stdout of <code>search-in-subs</code> is connected to a terminal.</li>
+                    <li><code>--help</code> now opens the man page.</li>
+                    <li>Various improvements to the man mage were made, including the addition of a new <code>CONFIGURATION</code> section.</li>
                     <li>
-                        Code:
+                        <p>
+                            Introducing <i>configuration file-only parameters</i>. These are settings that can only be set in the configuration file, and don't have a command-line counterpart.
+                        </p>
                         <ul>
+                            <li>The default name of a generated EDL file is now configurable: <code>conf_edl_default_name</code>.
+                            <li>It is now possible to set custom secondary filename extensions for SRT files to allow <code>search-in-subs</code> to correctly match up unusually-named subtitle files with their video counterparts: <code>conf_srt_secondary_ext</code>. Also added <code>--edl-play-srt-secondary-ext</code> for setting a secondary filename extension temporarily on the command line. Fixes <a href='https://github.com/linguisticmind/search-in-subs/issues/4'>#4</a>.</li>
                             <li>
-                                <p>
-                                    <b>BREAKING</b>: Shifted to a new naming convention for variables that hold additional data related to options. The new format for the names of such variables is <code>optdata&lowbar;&lowbar;&lt;opt_name&gt;&lowbar;&lowbar;&lt;optdata_name&gt;</code> where <code>&lt;opt_name&gt;</code> is the name of the option, and <code>&lt;optdata_name&gt;</code> is the name of the piece of option data that the variable holds. Note the double underscore (<code>&lowbar;&lowbar;</code>) surrounding the <code>&lt;opt_name&gt;</code>.
-                                </p>
-                                <p>
-                                    This prevents conflating the main option variables (<code>opt_&lt;opt_name&gt;</code>) with the variables that hold additional option data, and allows for easy access to variables from either set via the <code>${!prefix&ast;}</code> and <code>${!prefix@}</code> <a href='https://www.gnu.org/software/bash/manual/bash.html#Shell-Parameter-Expansion'>parameter expansions</a>.
-                                </p>
+                                The default glob setting has been made configuration file-only since its command-line counterpart didn't really have any use. The new variable name is <code>conf_default_glob</code>.
                             </li>
-                            <li>Shifted to using a <code>script_name</code> variable set to <code>"${BASH_SOURCE##*/}"</code> to hold the name of the script shown in messages. Prior to this, <code>"${BASH_SOURCE##*/}"</code> was used directly everywhere.</li>
-                            <li>Shifted to using a more semantically clear <code>==</code> comparison operator instead of <code>=</code> in conditional statements. This ensures consistency with comparison operators in other programming languages, and in <a href='https://www.gnu.org/software/bash/manual/bash.html#Shell-Arithmetic'>Bash's own arithmetic expressions</a>.</li>
                         </ul>
                     </li>
-                    <li>man page: renamed the <code>exit codes</code> section to <code>exit status</code>, removed superfluous text from it, and moved it after the <code>options</code> section.</li>
                 </ul>
             </p>
-            <p>man page: fixed a typo</p>
+            <hr>
+            <p>
+                <b>ATTENTION</b>: This release introduces <strong>breaking changes</strong>. It is recommended that you back up your configuration file, generate a new one, and manually copy over your settings from the backup file into the newly-generated configuration file.
+            </p>
+            <dl>
+                <dt>
+                    What does <code>search-in-subs</code> do when it generates a configuration file?
+                </dt>
+                <dd>
+                    It takes the part of <a href='search-in-subs'>its own source code</a> demarcated by lines <code># --- BEGIN config ---</code> and <code># --- END config ---</code>, comments out non-empty lines from that part, and saves the resulting text to <code>~/.config/search-in-subs/config.bash</code>. See the <a href='https://github.com/linguisticmind/search-in-subs#manual'>man page</a> for more information about the functionality provided by the new <code>--config</code> option.
+                </dd>
+            </dl>
+            <p>
+                The suggested procedure for migrating your settings is:
+            </p>
+            <div>
+            <pre>cd ~/.config/search-in-subs
+mv -nv config.bash config.bash.bak
+search-in-subs --config</pre>
+            </div>
+            <p>
+                <code>search-in-subs</code> will generate a new configuration file and ask if you would like to open it in a text editor. Reply <code>y</code> or simply press Enter.
+            </p>
+            <p>
+                Open <code>~/.config/search-in-subs/config.bash.bak</code> in a text editor as well. If you're using <code>vim</code>, you can run <code>:tabnew ~/.config/search-in-subs/config.bash.bak</code>.
+            </p>
+            <p>
+                Then copy your settings over to the new configuration file. It should be clear from just looking at the file what goes where.
+            </p>
+            <p>
+                If you run into problems, please <a href='https://github.com/linguisticmind/search-in-subs/issues'>open an issue</a> or <a href='https://github.com/linguisticmind/search-in-subs/discussions'>ask a question</a>.
+            </p>
         </td>
     </tr>
 </table>
@@ -82,6 +116,12 @@ Video tutorials:
 On Debian, run `sudo apt install mpv ffmpeg lua5.4` to install these dependencies.
 
 `lua` 5.4 is the version of `lua` that `search-in-subs` was tested with. `search-in-subs` first checks `PATH` for a binary called `lua5.4`, and if that is not available, it uses `lua` as a fallback binary name.
+
+If [`bat`](https://github.com/sharkdp/bat) is installed, it will be used to pretty-print the preview of a generated configuration file when using `--config`.
+
+On Debian, run `sudo apt install bat` to install it.
+
+Note that on Debian, `bat`'s executable is [called `batcat` instead of `bat`](https://github.com/sharkdp/bat/issues/982).
 
 `search-in-subs` was written and tested on Debian 12, and takes advantage of standard utilities that come with the system. In order to run `search-in-subs` on other systems, make sure that the following are installed and available on system's `PATH`:
 
@@ -145,37 +185,38 @@ DESCRIPTION
 
        At least one search term  must  be  specified  to  run  a  search  (see
        -t, --search-term).  If no <file|dir> argument is given, a glob pattern
-       set with the -g, --default-glob option is used to match subtitle files.
+       set with the conf_default_glob option is used to match subtitle  files.
        If  a  <file|dir>  argument  is a directory, files matching the default
        glob pattern in that directory are added to the search.
 
-       The built-in value of -g, --default-glob is '*.srt', which matches  all
+       The default value of conf_default_glob is '*.srt',  which  matches  all
        files  with the '.srt' extension in the current working directory. That
        value can be changed to any other glob  pattern  in  the  configuration
-       file (see FILES below).
+       file (see CONFIGURATION and FILES below).
 
        Shell  options  'nullglob', 'extglob' and 'globstar' are enabled inter‐
        nally in search-in-subs, so shell globbing can be used to its full  ca‐
-       pacity  when  setting  -g, --default-glob.  For  example,  to match all
-       '.srt' files in the current working  directory  recursively,  including
-       all   of  its  subdirectories,  one  could  set  -g, --default-glob  to
-       '**/*.srt'.
+       pacity when setting conf_default_glob. For example, to match all '.srt'
+       files in the current working directory recursively,  including  all  of
+       its subdirectories, one could set conf_default_glob to '**/*.srt'.
 
        search-in-subs can also gather statistics on searches that it runs. Try
        running a search with the -s, --stats option set. For more information,
        see STATISTICS below.
 
    mpv EDL generation
-       search-in-subs can generate EDL files for  mpv  player,  and  play  the
-       search  results  using  it.  To use this functionality, mpv, ffmpeg and
+       search-in-subs  can  generate  EDL  files  for mpv player, and play the
+       search results using it. To use this  functionality,  mpv,  ffmpeg  and
        lua (v5.4) must be installed and available on system's PATH.
 
        In order to generate the EDL files, a video or audio file must exist in
-       the  same directory as the subtitle file(s) on which the search is per‐
+       the same directory as the subtitle file(s) on which the search is  per‐
        formed. The video or audio file must have the same name as the subtitle
-       file,  minus the '.srt' extension and potentially a secondary extension
-       containing a language code, e.g. '.en.srt'. If  both  video  and  audio
-       files  are found, video files take precedence. If multiple video or au‐
+       file, minus the '.srt' extension and potentially a secondary  extension
+       containing a language code, e.g. '.en.srt'. Custom secondary extensions
+       may be added with conf_srt_secondary_ext or set temporarily on the com‐
+       mand  line  with  --edl-play-srt-secondary-ext. If both video and audio
+       files are found, video files take precedence. If multiple video or  au‐
        dio files are found, the first one will be chosen for use in the gener‐
        ated EDL files.
 
@@ -186,21 +227,20 @@ DESCRIPTION
 
 OPTIONS
    Passing arguments to options
-       Enhanced getopt syntax applies when passing options. There is  one  im‐
-       portant  point  to  highlight when it comes to passing options with re‐
+       Enhanced  getopt  syntax applies when passing options. There is one im‐
+       portant point to highlight when it comes to passing  options  with  re‐
        quired vs optional arguments.
 
-       In case of a short option, if an option takes  a  *required*  argument,
-       the  argument may be written as a separate parameter, *or* directly af‐
-       ter the option character. If an option takes  an  *optional*  argument,
-       however, the argument *must* be written directly after the option char‐
-       acter.
+       In  case of a short option, if an option takes a required argument, the
+       argument may be written as a separate parameter, or directly after  the
+       option character. If an option takes an optional argument, however, the
+       argument must be written directly after the option character.
 
-       In case of a long option, if an option takes a *required* argument, the
-       argument  may  be  written as a separate parameter, *or* directly after
-       the option name, separated by an equals sign ('='). If an option  takes
-       an  *optional*  argument,  however,  the argument *must* be written di‐
-       rectly after the option name, separated by an equals sign ('=').
+       In case of a long option, if an option takes a required  argument,  the
+       argument  may be written as a separate parameter, or directly after the
+       option name, separated by an equals sign ('='). If an option  takes  an
+       optional argument, however, the argument must be written directly after
+       the option name, separated by an equals sign ('=').
 
                            Short option   Long option
        Required argument   -o <value>     --option <value>
@@ -210,6 +250,7 @@ OPTIONS
        Options that take optional arguments can be recognized in  the  options
        list  below  by  their  <value> and the preceding equals sign being en‐
        closed in square brackets:
+
        -o, --option[=<value>]
 
    General
@@ -219,15 +260,6 @@ OPTIONS
 
               At least one search term must be given to perform a search. Set‐
               ting this option multiple times sets multiple search terms.
-
-       -g, --default-glob=<glob_pattern>
-              A shell glob pattern to use when  no  <file|dir>  arguments  are
-              specified, or when a <file|dir> argument is a directory. The de‐
-              fault is '*.srt'.
-
-              Shell options 'nullglob', 'extglob' and 'globstar'  are  enabled
-              internally  in  search-in-subs, thus the default glob pattern is
-              sensitive to those options.
 
        -v, --verbose
               Print the filename even if there were no matches found  in  that
@@ -256,10 +288,13 @@ OPTIONS
               Use   regular   expressions   instead   of   fixed   strings  in
               <search_term>s.
 
-              Also see REGULAR EXPESSIONS below.
+              The regular expressions used are POSIX Extended Regular  Expres‐
+              sions  as  implemented  in  GNU  sed. More information on can be
+              found        at        <https://www.gnu.org/software/sed/manual/
+              sed.html#sed-regular-expressions>.
 
        -R, --no-regex
-              Use  fixed   strings   instead   of   regular   expressions   in
+              Use   fixed   strings   instead   of   regular   expressions  in
               <search_term>s. This is the default.
 
        -c, --match-case
@@ -269,16 +304,16 @@ OPTIONS
               Make the search case-insensitive. This is the default.
 
        -e, --exact-whitespace
-              Match   whitespace   characters  exactly  as  specified  in  the
+              Match  whitespace  characters  exactly  as  specified   in   the
               <search_term>.
 
        -E, --no-exact-whitespace
-              Treat all whitespace characters the same during search -  ignor‐
-              ing  the  type of whitespace character, and how many of them ap‐
+              Treat  all whitespace characters the same during search - ignor‐
+              ing the type of whitespace character, and how many of  them  ap‐
               pear in a sequence. This is the default.
 
               Whitespace characters are: space, newline, carriage return, hor‐
-              izontal  tab, vertical tab and form feed (POSIX Extended Regular
+              izontal tab, vertical tab and form feed (POSIX Extended  Regular
               Expressions '[:space:]' character class).
 
    Statistics
@@ -300,11 +335,11 @@ OPTIONS
               Compactify headers in the statistics table.
 
        -M, --stats-headers-no-compact
-              Do not compactify headers in the statistics table. This  is  the
+              Do  not  compactify headers in the statistics table. This is the
               default.
 
        -n, --stats-headers-file-numbers
-              Show  file  numbers in the headers of the statistics table. This
+              Show file numbers in the headers of the statistics  table.  This
               is the default.
 
        -N, --stats-headers-no-file-numbers
@@ -313,30 +348,30 @@ OPTIONS
        -w, --stats-wrap-filenames
               Wrap filenames in the statistics table. This is the default.
 
-              The table always fits the width  of  the  terminal  screen,  but
+              The  table  always  fits  the  width of the terminal screen, but
               filenames may be printed on multiple lines.
 
        -W, --stats-no-wrap-filenames
               Do not wrap filenames in the statistics table.
 
-              Files  are always printed one per row, regardless of whether the
+              Files are always printed one per row, regardless of whether  the
               table fits the width of the terminal screen.
 
    mpv EDL generation
        -p, --edl-play
               Play search results in mpv.
 
-              Unless             -f, --edl-save-files-relative              or
+              Unless              -f, --edl-save-files-relative             or
               -F, --edl-save-files-absolute is used together with this option,
-              temporary EDL files are generated and saved in the cache  direc‐
-              tory     (see     FILES     for     more    information).    The
+              temporary  EDL files are generated and saved in the cache direc‐
+              tory    (see    FILES     for     more     information).     The
               -k, --edl-keep-temporary and -K, --edl-no-keep-temporary options
-              control  whether  or the temporary EDL files are deleted or kept
+              control whether or the temporary EDL files are deleted  or  kept
               after mpv player closes.
 
-              If               -f, --edl-save-files-relative                or
-              -F, --edl-save-files-absolute     is    used    together    with
-              -p, --edl-play, then temporary files are not generated  and  the
+              If                -f, --edl-save-files-relative               or
+              -F, --edl-save-files-absolute    is    used    together     with
+              -p, --edl-play,  then  temporary files are not generated and the
               saved EDL files are played.
 
        -P, --edl-no-play
@@ -347,7 +382,7 @@ OPTIONS
               in mpv.
 
        -K, --edl-play-no-keep-temporary
-              Do not keep temporary EDL files that are created to play  search
+              Do  not keep temporary EDL files that are created to play search
               results in mpv. This is the default.
 
               The temporary files are deleted right after mpv player closes.
@@ -358,37 +393,41 @@ OPTIONS
               imal separator are allowed. The default <value> is 0.
 
        -a, --edl-play-after=<value>
-              Add  a specified amount of time after each segment when generat‐
+              Add a specified amount of time after each segment when  generat‐
               ing EDL files. <value> is in seconds. Precise values with a dec‐
               imal separator are allowed. The default <value> is 0.
 
-       -f, --edl-save-files-relative[={<path>[/]|<path>/<name>.edl|<name>.edl}]
-              Save EDL files that use relative paths to refer to source files.
-              The default value is unset. When omitted, the value is ''.
+       --edl-play-srt-secondary-ext=<value>
+              Specify a custom secondary filename extension for SRT files. See
+              also conf_srt_secondary_ext.
 
-              If  <path>  is not given, the EDL files are saved to the current
-              working  directory.  If  <name>   is   not   given,   the   name
-              'search_results.edl' will be used.
+       -f, --edl-save[={<path>[/]|<path>/<name>.edl|<name>.edl}]
+              Save  EDL  files  to  a specified location instead of generating
+              temporary ones.
+
+              If <path> is not given, the EDL files are saved to  the  current
+              working  directory.  If  <name>  is  not  given, the name set by
+              conf_edl_default_name will be used.
 
               A '.edl' extension after <name> is required because it serves to
-              distinguish a directory called "<name>" from a name  of  an  EDL
-              file.  To save to a directory whose name ends in '.edl' (without
+              distinguish  a  directory  called "<name>" from a name of an EDL
+              file. To save to a directory whose name ends in '.edl'  (without
               specifying "<name>.edl"), add a trailing forward slash ('/') af‐
               ter <path>.
 
-       -F, --edl-save-files-absolute[={<path>[/]|<path>/<name>.edl|<name>.edl}]
-              Save EDL files that use absolute paths to refer to source files.
-              The default value is unset. When omitted, the value is ''.
-
-              See  -f,  --edl-save-files-relative  for information on usage of
-              <path> and <name> values.
-
-       --edl-no-save-files
+       -F, --edl-no-save
               Do not save EDL files, but  generate  temporary  files  instead.
               This is the default.
 
-              This     option     disables     -f, --edl-save-files-relative /
-              -F, --edl-save-files-absolute.
+       --edl-save-paths=<value>
+              What  kind of paths to use in saved EDL files to refer to source
+              files.
+
+              relative
+                     Use relative paths. This is the default.
+
+              absolute
+                     Use absolute paths.
 
        -d, --edl-save-mkdir
               Create  the  EDL   save   directory   (the   <path>   value   of
@@ -464,19 +503,128 @@ OPTIONS
               optdata__mpv_opts__append.
 
    Other
-       --color
-              Colorize the output. This is the default.
+       --color[={always|auto|never}]
+              Colorize the output. The default value is 'auto'.
+
+              always    Always colorize.
+
+              [auto]    Colorize if stdout is connected to a terminal.
+
+              never     Never colorize.
 
        --no-color
-              Disable colorization of the output.
+              Disable  colorization  of  the output. Equivalent to -c, --color
+              set to 'never'.
 
-       --help Print help.
+       --help Open the man page.
 
        --version
               Print version information.
 
+       --config[={edit|generate|remove|auto}]
+              Perform an action on the configuration file. See also CONFIGURA‐
+              TION and FILES below.
+
+              edit   Open an existing configuration file in a text editor.
+
+              generate
+                     Generate a new configuration file.
+
+              remove Delete  an existing configuration file. If the configura‐
+                     tion directory doesn't have any other files, it  is  also
+                     deleted.
+
+              [auto] Generate a configuration file if it does not exist. If it
+                     does, open it in a text editor. This is the default.
+
+CONFIGURATION
+       This is how command line options and configuration variables correspond
+       to each other. The command line option on the left sets the variable(s)
+       on the right internally.
+
+       Special symbols in the right column:
+
+       -      This option is non-configurable.
+
+       "      This option sets the same variable(s) as the one above.
+
+       -t, --search-term=<value>              opt_search_term
+       -v, --verbose                          opt_verbose
+       -V, --no-verbose                       "
+       -i, --inverse                          opt_inverse
+       -I, --no-inverse                       "
+       -q, --quiet                            opt_quiet
+       -Q, --no-quiet                         "
+       -r, --regex                            opt_regex
+       -R, --no-regex                         "
+       -c, --match-case                       opt_match_case
+       -C, --no-match-case                    "
+       -e, --exact-whitespace                 opt_exact_whitespace
+       -E, --no-exact-whitespace              "
+       -s, --stats                            opt_stats
+       -S, --no-stats                         "
+       -h, --stats-headers                    opt_stats_headers
+       -H, --stats-no-headers                 "
+       -m, --stats-headers-compact            opt_stats_headers_compact
+       -M, --stats-headers-no-compact         "
+       -n, --stats-headers-file-numbers       opt_stats_headers_file_numbers
+       -N, --stats-headers-no-file-numbers    "
+       -w, --stats-wrap-filenames             opt_stats_wrap_filenames
+       -W, --stats-no-wrap-filenames          "
+       -p, --edl-play                         opt_edl_play
+       -P, --edl-no-play                      "
+       -k, --edl-play-keep-temporary          opt_edl_play_keep_temporary
+       -K, --edl-play-no-keep-temporary       "
+       -b, --edl-play-before=<value>          opt_edl_play_before
+       -a, --edl-play-after=<value>           opt_edl_play_after
+       --edl-play-srt-secondary-ext=<value>   -
+       -f, --edl-save[=<value>]               opt_edl_save
+                                              optdata__edl_save__file
+       -F, --edl-no-save                      "
+       --edl-save-paths=<value>               opt_edl_save_paths
+       -d, --edl-save-mkdir                   opt_edl_save_mkdir
+       -D, --edl-save-no-mkdir                "
+       -y, --edl-save-overwrite               opt_edl_save_overwrite
+       -Y, --edl-save-no-overwrite            "
+       -o, --edl-ignore-missing               opt_edl_ignore_missing
+       -O, --edl-no-ignore-missing            "
+       -u, --edl-structure=<value>            opt_edl_structure
+       --mpv-opts=<value>                     opt_mpv_opts
+                                              optdata__mpv_opts__append
+       --color[=<value>]                      opt_color
+       --no-color                             "
+       --help                                 -
+       --version                              -
+       --config[=<value>]                     -
+
+   Configuration file-only parameters
+       conf_default_glob
+              A shell glob pattern to use when  no  <file|dir>  arguments  are
+              specified, or when a <file|dir> argument is a directory. The de‐
+              fault is '*.srt'.
+
+              Shell options 'nullglob', 'extglob' and 'globstar'  are  enabled
+              internally  in  search-in-subs, thus the default glob pattern is
+              sensitive to those options.
+
+       conf_edl_default_name
+              The default name for a generated EDL file. The default value  is
+              'search_results'.
+
+       conf_srt_secondary_ext
+              Secondary  filename  extensions for SRT files. The default value
+              includes standard language codes.
+
+              Since there are a lot of language codes, the  default  value  is
+              not  included in the configuration file generated with --config.
+              Instead, a template for adding to the default  array  is  gener‐
+              ated.
+
+              See  also  --edl-play-srt-secondary-ext.  It adds values to this
+              array temporarily from the command line.
+
 EXIT STATUS
-       0      Success.  No  errors  have  occured,  and at least one match was
+       0      Success. No errors have occured, and  at  least  one  match  was
               found.
 
        1      A general error has occured.
@@ -486,11 +634,26 @@ EXIT STATUS
        3      EDL     generation     failed.     Can     only     occur     if
               -O, --edl-no-ignore-missing is set.
 
-REGULAR EXPRESSIONS
-       The  regular expressions used are POSIX Extended Regular Expressions as
-       implemented  in  GNU  sed.  More  information  on  can  be   found   at
-       <https://www.gnu.org/software/sed/manual/
-       sed.html#sed-regular-expressions>.
+ENVIRONMENT
+       The values of VISUAL and EDITOR  environment  variables  determine  the
+       text editor when opening configuration files with --config.
+
+       VISUAL  is  evaluated  first. If that is not set, then EDITOR is evalu‐
+       ated. If neither is set, nano is used as the text editor.
+
+FILES
+       A configuration file can be used to  change  the  default  behavior  of
+       search-in-subs.
+
+       The  configuration file's location is "$XDG_CONFIG_HOME/search-in-subs/
+       config.bash". If "XDG_CONFIG_HOME" is not set, it defaults  to  "$HOME/
+       .config".
+
+       Temporary  EDL  files  that are generated when using the -p, --edl-play
+       option are stored in a cache directory.
+
+       The cache directory's location is "$XDG_CACHE_HOME/search-in-subs".  If
+       "XDG_CACHE_HOME" is not set, it defaults to "$HOME/.cache".
 
 STATISTICS
        If the -s, --stats option is enabled, search-in-subs gathers statistics
@@ -521,7 +684,7 @@ STATISTICS
        Unmatched   Total number of subtitles in all files that did not have matches.
        Matched %   Total percentage of subtitles in all files that had matches.
 
-       In  the  'File'  column of the 'Total' row, information is presented in
+       In the 'File' column of the 'Total' row, information  is  presented  in
        the following format:
 
        <Matched> / <Total> (<Unmatched>) <Matched %>
@@ -532,20 +695,6 @@ STATISTICS
        <Total>       Total number of files.
        <Unmatched>   Total number of files that did not have matches.
        <Matched %>   Percentage of files that had matches.
-
-FILES
-       A configuration file can be used to  change  the  default  behavior  of
-       search-in-subs.
-
-       The  configuration file's location is "$XDG_CONFIG_HOME/search-in-subs/
-       config.bash". If "XDG_CONFIG_HOME" is not set, it defaults  to  "$HOME/
-       .config".
-
-       Temporary  EDL  files  that are generated when using the -p, --edl-play
-       option are stored in a cache directory.
-
-       The cache directory's location is "$XDG_CACHE_HOME/search-in-subs".  If
-       "XDG_CACHE_HOME" is not set, it defaults to "$HOME/.cache".
 
 AUTHOR
        Alex Rogers <https://github.com/linguisticmind>
@@ -560,7 +709,7 @@ COPYRIGHT
        This is free software: you are free  to  change  and  redistribute  it.
        There is NO WARRANTY, to the extent permitted by law.
 
-SEARCH-IN-SUBS 0.2.6                 2025                    SEARCH-IN-SUBS(1)
+SEARCH-IN-SUBS 0.3.0              2025-03-23                 SEARCH-IN-SUBS(1)
 ```
 
 ## License

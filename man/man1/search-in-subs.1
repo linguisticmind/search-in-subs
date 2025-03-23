@@ -1,4 +1,4 @@
-.TH SEARCH-IN-SUBS 1 2025 "SEARCH-IN-SUBS 0.2.6"
+.TH SEARCH-IN-SUBS 1 2025-03-23 "SEARCH-IN-SUBS 0.3.0"
 .
 .SH NAME
 .
@@ -6,7 +6,7 @@ search-in-subs \- search for words in subtitle files
 .
 .SH SYNOPSIS
 .
-.SY "search-in-subs"
+.SY search-in-subs
 [<options>] -t <search_term> ... [<file|dir> ...]
 .YS
 .
@@ -14,11 +14,11 @@ search-in-subs \- search for words in subtitle files
 .P
 \fBsearch-in-subs\fR allows the user to search for text in SRT subtitle files.
 .P
-At least one search term must be specified to run a search (see \%\fB-t,\ --search-term\fR). If no \%<file|dir> argument is given, a glob pattern set with the \%\fB-g,\ --default-glob\fR option is used to match subtitle files. If a \%<file|dir> argument is a directory, files matching the default glob pattern in that directory are added to the search.
+At least one search term must be specified to run a search (see \%\fB-t,\ --search-term\fR). If no \%<file|dir> argument is given, a glob pattern set with the \%\fBconf_default_glob\fR option is used to match subtitle files. If a \%<file|dir> argument is a directory, files matching the default glob pattern in that directory are added to the search.
 .P
-The built-in value of \%\fB-g,\ --default-glob\fR is \%'*.srt', which matches all files with the '.srt' extension in the current working directory. That value can be changed to any other glob pattern in the configuration file (see FILES below).
+The default value of \%\fBconf_default_glob\fR is \%'*.srt', which matches all files with the '.srt' extension in the current working directory. That value can be changed to any other glob pattern in the configuration file (see CONFIGURATION and FILES below).
 .P
-Shell options \%'nullglob', \%'extglob' and \%'globstar' are enabled internally in \%\fBsearch-in-subs\fR, so shell globbing can be used to its full capacity when setting \%\fB-g,\ --default-glob\fR. For example, to match all \%'.srt' files in the current working directory recursively, including all of its subdirectories, one could set \%\fB-g,\ --default-glob\fR to \%'**/*.srt'.
+Shell options \%'nullglob', \%'extglob' and \%'globstar' are enabled internally in \%\fBsearch-in-subs\fR, so shell globbing can be used to its full capacity when setting \%\fBconf_default_glob\fR. For example, to match all \%'.srt' files in the current working directory recursively, including all of its subdirectories, one could set \%\fBconf_default_glob\fR to \%'**/*.srt'.
 .P
 \%\fBsearch-in-subs\fR can also gather statistics on searches that it runs. Try running a search with the \%\fB-s,\ --stats\fR option set. For more information, see STATISTICS below.
 .
@@ -26,7 +26,7 @@ Shell options \%'nullglob', \%'extglob' and \%'globstar' are enabled internally 
 .P
 \%\fBsearch-in-subs\fR can generate EDL files for \%\fBmpv\fR player, and play the search results using it. To use this functionality, \%\fBmpv\fR, \%\fBffmpeg\fR and \%\fBlua\fR\ (v5.4) must be installed and available on system's PATH.
 .P
-In order to generate the EDL files, a video or audio file must exist in the same directory as the subtitle file(s) on which the search is performed. The video or audio file must have the same name as the subtitle file, minus the \%'.srt' extension and potentially a secondary extension containing a language code, e.g. \%'.en.srt'. If both video and audio files are found, video files take precedence. If multiple video or audio files are found, the first one will be chosen for use in the generated EDL files.
+In order to generate the EDL files, a video or audio file must exist in the same directory as the subtitle file(s) on which the search is performed. The video or audio file must have the same name as the subtitle file, minus the \%'.srt' extension and potentially a secondary extension containing a language code, e.g. \%'.en.srt'. Custom secondary extensions may be added with \%\fBconf_srt_secondary_ext\fR or set temporarily on the command line with \%\fB--edl-play-srt-secondary-ext\fR. If both video and audio files are found, video files take precedence. If multiple video or audio files are found, the first one will be chosen for use in the generated EDL files.
 .P
 See \%\fB--edl-*\fR options below for more information.
 .P
@@ -38,9 +38,9 @@ More information on mpv EDL format can be found at \%<https://github.com/\:mpv-p
 .P
 Enhanced \%\fBgetopt\fR syntax applies when passing options. There is one important point to highlight when it comes to passing options with required vs optional arguments.
 .P
-In case of a short option, if an option takes a *required* argument, the argument may be written as a separate parameter, *or* directly after the option character. If an option takes an *optional* argument, however, the argument *must* be written directly after the option character.
+In case of a short option, if an option takes a \fIrequired\fR argument, the argument may be written as a separate parameter, \fIor\fR directly after the option character. If an option takes an \fIoptional\fR argument, however, the argument \fImust\fR be written directly after the option character.
 .P
-In case of a long option, if an option takes a *required* argument, the argument may be written as a separate parameter, *or* directly after the option name, separated by an equals sign \%('='). If an option takes an *optional* argument, however, the argument *must* be written directly after the option name, separated by an equals sign \%('=').
+In case of a long option, if an option takes a \fIrequired\fR argument, the argument may be written as a separate parameter, \fIor\fR directly after the option name, separated by an equals sign \%('='). If an option takes an \fIoptional\fR argument, however, the argument \fImust\fR be written directly after the option name, separated by an equals sign \%('=').
 .
 .TS
 tab(|);
@@ -53,7 +53,7 @@ Optional argument|\fB-o\fR[<value>]|\fB--option\fR[=<value>]
 .
 .P
 Options that take optional arguments can be recognized in the options list below by their \%<value> and the preceding equals sign being enclosed in square brackets:
-.
+.P
 .EX
 \fB-o, --option\fR[=<value>]
 .EE
@@ -66,12 +66,6 @@ Text to search for. Can be a fixed string or a regular expression depending on t
 .
 .sp
 At least one search term must be given to perform a search. Setting this option multiple times sets multiple search terms.
-.
-.TP
-.B \%-g,\ --default-glob\fR=<glob_pattern>
-A shell glob pattern to use when no \%<file|dir> arguments are specified, or when a \%<file|dir> argument is a directory. The default is \%'*.srt'.
-.sp
-Shell options \%'nullglob', \%'extglob' and \%'globstar' are enabled internally in \%\fBsearch-in-subs\fR, thus the default glob pattern is sensitive to those options.  
 .
 .TP
 .B \%-v,\ --verbose
@@ -101,7 +95,7 @@ Do not suppress printing of matches or filenames. This is the default.
 .B \%-r,\ --regex
 Use regular expressions instead of fixed strings in \%<search_term>s.
 .sp
-Also see REGULAR EXPESSIONS below.
+The regular expressions used are POSIX Extended Regular Expressions as implemented in GNU sed. More information on can be found at \%<https://www.gnu.org/\:software/\:sed/\:manual/\:sed.html#sed-regular-expressions>.
 .
 .TP
 .B \%-R,\ --no-regex
@@ -206,24 +200,33 @@ Add a specified amount of time before each segment when generating EDL files. \%
 Add a specified amount of time after each segment when generating EDL files. \%<value> is in seconds. Precise values with a decimal separator are allowed. The default \%<value> is 0.
 .
 .TP
-.B \%-f,\ --edl-save-files-relative\fR[={<path>[/]|<path>/<name>.edl|<name>.edl}]
-Save EDL files that use relative paths to refer to source files. The default value is unset. When omitted, the value is ''.
+.B \%--edl-play-srt-secondary-ext\fR=<value>
+Specify a custom secondary filename extension for SRT files. See also \%\fBconf_srt_secondary_ext\fR.
+.
+.TP
+.B \%-f,\ --edl-save\fR[={<path>[/]|<path>/<name>.edl|<name>.edl}]
+Save EDL files to a specified location instead of generating temporary ones.
 .sp
-If \%<path> is not given, the EDL files are saved to the current working directory. If \%<name> is not given, the name \%'search_results.edl' will be used.
+If \%<path> is not given, the EDL files are saved to the current working directory. If \%<name> is not given, the name set by \%\fBconf_edl_default_name\fR will be used.
 .sp
 A '.edl' extension after \%<name> is required because it serves to distinguish a directory called \%"<name>" from a name of an EDL file. To save to a directory whose name ends in \%'.edl' (without specifying \%"<name>.edl"), add a trailing forward slash \%('/') after \%<path>.
 .
 .TP
-.B \%-F,\ --edl-save-files-absolute\fR[={<path>[/]|<path>/<name>.edl|<name>.edl}]
-Save EDL files that use absolute paths to refer to source files. The default value is unset. When omitted, the value is ''.
-.sp
-See \fB-f, --edl-save-files-relative\fR for information on usage of \%<path> and \%<name> values.
+.B \%-F,\ --edl-no-save
+Do not save EDL files, but generate temporary files instead. This is the default.
 .
 .TP
-.B --edl-no-save-files
-Do not save EDL files, but generate temporary files instead. This is the default.
-.sp
-This option disables \%\fB-f,\ --edl-save-files-relative\fR\ / \%\fB-F,\ --edl-save-files-absolute\fR.
+.B \%--edl-save-paths\fR=<value>
+What kind of paths to use in saved EDL files to refer to source files.
+.
+.RS
+.TP
+relative
+Use relative paths. This is the default.
+.TP
+absolute
+Use absolute paths.
+.RE
 .
 .TP
 .B \%-d,\ --edl-save-mkdir
@@ -258,7 +261,7 @@ If set, an error message is shown listing subtitle files for which no correspond
 Determines the structure of the set of generated EDL files. \%<value> can be \%'flat', \%'subdir', \%'subdir_hidden', \%'subdir_except_chapters' or \%'subdir_hidden_except_chapters'. The default \%<value> is \%'flat'.
 .
 .TP
-.B --mpv-opts\fR=[:[:]]<opts>
+.B \%--mpv-opts\fR=[:[:]]<opts>
 Options to \%\fBmpv\fR player.
 .sp
 \%<opts> is an option string that follows \%\fBxargs\fR quoting. It can be preceded by a single colon, double colon, or nothing.
@@ -278,20 +281,138 @@ The name of the variable that controls this has the following format: \%\fBoptda
 .SS Other
 .
 .TP
-.B --color
-Colorize the output. This is the default.
+.B \%--color\fR[={always|auto|never}]\fR
+Colorize the output. The default value is 'auto'.
+.
+.RS
+.TP 10
+always
+Always colorize.
+.TP
+[auto]
+Colorize if stdout is connected to a terminal.
+.TP
+never
+Never colorize.
+.RE
 .
 .TP
-.B --no-color
-Disable colorization of the output.
+.B \%--no-color\fR
+Disable colorization of the output. Equivalent to \fB\%-c,\ --color\fR set to 'never'.
 .
 .TP
-.B --help
-Print help.
+.B \%--help
+Open the man page.
 .
 .TP
-.B --version
+.B \%--version
 Print version information.
+.
+.TP
+.B \%--config\fR[={edit|generate|remove|auto}]
+Perform an action on the configuration file. See also CONFIGURATION and FILES below.
+.
+.RS
+.TP
+edit
+Open an existing configuration file in a text editor.
+.TP
+generate
+Generate a new configuration file.
+.TP
+remove
+Delete an existing configuration file. If the configuration directory doesn't have any other files, it is also deleted.
+.TP
+[auto]
+Generate a configuration file if it does not exist. If it does, open it in a text editor. This is the default.
+.RE
+.
+.SH CONFIGURATION
+.P
+This is how command line options and configuration variables correspond to each other. The command line option on the left sets the variable(s) on the right internally.
+.P
+Special symbols in the right column:
+.
+.TP
+-
+This option is non-configurable.
+.TP
+"
+This option sets the same variable(s) as the one above.
+.
+.P
+.TS
+nokeep;
+lb lb .
+-t, --search-term\fR=<value>	opt_search_term
+-v, --verbose	opt_verbose
+-V, --no-verbose	\fR"
+-i, --inverse	opt_inverse
+-I, --no-inverse	\fR"
+-q, --quiet	opt_quiet
+-Q, --no-quiet	\fR"
+-r, --regex	opt_regex
+-R, --no-regex	\fR"
+-c, --match-case	opt_match_case
+-C, --no-match-case	\fR"
+-e, --exact-whitespace	opt_exact_whitespace
+-E, --no-exact-whitespace	\fR"
+-s, --stats	opt_stats
+-S, --no-stats	\fR"
+-h, --stats-headers	opt_stats_headers
+-H, --stats-no-headers	\fR"
+-m, --stats-headers-compact	opt_stats_headers_compact
+-M, --stats-headers-no-compact	\fR"
+-n, --stats-headers-file-numbers	opt_stats_headers_file_numbers
+-N, --stats-headers-no-file-numbers	\fR"
+-w, --stats-wrap-filenames	opt_stats_wrap_filenames
+-W, --stats-no-wrap-filenames	\fR"
+-p, --edl-play	opt_edl_play
+-P, --edl-no-play	\fR"
+-k, --edl-play-keep-temporary	opt_edl_play_keep_temporary
+-K, --edl-play-no-keep-temporary	\fR"
+-b, --edl-play-before\fR=<value>	opt_edl_play_before
+-a, --edl-play-after\fR=<value>	opt_edl_play_after
+--edl-play-srt-secondary-ext\fR=<value>	\fR-
+-f, --edl-save\fR[=<value>]	opt_edl_save
+	optdata__edl_save__file
+-F, --edl-no-save	\fR"
+--edl-save-paths\fR=<value>	opt_edl_save_paths
+-d, --edl-save-mkdir	opt_edl_save_mkdir
+-D, --edl-save-no-mkdir	\fR"
+-y, --edl-save-overwrite	opt_edl_save_overwrite
+-Y, --edl-save-no-overwrite	\fR"
+-o, --edl-ignore-missing	opt_edl_ignore_missing
+-O, --edl-no-ignore-missing	\fR"
+-u, --edl-structure\fR=<value>	opt_edl_structure
+--mpv-opts\fR=<value>	opt_mpv_opts
+	optdata__mpv_opts__append
+--color\fR[=<value>]	opt_color
+--no-color\fR	\fR"
+--help	\fR-
+--version	\fR-
+--config\fR[=<value>]	\fR-
+.TE
+.
+.SS Configuration file-only parameters
+.
+.TP
+.B \%conf_default_glob
+A shell glob pattern to use when no \%<file|dir> arguments are specified, or when a \%<file|dir> argument is a directory. The default is \%'*.srt'.
+.sp
+Shell options \%'nullglob', \%'extglob' and \%'globstar' are enabled internally in \%\fBsearch-in-subs\fR, thus the default glob pattern is sensitive to those options.  
+.
+.TP
+.B \%conf_edl_default_name
+The default name for a generated EDL file. The default value is \%'search_results'.
+.
+.TP
+.B \%conf_srt_secondary_ext
+Secondary filename extensions for SRT files. The default value includes standard language codes.
+.sp
+Since there are a lot of language codes, the default value is not included in the configuration file generated with \%\fB--config\fR. Instead, a template for adding to the default array is generated. 
+.sp
+See also \%\fB--edl-play-srt-secondary-ext\fR. It adds values to this array temporarily from the command line.
 .
 .SH EXIT STATUS
 .
@@ -308,15 +429,27 @@ No matches were found.
 3
 EDL generation failed. Can only occur if \%\fB-O,\ --edl-no-ignore-missing\fR is set.
 .
-.SH REGULAR EXPRESSIONS
+.SH ENVIRONMENT
 .P
-The regular expressions used are POSIX Extended Regular Expressions as implemented in GNU sed. More information on can be found at \%<https://www.gnu.org/\:software/\:sed/\:manual/\:sed.html#sed-regular-expressions>.
+The values of \%\fBVISUAL\fR and \%\fBEDITOR\fR environment variables determine the text editor when opening configuration files with \%\fB--config\fR.
+.P
+\%\fBVISUAL\fR is evaluated first. If that is not set, then \%\fBEDITOR\fR is evaluated. If neither is set, \%\fBnano\fR is used as the text editor.
+.
+.SH FILES
+.P
+A configuration file can be used to change the default behavior of \%\fBsearch-in-subs\fR.
+.P
+The configuration file's location is \%"$XDG_CONFIG_HOME/\:search-in-subs/\:config.bash". If \%"XDG_CONFIG_HOME" is not set, it defaults to \%"$HOME/\:.config".
+.P
+Temporary EDL files that are generated when using the \%\fB-p,\ --edl-play\fR option are stored in a cache directory.
+.P
+The cache directory's location is \%"$XDG_CACHE_HOME/\:search-in-subs". If \%"XDG_CACHE_HOME" is not set, it defaults to \%"$HOME/\:.cache".
 .
 .SH STATISTICS
 .P
 If the \%\fB-s,\ --stats\fR option is enabled, \%\fBsearch-in-subs\fR gathers statistics on the search that it performs and displays those statistics in a table at the end of the output.
 .P
-The 'Matched', 'Total', 'Unmatched' and 'Matched %' columns of that table contain the following data: 
+The 'Matched', 'Total', 'Unmatched' and 'Matched\ %' columns of that table contain the following data: 
 .P
 In the file rows: 
 .
@@ -353,7 +486,7 @@ Matched %|Total percentage of subtitles in all files that had matches.
 .P
 In the 'File' column of the 'Total' row, information is presented in the following format:
 .P
-<Matched> / <Total> (<Unmatched>) <Matched %>
+<Matched> / <Total> (<Unmatched>) <Matched\ %>
 .P
 Where the placeholder values represent the following:
 .
@@ -365,16 +498,6 @@ l l .
 <Unmatched>|Total number of files that did not have matches.
 <Matched %>|Percentage of files that had matches.
 .TE
-.
-.SH FILES
-.P
-A configuration file can be used to change the default behavior of \%\fBsearch-in-subs\fR.
-.P
-The configuration file's location is \%"$XDG_CONFIG_HOME/\:search-in-subs/\:config.bash". If \%"XDG_CONFIG_HOME" is not set, it defaults to \%"$HOME/\:.config".
-.P
-Temporary EDL files that are generated when using the \%\fB-p,\ --edl-play\fR option are stored in a cache directory.
-.P
-The cache directory's location is \%"$XDG_CACHE_HOME/\:search-in-subs". If \%"XDG_CACHE_HOME" is not set, it defaults to \%"$HOME/\:.cache".
 .
 .SH AUTHOR
 .P
