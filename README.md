@@ -161,13 +161,6 @@ Note that on Debian, `bat`'s executable is [called `batcat` instead of `bat`](ht
 
     A copy of the manual page is also [included in this README file](#manual).
 
-4. (OPTIONAL) Copy the [example config file](config.bash) to the config directory:
-
-    ```bash
-    mkdir -v ~/.config/search-in-subs
-    cp -v ~/repos/search-in-subs/config.bash ~/.config/search-in-subs
-    ```
-
 ## Manual
 
 ```plain
