@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-declare -- version='0.3.0'
+declare -- version='0.3.1'
 
 declare -- script_source=$(realpath -- "${BASH_SOURCE[0]}")
 declare -- script_name="${script_source##*/}"
@@ -29,7 +29,7 @@ shopt -s extglob globstar nullglob
 function bat_or_cat { { type -P batcat || type -P bat; } > /dev/null && "$_" "$@" || cat; }
 
 declare -- opts
-opts=$(getopt -n "$script_name" -o 't:,v,V,i,I,q,Q,r,R,c,C,e,E,s,S,h,H,m,M,n,N,w,W,p,P,k,K,b:,a:,f::,F,d,D,y,Y,o,O,u:,' -l 'search-term:,verbose,no-verbose,inverse,no-inverse,quiet,no-quiet,regex,no-regex,match-case,no-match-case,exact-whitespace,no-exact-whitespace,stats,no-stats,stats-headers,stats-no-headers,stats-headers-compact,stats-headers-no-compact,stats-headers-file-numbers,stats-headers-no-file-numbers,stats-wrap-filenames,stats-no-wrap-filenames,edl-play,edl-no-play,edl-play-keep-temporary,edl-play-no-keep-temporary,edl-play-before:,edl-play-after:,edl-play-srt-secondary-ext:,edl-save::,edl-no-save,edl-save-paths:,edl-save-mkdir,edl-save-no-mkdir,edl-save-overwrite,edl-save-no-overwrite,edl-ignore-missing,edl-no-ignore-missing,edl-structure:,mpv-opts:,color::,no-color,help,version,config::,' -- "$@") || exit 1
+opts=$(getopt -n "$script_name" -o 't:,v,V,i,I,j,J,q,Q,r,R,c,C,e,E,s,S,h,H,m,M,n,N,w,W,p,P,k,K,b:,a:,f::,F,d,D,y,Y,o,O,u:,' -l 'search-term:,verbose,no-verbose,inverse,no-inverse,filenames-nly,no-filenames-only,quiet,no-quiet,regex,no-regex,match-case,no-match-case,exact-whitespace,no-exact-whitespace,stats,no-stats,stats-headers,stats-no-headers,stats-headers-compact,stats-headers-no-compact,stats-headers-file-numbers,stats-headers-no-file-numbers,stats-wrap-filenames,stats-no-wrap-filenames,edl-play,edl-no-play,edl-play-keep-temporary,edl-play-no-keep-temporary,edl-play-before:,edl-play-after:,edl-play-srt-secondary-ext:,edl-save::,edl-no-save,edl-save-paths:,edl-save-mkdir,edl-save-no-mkdir,edl-save-overwrite,edl-save-no-overwrite,edl-ignore-missing,edl-no-ignore-missing,edl-structure:,mpv-opts:,color::,no-color,help,version,config::,' -- "$@") || exit 1
 eval set -- "$opts"
 unset -v opts
 
@@ -86,6 +86,7 @@ declare -a conf_srt_secondary_ext+=()
 declare -a opt_search_term=()
 declare -- opt_verbose=
 declare -- opt_inverse=
+declare -- opt_filenames_only=
 declare -- opt_quiet=
 declare -- opt_regex=
 declare -- opt_match_case=
@@ -123,6 +124,8 @@ while true; do
     -V | --no-verbose ) opt_verbose=; shift ;;
     -i | --inverse ) opt_inverse=1; shift ;;
     -I | --no-inverse ) opt_inverse=; shift ;;
+    -j | --filenames-only ) opt_filenames_only=1; shift ;;
+    -J | --no-filenames-only ) opt_filenames_only=; shift ;;
     -q | --quiet ) opt_quiet=1; shift ;;
     -Q | --no-quiet ) opt_quiet=; shift ;;
     -r | --regex ) opt_regex=1; shift ;;
@@ -318,6 +321,8 @@ unset -v search_term
 
 search_term_re="${search_term_re%|}"
 
+declare -- optdata__filenames_only__inv
+[[ ! $opt_filenames_only ]] && optdata__filenames_only__inv=1
 declare -- optdata__match_case__inv
 [[ ! $opt_match_case ]] && optdata__match_case__inv=1
 
@@ -501,11 +506,11 @@ for (( i = 1; i <= $#; i++ )); do
     [[ $opt_stats ]] && ((stats_number_subtitles_matched[${!i}]++))
 
     [[ ! $opt_quiet && ! $opt_inverse && ! $file_has_matches ]] &&
-      printf ${opt_color:+'\x1b[38;5;34m'}'%s'${opt_color:+'\x1b[39m'}'\n\n' "${!i}" 
+      printf ${opt_color:+'\x1b[38;5;34m'}'%s'${opt_color:+'\x1b[39m'}'\n'${optdata__filenames_only__inv:+'\n'} "${!i}" 
 
     file_has_matches=1
 
-    [[ ! $opt_quiet && ! $opt_inverse ]] && printf '%s\n\n' "$subtitle"
+    [[ ! $opt_quiet && ! $opt_filenames_only && ! $opt_inverse ]] && printf '%s\n\n' "$subtitle"
 
   done < <(
 

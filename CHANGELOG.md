@@ -8,6 +8,19 @@
     </tr>
     <tr>
         <td>
+            <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.3.1'>0.3.1</a>
+        </td>
+        <td>
+           2025-03-24
+        </td>
+        <td>
+            <p>
+                Added <code>-j, --filenames-only</code>, <code>-J, --no-filenames-only</code>. This option suppresses printing of matches, only printing the names of the files where matches were found.
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
             <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.3.0'>0.3.0</a>
         </td>
         <td>

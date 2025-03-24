@@ -41,6 +41,19 @@ Video tutorials:
     </tr>
     <tr>
         <td>
+            <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.3.1'>0.3.1</a>
+        </td>
+        <td>
+           2025-03-24
+        </td>
+        <td>
+            <p>
+                Added <code>-j, --filenames-only</code>, <code>-J, --no-filenames-only</code>. This option suppresses printing of matches, only printing the names of the files where matches were found.
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
             <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.3.0'>0.3.0</a>
         </td>
         <td>
@@ -268,6 +281,14 @@ OPTIONS
        -I, --no-inverse
               Do not supress printing of matches and names of the files  where
               matches were found. This is the default.
+
+       -j, --filenames-only
+              Suppress  printing  of matched subtitles. Only print the name of
+              the file where matches were found.
+
+       -J, --no-filenames-only
+              Do not supress printing of matched subtitles. This  is  the  de‐
+              fault.
 
        -q, --quiet
               Do  not  print any matches or filenames. Useful, for example, if
@@ -702,7 +723,7 @@ COPYRIGHT
        This is free software: you are free  to  change  and  redistribute  it.
        There is NO WARRANTY, to the extent permitted by law.
 
-SEARCH-IN-SUBS 0.3.0              2025-03-23                 SEARCH-IN-SUBS(1)
+SEARCH-IN-SUBS 0.3.1              2025-03-24                 SEARCH-IN-SUBS(1)
 ```
 
 ## License
