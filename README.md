@@ -567,6 +567,8 @@ CONFIGURATION
        -V, --no-verbose                       "
        -i, --inverse                          opt_inverse
        -I, --no-inverse                       "
+       -j, --filenames-only                   opt_filenames_only
+       -J, --no-filenames-only                "
        -q, --quiet                            opt_quiet
        -Q, --no-quiet                         "
        -r, --regex                            opt_regex
