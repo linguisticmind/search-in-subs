@@ -264,7 +264,7 @@ case $opt_edl_save_paths in
   * ) printf '%s\n' "${opt_color:+$'\x1b[31m'}[$script_name] Invalid argument to ${opt_color:+$'\x1b[1m'}--edl-save-paths${opt_color:+$'\x1b[22m'}: ${opt_edl_save_paths@Q}. Allowed values are 'relative', 'absolute'.${opt_color:+$'\x1b[0m'}" >&2; exit 1 ;;
 esac
 
-declare -- edl_path edl_name="$conf_edl_default_name"'.edl'
+declare -- edl_path= edl_name="$conf_edl_default_name"'.edl'
 
 if [[ $opt_edl_save ]]; then
 
@@ -286,7 +286,7 @@ if [[ $opt_edl_save ]]; then
 
 fi
 
-declare -- edl_subdir edl_chapters_in_subdir
+declare -- edl_subdir= edl_chapters_in_subdir=
 
 case $opt_edl_structure in
   flat ) edl_subdir= edl_chapters_in_subdir=;;
@@ -321,9 +321,9 @@ unset -v search_term
 
 search_term_re="${search_term_re%|}"
 
-declare -- optdata__filenames_only__inv
+declare -- optdata__filenames_only__inv=
 [[ ! $opt_filenames_only ]] && optdata__filenames_only__inv=1
-declare -- optdata__match_case__inv
+declare -- optdata__match_case__inv=
 [[ ! $opt_match_case ]] && optdata__match_case__inv=1
 
 declare -- sed_script_cleanup='1 s/^\xef\xbb\xbf//; s/\r$//; s/\s+$//' # Remove byte order mark, carriage returns, and trailing whitespace
@@ -341,50 +341,46 @@ type -P 'lua5.4' > /dev/null && lua_bin='lua5.4' || lua_bin='lua'
 
 function generate_edl_line {
 
-  "$lua_bin" \
-    <(printf '%s\n' '
+  "$lua_bin" <(printf '%s\n' '
 
-      filename = arg[1]
-      timecodes_parts = {arg[2]:match("(%d%d):(%d%d):(%d%d),(%d%d%d)%s+%-%->%s+(%d%d):(%d%d):(%d%d),(%d%d%d)")}
-      chapter_title = arg[3]
-      before, after = string.format("%.3f", arg[4]), string.format("%.3f", arg[5])
-      file_duration = arg[6]
+    filename = arg[1]
+    timecodes_parts = {arg[2]:match("(%d%d):(%d%d):(%d%d),(%d%d%d)%s+%-%->%s+(%d%d):(%d%d):(%d%d),(%d%d%d)")}
+    chapter_title = arg[3]
+    before, after = string.format("%.3f", arg[4]), string.format("%.3f", arg[5])
+    file_duration = arg[6]
 
-      a = timecodes_parts[1] * 3600 + timecodes_parts[2] * 60 + (timecodes_parts[3] .. "." .. timecodes_parts[4]) - before 
-      b = timecodes_parts[5] * 3600 + timecodes_parts[6] * 60 + (timecodes_parts[7] .. "." .. timecodes_parts[8]) + after
+    a = timecodes_parts[1] * 3600 + timecodes_parts[2] * 60 + (timecodes_parts[3] .. "." .. timecodes_parts[4]) - before
+    b = timecodes_parts[5] * 3600 + timecodes_parts[6] * 60 + (timecodes_parts[7] .. "." .. timecodes_parts[8]) + after
 
-      if a < 0 then a = 0 end
-      if file_duration ~= nil and b > tonumber(file_duration) then b = file_duration end
+    if a < 0 then a = 0 end
+    if file_duration ~= nil and b > tonumber(file_duration) then b = file_duration end
 
-      print(string.format("%%%s%%%s,%s,%s,title=%%%s%%%s", #filename, filename, a, b - a, #chapter_title, chapter_title))
+    print(string.format("%%%s%%%s,%s,%s,title=%%%s%%%s", #filename, filename, a, b - a, #chapter_title, chapter_title))
 
-    ') \
-      "$1" "$2" "$3" "$opt_edl_play_before" "$opt_edl_play_after" ${4:+"$4"}
+  ') "$1" "$2" "$3" "$opt_edl_play_before" "$opt_edl_play_after" ${4:+"$4"}
 
 }
 
 function calc_segment_length {
 
-  "$lua_bin" \
-    <(printf '%s\n' '
+  "$lua_bin" <(printf '%s\n' '
 
-      timecodes_parts = {arg[1]:match("(%d%d):(%d%d):(%d%d),(%d%d%d)%s+%-%->%s+(%d%d):(%d%d):(%d%d),(%d%d%d)")}
-      before = string.format("%.0f", arg[2] * 1000) 
-      after = string.format("%.0f", arg[3] * 1000)
-      if arg[4] ~= nil then
-        file_duration = string.format("%.0f", arg[4] * 1000)
-      end
+    timecodes_parts = {arg[1]:match("(%d%d):(%d%d):(%d%d),(%d%d%d)%s+%-%->%s+(%d%d):(%d%d):(%d%d),(%d%d%d)")}
+    before = string.format("%.0f", arg[2] * 1000)
+    after = string.format("%.0f", arg[3] * 1000)
+    if arg[4] ~= nil then
+      file_duration = string.format("%.0f", arg[4] * 1000)
+    end
 
-      a = ((timecodes_parts[1] * 3600 + timecodes_parts[2] * 60 + timecodes_parts[3]) .. timecodes_parts[4]) - before
-      b = ((timecodes_parts[5] * 3600 + timecodes_parts[6] * 60 + timecodes_parts[7]) .. timecodes_parts[8]) + after
+    a = ((timecodes_parts[1] * 3600 + timecodes_parts[2] * 60 + timecodes_parts[3]) .. timecodes_parts[4]) - before
+    b = ((timecodes_parts[5] * 3600 + timecodes_parts[6] * 60 + timecodes_parts[7]) .. timecodes_parts[8]) + after
 
-      if a < 0 then a = 0 end
-      if file_duration ~= nil and b > tonumber(file_duration) then b = file_duration end
+    if a < 0 then a = 0 end
+    if file_duration ~= nil and b > tonumber(file_duration) then b = file_duration end
 
-      print(b - a)
+    print(b - a)
 
-    ') \
-      "$1" "$opt_edl_play_before" "$opt_edl_play_after" ${2:+"$2"}
+  ') "$1" "$opt_edl_play_before" "$opt_edl_play_after" ${2:+"$2"}
 
 }
 
