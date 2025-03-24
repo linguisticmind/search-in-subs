@@ -251,7 +251,7 @@ if [[ $opt_config ]]; then
         done
       fi
     ;;
-    * ) printf '%s\n' "${opt_color:+$'\x1b[31m'}[$script_name] Invalid argument to ${opt_color:+$'\x1b[1m'}--config${opt_color:+$'\x1b[22m'}: ${opt_config@Q}. Allowed values are 'edit', 'generate', 'remove', and 'auto'.${opt_color:+$'\x1b[0m'}" >&2; exit 1 ;;
+    * ) printf '%s\n' "${opt_color:+$'\x1b[31m'}[$script_name] Invalid argument to ${opt_color:+$'\x1b[1m'}--config${opt_color:+$'\x1b[22m'}: ${opt_config@Q}. Allowed values are 'edit', 'generate', 'remove', ['auto'].${opt_color:+$'\x1b[0m'}" >&2; exit 1 ;;
   esac
   exit
 fi
@@ -318,8 +318,8 @@ unset -v search_term
 
 search_term_re="${search_term_re%|}"
 
-declare -- case_insensitive
-[[ ! $opt_match_case ]] && case_insensitive=1
+declare -- optdata__match_case__inv
+[[ ! $opt_match_case ]] && optdata__match_case__inv=1
 
 declare -- sed_script_cleanup='1 s/^\xef\xbb\xbf//; s/\r$//; s/\s+$//' # Remove byte order mark, carriage returns, and trailing whitespace
 
@@ -404,19 +404,13 @@ for (( i = 1; i <= $#; i++ )); do
   video_file_missing=
 
   if [[ ! -e "${!i}" ]]; then
-    printf \
-      ${opt_color:+'\x1b[33m'}'[%s] %s'${opt_color:+'\x1b[39m'}'\n' \
-      "$script_name" \
-      "File ${!i@Q} does not exist. Skipping." >&2
+    printf '%s\n' "${opt_color:+$'\x1b[33m'}[$script_name] File ${!i@Q} does not exist. Skipping.${opt_color:+$'\x1b[0m'}" >&2
     had_errors=1
     shift
     ((i--))
     continue
   elif [[ ! -f "${!i}" ]]; then
-    printf \
-      ${opt_color:+'\x1b[33m'}'[%s] %s'${opt_color:+'\x1b[39m'}'\n' \
-      "$script_name" \
-      "${!i@Q} is not a file. Skipping." >&2
+    printf '%s\n' "${opt_color:+$'\x1b[33m'}[$script_name] ${!i@Q} is not a file. Skipping.${opt_color:+$'\x1b[0m'}" >&2
     had_errors=1
     shift
     ((i--))
@@ -428,8 +422,7 @@ for (( i = 1; i <= $#; i++ )); do
     stats_number_subtitles_matched[${!i}]=0
   fi
 
-  if [[ ($opt_edl_play || \
-        $opt_edl_save) ]]; then 
+  if [[ $opt_edl_play || $opt_edl_save ]]; then 
 
       declare -- video_file subtitle_file
 
@@ -445,11 +438,12 @@ for (( i = 1; i <= $#; i++ )); do
 
       declare -- candidate
       for candidate in "${candidates[@]}"; do
-        mime_type=$(file --dereference --brief --mime-type "$candidate")
+        declare -- mime_type=$(file --dereference --brief --mime-type -- "$candidate")
         case $mime_type in
           video/* ) video_files+=("$candidate");;
           audio/* ) audio_files+=("$candidate");;
         esac
+        unset -v mime_type
       done
       unset -v candidate
       unset -v candidates
@@ -482,6 +476,8 @@ for (( i = 1; i <= $#; i++ )); do
   fi
 
   file_has_matches=
+
+  declare -- subtitle
 
   while read -rd '' subtitle; do
 
@@ -521,8 +517,7 @@ for (( i = 1; i <= $#; i++ )); do
         /^[[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3} --> [[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3}$/ {
           H
           {
-            :a
-            $ ! {
+            :a $ ! {
               n
               H
               /^$/! b a
@@ -530,21 +525,17 @@ for (( i = 1; i <= $#; i++ )); do
           }
           x
           s/[^\n]$/\n/
-          s/\n+$/\x0/
+          s/\n+$/\x00/
           h
           s/^([[:digit:]]+\n[[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3} --> [[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3}).*$/'${opt_color:+'\x1b[2m'}'\1'${opt_color:+'\x1b[22m'}'/
           x
           s/^[[:digit:]]+\n[[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3} --> [[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3}\n//
-          /'"$search_term_re"'/M'${case_insensitive:+'I'}' {
-            s/'"$search_term_re"'/'${opt_color:+'\x1b[7m'}'&'${opt_color:+'\x1b[27m'}'/gM'${case_insensitive:+'I'}'
-            s/<b>/'${opt_color:+'\x1b[1m'}'/g
-            s/<\/b>/'${opt_color:+'\x1b[22m'}'/g
-            s/<i>/'${opt_color:+'\x1b[3m'}'/g
-            s/<\/i>/'${opt_color:+'\x1b[23m'}'/g
-            s/<u>/'${opt_color:+'\x1b[4m'}'/g
-            s/<\/u>/'${opt_color:+'\x1b[24m'}'/g
-            s/<s>/'${opt_color:+'\x1b[9m'}'/g
-            s/<\/s>/'${opt_color:+'\x1b[29m'}'/g
+          /'"$search_term_re"'/M'${optdata__match_case__inv:+'I'}' {
+            s/'"$search_term_re"'/'${opt_color:+'\x1b[7m'}'&'${opt_color:+'\x1b[27m'}'/gM'${optdata__match_case__inv:+'I'}'
+            s/<b>/'${opt_color:+'\x1b[1m'}'/g; s/<\/b>/'${opt_color:+'\x1b[22m'}'/g
+            s/<i>/'${opt_color:+'\x1b[3m'}'/g; s/<\/i>/'${opt_color:+'\x1b[23m'}'/g
+            s/<u>/'${opt_color:+'\x1b[4m'}'/g; s/<\/u>/'${opt_color:+'\x1b[24m'}'/g
+            s/<s>/'${opt_color:+'\x1b[9m'}'/g; s/<\/s>/'${opt_color:+'\x1b[29m'}'/g
             H
             x
             p
@@ -556,9 +547,11 @@ for (( i = 1; i <= $#; i++ )); do
 
   )
 
+  unset -v subtitle
+
   if [[ ! $opt_quiet && ! $file_has_matches && ( $opt_verbose || $opt_inverse ) ]]; then
     printf ${opt_color:+'\x1b[2m'}'%s'${opt_color:+'\x1b[22m'}'\n' "${!i}" 
-    [[ $opt_stats && $i == $# ]] && printf '\n'
+    [[ $opt_stats && $i -eq $# ]] && printf '\n'
   fi
 
   if [[ $opt_stats ]]; then
@@ -571,9 +564,7 @@ unset -v i
 
 function clear_cache_edl { (shopt -s dotglob; compgen -G "$cache_dir_edl"'/*' > /dev/null && rm -r "$cache_dir_edl"/*) }
 
-if [[ $had_matches && \
-      ($opt_edl_play || \
-      $opt_edl_save) ]]; then
+if [[ $had_matches && ( $opt_edl_play || $opt_edl_save ) ]]; then
 
   declare -- missing_video_files_warning missing_video_files_error
 
@@ -600,10 +591,7 @@ if [[ $had_matches && \
       if [[ $opt_edl_save_mkdir ]]; then
         mkdir -p "$edl_dest_dir"
       else
-        printf \
-          ${opt_color:+'\x1b[31m'}'[%s] %s'${opt_color:+'\x1b[39m'}'\n' \
-          "$script_name" \
-          "EDL save directory ${edl_dest_dir@Q} does not exist. Make sure to pass a path to an existing directory, or set -d, --edl-save-mkdir to create a directory automatically." >&2
+        printf '%s\n' "${opt_color:+$'\x1b[31m'}[$script_name] EDL save directory ${edl_dest_dir@Q} does not exist. Make sure to pass a path to an existing directory, or set -d, --edl-save-mkdir to create a directory automatically.${opt_color:+$'\x1b[0m'}" >&2
         exit 1
       fi
 
@@ -624,14 +612,9 @@ if [[ $had_matches && \
       done
 
       if [[ ${#existing_files[@]} -gt 0 ]]; then
-        printf \
-          ${opt_color:+'\x1b[31m'}'[%s] %s''\n' \
-          "$script_name" \
-          'The following files already exist:' >&2
+        printf '%s\n' "${opt_color:+$'\x1b[31m'}[$script_name] The following files already exist:" >&2
         printf '%s\n' "${existing_files[@]@Q}" >&2
-        printf \
-          '%s'${opt_color:+'\x1b[39m'}'\n' \
-          'Set `-y, --edl-save-overwrite` to overwrite.' >&2
+        printf '%s\n' "Set ${opt_color:+$'\x1b[1m'}-y, --edl-save-overwrite${opt_color:+$'\x1b[22m'} to overwrite.${opt_color:+$'\x1b[39m'}" >&2
         exit 1
       fi
 
@@ -958,10 +941,7 @@ if [[ $opt_stats ]]; then
 fi
 
 if [[ $had_errors ]]; then
-  printf \
-    ${opt_color:+'\x1b[33m'}'[%s] %s'${opt_color:+'\x1b[39m'}'\n' \
-    "$script_name" \
-    'Some files were not files or did not exist. See output above.' >&2
+  printf '%s\n' "${opt_color:+$'\x1b[33m'}[$script_name] Some files were not files or did not exist. See output above.${opt_color:+$'\x1b[0m'}" >&2
   exit 1
 fi
 
@@ -971,41 +951,26 @@ fi
 
 if [[ $missing_video_files_warning ]]; then
 
-  printf \
-    ${opt_color:+'\x1b[33m'}'[%s] %s''\n' \
-    "$script_name" \
-    'No video files corresponding to the following subtitle files could be identified:' >&2
+  printf '%s\n' "${opt_color:+$'\x1b[33m'}[$script_name] No video files corresponding to the following subtitle files could be identified:" >&2
   printf '%s\n' "${missing_video_files[@]@Q}" >&2
-  printf ${opt_color:+'\x1b[39m'} >&2
+  printf '%s' "${opt_color:+$'\x1b[0m'}" >&2
 
   if [[ $all_video_files_missing_warning ]]; then
-
-    printf \
-      ${opt_color:+'\x1b[33m'}'[%s] %s'${opt_color:+'\x1b[39m'}'\n' \
-      "$script_name" \
-      'No EDL files were generated because no video files could be found.' >&2
-
+    printf '%s\n' "${opt_color:+$'\x1b[33m'}[$script_name] No EDL files were generated because no video files could be found.${opt_color:+$'\x1b[0m'}" >&2
   fi
 
 fi
 
 if [[ $missing_video_files_error ]]; then
-
-  printf \
-    ${opt_color:+'\x1b[31m'}'[%s] %s''\n' \
-    "$script_name" \
-    'No video files corresponding to the following subtitle files could be identified:' >&2
+  printf '%s\n' "${opt_color:+$'\x1b[31m'}[$script_name] No video files corresponding to the following subtitle files could be identified:" >&2
   printf '%s\n' "${missing_video_files[@]@Q}" >&2
-  printf \
-    '%s'${opt_color:+'\x1b[39m'}'\n' \
-    'Set -o, --edl-ignore-missing to skip segments with missing video files.' >&2
+  printf '%s\n' "Set ${opt_color:+$'\x1b[1m'}-o, --edl-ignore-missing${opt_color:+$'\x1b[22m'} to skip segments with missing video files.${opt_color:+$'\x1b[0m'}" >&2
   exit 3
-
 fi
 
 if [[ $play_edl ]]; then
 
-  mpv "${opt_mpv_opts[@]}" --chapters-file="$edl_chapters_ffmetadata" "$edl_main_edl"
+  mpv "${opt_mpv_opts[@]}" --chapters-file="$edl_chapters_ffmetadata" -- "$edl_main_edl"
 
   if [[ ! $opt_edl_save && \
         ! $opt_edl_play_keep_temporary ]]; then
