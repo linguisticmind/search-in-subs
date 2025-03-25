@@ -1,4 +1,4 @@
-.TH SEARCH-IN-SUBS 1 2025-03-25 "SEARCH-IN-SUBS 0.3.3"
+.TH SEARCH-IN-SUBS 1 2025-03-25 "SEARCH-IN-SUBS 0.3.4"
 .
 .SH NAME
 .
@@ -451,14 +451,14 @@ Closing timecode in the \fBmpv\fR format.
 %{timecode_end_raw}
 Closing timecode as it appears in the SRT file.
 .TP
-%{text_raw}
+%{text_tall}
 Subtitle text as it appears in the SRT file. Formatting tags such as \%<i></i> are removed.
 .TP
 %{text_long}
-Like %{text_raw}, but with newlines replaced with spaces.
+Like %{text_tall}, but with newlines replaced with spaces.
 .TP
 %{text_abbr}
-Like %{text_raw}, but only showing the first line of the subtitle.
+Like %{text_tall}, but only showing the first line of the subtitle.
 .RE
 .
 .SH EXIT STATUS

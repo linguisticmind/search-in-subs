@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-declare -- version='0.3.3'
+declare -- version='0.3.4'
 
 declare -- script_source=$(realpath -- "${BASH_SOURCE[0]}")
 declare -- script_name="${script_source##*/}"
@@ -519,7 +519,7 @@ for (( i = 1; i <= $#; i++ )); do
         [timecode_start_raw]="${BASH_REMATCH[3]}"
         [timecode_end]="${BASH_REMATCH[4]/,/.}"
         [timecode_end_raw]="${BASH_REMATCH[4]}"
-        [text_raw]="${BASH_REMATCH[5]}"
+        [text_tall]="${BASH_REMATCH[5]}"
         [text_long]="${BASH_REMATCH[5]//$'\n'/ }"
         [text_abbr]="${BASH_REMATCH[6]}"
       )
