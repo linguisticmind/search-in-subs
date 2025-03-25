@@ -41,6 +41,22 @@ Video tutorials:
     </tr>
     <tr>
         <td>
+            <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.3.4'>0.3.4</a>
+        </td>
+        <td>
+           2025-03-25
+        </td>
+        <td>
+            <p>
+                Bug fix: Last word of a subtitle file wasn't matching properly. Now it does.
+            </p>
+            <p>
+                <code>conf_chapter_title</code>: Renamed <code>%{text_raw}</code> to <code>%{text_tall}</code> since that string has formatting tags stripped.
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
             <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.3.3'>0.3.3</a>
         </td>
         <td>
@@ -686,19 +702,20 @@ CONFIGURATION
               %{timecode_end_raw}
                      Closing timecode as it appears in the SRT file.
 
-              %{text_raw}
+              %{text_tall}
                      Subtitle text as it appears in the SRT  file.  Formatting
                      tags such as <i></i> are removed.
 
               %{text_long}
-                     Like %{text_raw}, but with newlines replaced with spaces.
+                     Like  %{text_tall},  but with newlines replaced with spa‐
+                     ces.
 
               %{text_abbr}
-                     Like  %{text_raw}, but only showing the first line of the
+                     Like %{text_tall}, but only showing the first line of the
                      subtitle.
 
 EXIT STATUS
-       0      Success. No errors have occured, and  at  least  one  match  was
+       0      Success.  No  errors  have  occured,  and at least one match was
               found.
 
        1      A general error has occured.
@@ -709,24 +726,24 @@ EXIT STATUS
               -O, --edl-no-ignore-missing is set.
 
 ENVIRONMENT
-       The values of VISUAL and EDITOR  environment  variables  determine  the
+       The  values  of  VISUAL  and EDITOR environment variables determine the
        text editor when opening configuration files with --config.
 
-       VISUAL  is  evaluated  first. If that is not set, then EDITOR is evalu‐
+       VISUAL is evaluated first. If that is not set, then  EDITOR  is  evalu‐
        ated. If neither is set, nano is used as the text editor.
 
 FILES
-       A configuration file can be used to  change  the  default  behavior  of
+       A  configuration  file  can  be  used to change the default behavior of
        search-in-subs.
 
-       The  configuration file's location is "$XDG_CONFIG_HOME/search-in-subs/
-       config.bash". If "XDG_CONFIG_HOME" is not set, it defaults  to  "$HOME/
+       The configuration file's location is  "$XDG_CONFIG_HOME/search-in-subs/
+       config.bash".  If  "XDG_CONFIG_HOME" is not set, it defaults to "$HOME/
        .config".
 
-       Temporary  EDL  files  that are generated when using the -p, --edl-play
+       Temporary EDL files that are generated when  using  the  -p, --edl-play
        option are stored in a cache directory.
 
-       The cache directory's location is "$XDG_CACHE_HOME/search-in-subs".  If
+       The  cache directory's location is "$XDG_CACHE_HOME/search-in-subs". If
        "XDG_CACHE_HOME" is not set, it defaults to "$HOME/.cache".
 
 STATISTICS
@@ -749,6 +766,7 @@ STATISTICS
        Matched     Average number of subtitles per file that had matches.
        Total       Average number of subtitles per file.
        Unmatched   Average number of subtitles per file that did not have matches.
+
        Matched %   Average percentage of subtitles per file that had matches.
 
        In the 'Total' row:
@@ -758,7 +776,7 @@ STATISTICS
        Unmatched   Total number of subtitles in all files that did not have matches.
        Matched %   Total percentage of subtitles in all files that had matches.
 
-       In the 'File' column of the 'Total' row, information  is  presented  in
+       In  the  'File'  column of the 'Total' row, information is presented in
        the following format:
 
        <Matched> / <Total> (<Unmatched>) <Matched %>
@@ -782,17 +800,17 @@ PLACEHOLDER FORMAT
 
        <name> is a placeholder name.
 
-       <fallback> and <override> are also strings with placeholders just  like
+       <fallback>  and <override> are also strings with placeholders just like
        the entire string.
 
        <fallback> is substituted if the replacement value is unavailable.
 
        <override> is substituted instead of the replacement value allowing to,
-       for    instance,    insert    extra    characters    next    to     it:
+       for     instance,    insert    extra    characters    next    to    it:
        '%{date:+%{date}_}%{name}.mp4'.
 
-       In  strings  with placeholders, '\', '%', '{', ':', and '}' are special
-       characters. They can be escaped with  backslashes  ('\')  to  represent
+       In strings with placeholders, '\', '%', '{', ':', and '}'  are  special
+       characters.  They  can  be  escaped with backslashes ('\') to represent
        their literal values.
 
 AUTHOR
@@ -808,13 +826,13 @@ HOMEPAGE
        <https://github.com/linguisticmind/search-in-subs>
 
 COPYRIGHT
-       Copyright  ©  2025  Alex  Rogers.  License GPLv3+: GNU GPL version 3 or
+       Copyright © 2025 Alex Rogers. License GPLv3+:  GNU  GPL  version  3  or
        later <https://gnu.org/licenses/gpl.html>.
 
-       This is free software: you are free  to  change  and  redistribute  it.
+       This  is  free  software:  you  are free to change and redistribute it.
        There is NO WARRANTY, to the extent permitted by law.
 
-SEARCH-IN-SUBS 0.3.3              2025-03-25                 SEARCH-IN-SUBS(1)
+SEARCH-IN-SUBS 0.3.4              2025-03-25                 SEARCH-IN-SUBS(1)
 ```
 
 ## License

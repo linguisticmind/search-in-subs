@@ -8,6 +8,22 @@
     </tr>
     <tr>
         <td>
+            <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.3.4'>0.3.4</a>
+        </td>
+        <td>
+           2025-03-25
+        </td>
+        <td>
+            <p>
+                Bug fix: Last word of a subtitle file wasn't matching properly. Now it does.
+            </p>
+            <p>
+                <code>conf_chapter_title</code>: Renamed <code>%{text_raw}</code> to <code>%{text_tall}</code> since that string has formatting tags stripped.
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
             <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.3.3'>0.3.3</a>
         </td>
         <td>
