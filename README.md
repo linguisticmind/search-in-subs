@@ -41,6 +41,19 @@ Video tutorials:
     </tr>
     <tr>
         <td>
+            <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.3.3'>0.3.3</a>
+        </td>
+        <td>
+           2025-03-25
+        </td>
+        <td>
+            <p>
+                Removed <code>conf_srt_secondary_ext</code> and <code>--edl-play-srt-secondary-ext</code> in favor of a general algorithm for finding video files corresponding to subtitle files. There is no need to define custom secondary extensions anymore. Any number of additional extensions with any contents is supported. Improving the fix of <a href='https://github.com/linguisticmind/search-in-subs/issues/4'>#4</a>.
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
             <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.3.2'>0.3.2</a>
         </td>
         <td>
@@ -89,10 +102,8 @@ Video tutorials:
                         </p>
                         <ul>
                             <li>The default name of a generated EDL file is now configurable: <code>conf_edl_default_name</code>.
-                            <li>It is now possible to set custom secondary filename extensions for SRT files to allow <code>search-in-subs</code> to correctly match up unusually-named subtitle files with their video counterparts: <code>conf_srt_secondary_ext</code>. Also added <code>--edl-play-srt-secondary-ext</code> for setting a secondary filename extension temporarily on the command line. Fixes <a href='https://github.com/linguisticmind/search-in-subs/issues/4'>#4</a>.</li>
-                            <li>
-                                The default glob setting has been made configuration file-only since its command-line counterpart didn't really have any use. The new variable name is <code>conf_default_glob</code>.
-                            </li>
+                            <li><del>It is now possible to set custom secondary filename extensions for SRT files to allow <code>search-in-subs</code> to correctly match up unusually-named subtitle files with their video counterparts: <code>conf_srt_secondary_ext</code>. Also added <code>--edl-play-srt-secondary-ext</code> for setting a secondary filename extension temporarily on the command line. Fixes <a href='https://github.com/linguisticmind/search-in-subs/issues/4'>#4</a>.</del> See v0.3.3.</li>
+                            <li>The default glob setting has been made configuration file-only since its command-line counterpart didn't really have any use. The new variable name is <code>conf_default_glob</code>.</li>
                         </ul>
                     </li>
                 </ul>
@@ -231,11 +242,10 @@ DESCRIPTION
        In order to generate the EDL files, a video or audio file must exist in
        the same directory as the subtitle file(s) on which the search is  per‐
        formed. The video or audio file must have the same name as the subtitle
-       file, minus the '.srt' extension and potentially a secondary  extension
-       containing a language code, e.g. '.en.srt'. Custom secondary extensions
-       may be added with conf_srt_secondary_ext or set temporarily on the com‐
-       mand  line  with  --edl-play-srt-secondary-ext. If both video and audio
-       files are found, video files take precedence. If multiple video or  au‐
+       file, minus the '.srt' extension, and potentially additional extensions
+       containing  language  codes  or  other information, e.g. '.en.srt'. Any
+       number of additional extensions is allowed. If  both  video  and  audio
+       files  are found, video files take precedence. If multiple video or au‐
        dio files are found, the first one will be chosen for use in the gener‐
        ated EDL files.
 
@@ -246,18 +256,18 @@ DESCRIPTION
 
 OPTIONS
    Passing arguments to options
-       Enhanced  getopt  syntax applies when passing options. There is one im‐
-       portant point to highlight when it comes to passing  options  with  re‐
+       Enhanced getopt syntax applies when passing options. There is  one  im‐
+       portant  point  to  highlight when it comes to passing options with re‐
        quired vs optional arguments.
 
-       In  case of a short option, if an option takes a required argument, the
-       argument may be written as a separate parameter, or directly after  the
+       In case of a short option, if an option takes a required argument,  the
+       argument  may be written as a separate parameter, or directly after the
        option character. If an option takes an optional argument, however, the
        argument must be written directly after the option character.
 
-       In case of a long option, if an option takes a required  argument,  the
-       argument  may be written as a separate parameter, or directly after the
-       option name, separated by an equals sign ('='). If an option  takes  an
+       In  case  of a long option, if an option takes a required argument, the
+       argument may be written as a separate parameter, or directly after  the
+       option  name,  separated by an equals sign ('='). If an option takes an
        optional argument, however, the argument must be written directly after
        the option name, separated by an equals sign ('=').
 
@@ -266,22 +276,22 @@ OPTIONS
                            -o<value>      --option=<value>
        Optional argument   -o[<value>]    --option[=<value>]
 
-       Options that take optional arguments can be recognized in  the  options
-       list  below  by  their  <value> and the preceding equals sign being en‐
+       Options  that  take optional arguments can be recognized in the options
+       list below by their <value> and the preceding  equals  sign  being  en‐
        closed in square brackets:
 
        -o, --option[=<value>]
 
    General
        -t, --search-term=<search_term>
-              Text to search for. Can be a fixed string or a  regular  expres‐
+              Text  to  search for. Can be a fixed string or a regular expres‐
               sion depending on the -r, --regex / -R, --no-regex options.
 
               At least one search term must be given to perform a search. Set‐
               ting this option multiple times sets multiple search terms.
 
        -v, --verbose
-              Print the filename even if there were no matches found  in  that
+              Print  the  filename even if there were no matches found in that
               file.
 
        -V, --no-verbose
@@ -292,36 +302,36 @@ OPTIONS
               Only print the names of the files where no matches were found.
 
        -I, --no-inverse
-              Do not supress printing of matches and names of the files  where
+              Do  not supress printing of matches and names of the files where
               matches were found. This is the default.
 
        -j, --filenames-only
-              Suppress  printing  of matched subtitles. Only print the name of
+              Suppress printing of matched subtitles. Only print the  name  of
               the file where matches were found.
 
        -J, --no-filenames-only
-              Do not supress printing of matched subtitles. This  is  the  de‐
+              Do  not  supress  printing of matched subtitles. This is the de‐
               fault.
 
        -q, --quiet
-              Do  not  print any matches or filenames. Useful, for example, if
+              Do not print any matches or filenames. Useful, for  example,  if
               one only wishes to see the statistics or the exit status.
 
        -Q, --no-quiet
-              Do not suppress printing of matches or filenames.  This  is  the
+              Do  not  suppress  printing of matches or filenames. This is the
               default.
 
        -r, --regex
-              Use   regular   expressions   instead   of   fixed   strings  in
+              Use  regular   expressions   instead   of   fixed   strings   in
               <search_term>s.
 
-              The regular expressions used are POSIX Extended Regular  Expres‐
-              sions  as  implemented  in  GNU  sed. More information on can be
+              The  regular expressions used are POSIX Extended Regular Expres‐
+              sions as implemented in GNU sed.  More  information  on  can  be
               found        at        <https://www.gnu.org/software/sed/manual/
               sed.html#sed-regular-expressions>.
 
        -R, --no-regex
-              Use   fixed   strings   instead   of   regular   expressions  in
+              Use  fixed   strings   instead   of   regular   expressions   in
               <search_term>s. This is the default.
 
        -c, --match-case
@@ -331,16 +341,16 @@ OPTIONS
               Make the search case-insensitive. This is the default.
 
        -e, --exact-whitespace
-              Match  whitespace  characters  exactly  as  specified   in   the
+              Match   whitespace   characters  exactly  as  specified  in  the
               <search_term>.
 
        -E, --no-exact-whitespace
-              Treat  all whitespace characters the same during search - ignor‐
-              ing the type of whitespace character, and how many of  them  ap‐
+              Treat all whitespace characters the same during search -  ignor‐
+              ing  the  type of whitespace character, and how many of them ap‐
               pear in a sequence. This is the default.
 
               Whitespace characters are: space, newline, carriage return, hor‐
-              izontal tab, vertical tab and form feed (POSIX Extended  Regular
+              izontal  tab, vertical tab and form feed (POSIX Extended Regular
               Expressions '[:space:]' character class).
 
    Statistics
@@ -362,11 +372,11 @@ OPTIONS
               Compactify headers in the statistics table.
 
        -M, --stats-headers-no-compact
-              Do  not  compactify headers in the statistics table. This is the
+              Do not compactify headers in the statistics table. This  is  the
               default.
 
        -n, --stats-headers-file-numbers
-              Show file numbers in the headers of the statistics  table.  This
+              Show  file  numbers in the headers of the statistics table. This
               is the default.
 
        -N, --stats-headers-no-file-numbers
@@ -375,30 +385,30 @@ OPTIONS
        -w, --stats-wrap-filenames
               Wrap filenames in the statistics table. This is the default.
 
-              The  table  always  fits  the  width of the terminal screen, but
+              The table always fits the width  of  the  terminal  screen,  but
               filenames may be printed on multiple lines.
 
        -W, --stats-no-wrap-filenames
               Do not wrap filenames in the statistics table.
 
-              Files are always printed one per row, regardless of whether  the
+              Files  are always printed one per row, regardless of whether the
               table fits the width of the terminal screen.
 
    mpv EDL generation
        -p, --edl-play
               Play search results in mpv.
 
-              Unless              -f, --edl-save-files-relative             or
+              Unless             -f, --edl-save-files-relative              or
               -F, --edl-save-files-absolute is used together with this option,
-              temporary  EDL files are generated and saved in the cache direc‐
-              tory    (see    FILES     for     more     information).     The
+              temporary EDL files are generated and saved in the cache  direc‐
+              tory     (see     FILES     for     more    information).    The
               -k, --edl-keep-temporary and -K, --edl-no-keep-temporary options
-              control whether or the temporary EDL files are deleted  or  kept
+              control  whether  or the temporary EDL files are deleted or kept
               after mpv player closes.
 
-              If                -f, --edl-save-files-relative               or
-              -F, --edl-save-files-absolute    is    used    together     with
-              -p, --edl-play,  then  temporary files are not generated and the
+              If               -f, --edl-save-files-relative                or
+              -F, --edl-save-files-absolute     is    used    together    with
+              -p, --edl-play, then temporary files are not generated  and  the
               saved EDL files are played.
 
        -P, --edl-no-play
@@ -409,7 +419,7 @@ OPTIONS
               in mpv.
 
        -K, --edl-play-no-keep-temporary
-              Do  not keep temporary EDL files that are created to play search
+              Do not keep temporary EDL files that are created to play  search
               results in mpv. This is the default.
 
               The temporary files are deleted right after mpv player closes.
@@ -420,13 +430,9 @@ OPTIONS
               imal separator are allowed. The default <value> is 0.
 
        -a, --edl-play-after=<value>
-              Add a specified amount of time after each segment when  generat‐
+              Add  a specified amount of time after each segment when generat‐
               ing EDL files. <value> is in seconds. Precise values with a dec‐
               imal separator are allowed. The default <value> is 0.
-
-       --edl-play-srt-secondary-ext=<value>
-              Specify a custom secondary filename extension for SRT files. See
-              also conf_srt_secondary_ext.
 
        -f, --edl-save[={<path>[/]|<path>/<name>.edl|<name>.edl}]
               Save  EDL  files  to  a specified location instead of generating
@@ -575,56 +581,55 @@ CONFIGURATION
 
        "      This option sets the same variable(s) as the one above.
 
-       -t, --search-term=<value>              opt_search_term
-       -v, --verbose                          opt_verbose
-       -V, --no-verbose                       "
-       -i, --inverse                          opt_inverse
-       -I, --no-inverse                       "
-       -j, --filenames-only                   opt_filenames_only
-       -J, --no-filenames-only                "
-       -q, --quiet                            opt_quiet
-       -Q, --no-quiet                         "
-       -r, --regex                            opt_regex
-       -R, --no-regex                         "
-       -c, --match-case                       opt_match_case
-       -C, --no-match-case                    "
-       -e, --exact-whitespace                 opt_exact_whitespace
-       -E, --no-exact-whitespace              "
-       -s, --stats                            opt_stats
-       -S, --no-stats                         "
-       -h, --stats-headers                    opt_stats_headers
-       -H, --stats-no-headers                 "
-       -m, --stats-headers-compact            opt_stats_headers_compact
-       -M, --stats-headers-no-compact         "
-       -n, --stats-headers-file-numbers       opt_stats_headers_file_numbers
-       -N, --stats-headers-no-file-numbers    "
-       -w, --stats-wrap-filenames             opt_stats_wrap_filenames
-       -W, --stats-no-wrap-filenames          "
-       -p, --edl-play                         opt_edl_play
-       -P, --edl-no-play                      "
-       -k, --edl-play-keep-temporary          opt_edl_play_keep_temporary
-       -K, --edl-play-no-keep-temporary       "
-       -b, --edl-play-before=<value>          opt_edl_play_before
-       -a, --edl-play-after=<value>           opt_edl_play_after
-       --edl-play-srt-secondary-ext=<value>   -
-       -f, --edl-save[=<value>]               opt_edl_save
-                                              optdata__edl_save__file
-       -F, --edl-no-save                      "
-       --edl-save-paths=<value>               opt_edl_save_paths
-       -d, --edl-save-mkdir                   opt_edl_save_mkdir
-       -D, --edl-save-no-mkdir                "
-       -y, --edl-save-overwrite               opt_edl_save_overwrite
-       -Y, --edl-save-no-overwrite            "
-       -o, --edl-ignore-missing               opt_edl_ignore_missing
-       -O, --edl-no-ignore-missing            "
-       -u, --edl-structure=<value>            opt_edl_structure
-       --mpv-opts=<value>                     opt_mpv_opts
-                                              optdata__mpv_opts__append
-       --color[=<value>]                      opt_color
-       --no-color                             "
-       --help                                 -
-       --version                              -
-       --config[=<value>]                     -
+       -t, --search-term=<value>             opt_search_term
+       -v, --verbose                         opt_verbose
+       -V, --no-verbose                      "
+       -i, --inverse                         opt_inverse
+       -I, --no-inverse                      "
+       -j, --filenames-only                  opt_filenames_only
+       -J, --no-filenames-only               "
+       -q, --quiet                           opt_quiet
+       -Q, --no-quiet                        "
+       -r, --regex                           opt_regex
+       -R, --no-regex                        "
+       -c, --match-case                      opt_match_case
+       -C, --no-match-case                   "
+       -e, --exact-whitespace                opt_exact_whitespace
+       -E, --no-exact-whitespace             "
+       -s, --stats                           opt_stats
+       -S, --no-stats                        "
+       -h, --stats-headers                   opt_stats_headers
+       -H, --stats-no-headers                "
+       -m, --stats-headers-compact           opt_stats_headers_compact
+       -M, --stats-headers-no-compact        "
+       -n, --stats-headers-file-numbers      opt_stats_headers_file_numbers
+       -N, --stats-headers-no-file-numbers   "
+       -w, --stats-wrap-filenames            opt_stats_wrap_filenames
+       -W, --stats-no-wrap-filenames         "
+       -p, --edl-play                        opt_edl_play
+       -P, --edl-no-play                     "
+       -k, --edl-play-keep-temporary         opt_edl_play_keep_temporary
+       -K, --edl-play-no-keep-temporary      "
+       -b, --edl-play-before=<value>         opt_edl_play_before
+       -a, --edl-play-after=<value>          opt_edl_play_after
+       -f, --edl-save[=<value>]              opt_edl_save
+                                             optdata__edl_save__file
+       -F, --edl-no-save                     "
+       --edl-save-paths=<value>              opt_edl_save_paths
+       -d, --edl-save-mkdir                  opt_edl_save_mkdir
+       -D, --edl-save-no-mkdir               "
+       -y, --edl-save-overwrite              opt_edl_save_overwrite
+       -Y, --edl-save-no-overwrite           "
+       -o, --edl-ignore-missing              opt_edl_ignore_missing
+       -O, --edl-no-ignore-missing           "
+       -u, --edl-structure=<value>           opt_edl_structure
+       --mpv-opts=<value>                    opt_mpv_opts
+                                             optdata__mpv_opts__append
+       --color[=<value>]                     opt_color
+       --no-color                            "
+       --help                                -
+       --version                             -
+       --config[=<value>]                    -
 
    Configuration file-only parameters
        conf_default_glob
@@ -640,24 +645,12 @@ CONFIGURATION
               The default name for a generated EDL file. The default value  is
               'search_results'.
 
-       conf_srt_secondary_ext
-              Secondary  filename  extensions for SRT files. The default value
-              includes standard language codes.
-
-              Since there are a lot of language codes, the  default  value  is
-              not  included in the configuration file generated with --config.
-              Instead, a template for adding to the default  array  is  gener‐
-              ated.
-
-              See  also  --edl-play-srt-secondary-ext.  It adds values to this
-              array temporarily from the command line.
-
        conf_chapter_title
-              A generated EDL's chapter title. The  value  is  a  string  with
+              A  generated  EDL's  chapter  title.  The value is a string with
               placeholders. See also PLACEHOLDER FORMAT.
 
-              If  set to an empty string (''), the result is equivalent to us‐
-              ing the value of '%{text_abbr}', but with a  slight  performance
+              If set to an empty string (''), the result is equivalent to  us‐
+              ing  the  value of '%{text_abbr}', but with a slight performance
               increase. The default value is ''.
 
               The following placeholders are supported:
@@ -666,11 +659,11 @@ CONFIGURATION
                      Base name of the video file.
 
               %{file_edl}
-                     Path  to  the  video  file as it appears in the generated
+                     Path to the video file as it  appears  in  the  generated
                      EDL.
 
               %{file_rel}
-                     Path to the video file relative to  the  current  working
+                     Path  to  the  video file relative to the current working
                      directory.
 
               %{file_abs}
@@ -694,18 +687,18 @@ CONFIGURATION
                      Closing timecode as it appears in the SRT file.
 
               %{text_raw}
-                     Subtitle  text  as it appears in the SRT file. Formatting
+                     Subtitle text as it appears in the SRT  file.  Formatting
                      tags such as <i></i> are removed.
 
               %{text_long}
                      Like %{text_raw}, but with newlines replaced with spaces.
 
               %{text_abbr}
-                     Like %{text_raw}, but only showing the first line of  the
+                     Like  %{text_raw}, but only showing the first line of the
                      subtitle.
 
 EXIT STATUS
-       0      Success.  No  errors  have  occured,  and at least one match was
+       0      Success. No errors have occured, and  at  least  one  match  was
               found.
 
        1      A general error has occured.
@@ -716,24 +709,24 @@ EXIT STATUS
               -O, --edl-no-ignore-missing is set.
 
 ENVIRONMENT
-       The  values  of  VISUAL  and EDITOR environment variables determine the
+       The values of VISUAL and EDITOR  environment  variables  determine  the
        text editor when opening configuration files with --config.
 
-       VISUAL is evaluated first. If that is not set, then  EDITOR  is  evalu‐
+       VISUAL  is  evaluated  first. If that is not set, then EDITOR is evalu‐
        ated. If neither is set, nano is used as the text editor.
 
 FILES
-       A  configuration  file  can  be  used to change the default behavior of
+       A configuration file can be used to  change  the  default  behavior  of
        search-in-subs.
 
-       The configuration file's location is  "$XDG_CONFIG_HOME/search-in-subs/
-       config.bash".  If  "XDG_CONFIG_HOME" is not set, it defaults to "$HOME/
+       The  configuration file's location is "$XDG_CONFIG_HOME/search-in-subs/
+       config.bash". If "XDG_CONFIG_HOME" is not set, it defaults  to  "$HOME/
        .config".
 
-       Temporary EDL files that are generated when  using  the  -p, --edl-play
+       Temporary  EDL  files  that are generated when using the -p, --edl-play
        option are stored in a cache directory.
 
-       The  cache directory's location is "$XDG_CACHE_HOME/search-in-subs". If
+       The cache directory's location is "$XDG_CACHE_HOME/search-in-subs".  If
        "XDG_CACHE_HOME" is not set, it defaults to "$HOME/.cache".
 
 STATISTICS
@@ -765,7 +758,7 @@ STATISTICS
        Unmatched   Total number of subtitles in all files that did not have matches.
        Matched %   Total percentage of subtitles in all files that had matches.
 
-       In  the  'File'  column of the 'Total' row, information is presented in
+       In the 'File' column of the 'Total' row, information  is  presented  in
        the following format:
 
        <Matched> / <Total> (<Unmatched>) <Matched %>
@@ -789,17 +782,17 @@ PLACEHOLDER FORMAT
 
        <name> is a placeholder name.
 
-       <fallback>  and <override> are also strings with placeholders just like
+       <fallback> and <override> are also strings with placeholders just  like
        the entire string.
 
        <fallback> is substituted if the replacement value is unavailable.
 
        <override> is substituted instead of the replacement value allowing to,
-       for     instance,    insert    extra    characters    next    to    it:
+       for    instance,    insert    extra    characters    next    to     it:
        '%{date:+%{date}_}%{name}.mp4'.
 
-       In strings with placeholders, '\', '%', '{', ':', and '}'  are  special
-       characters.  They  can  be  escaped with backslashes ('\') to represent
+       In  strings  with placeholders, '\', '%', '{', ':', and '}' are special
+       characters. They can be escaped with  backslashes  ('\')  to  represent
        their literal values.
 
 AUTHOR
@@ -815,13 +808,13 @@ HOMEPAGE
        <https://github.com/linguisticmind/search-in-subs>
 
 COPYRIGHT
-       Copyright © 2025 Alex Rogers. License GPLv3+:  GNU  GPL  version  3  or
+       Copyright  ©  2025  Alex  Rogers.  License GPLv3+: GNU GPL version 3 or
        later <https://gnu.org/licenses/gpl.html>.
 
-       This  is  free  software:  you  are free to change and redistribute it.
+       This is free software: you are free  to  change  and  redistribute  it.
        There is NO WARRANTY, to the extent permitted by law.
 
-SEARCH-IN-SUBS 0.3.2              2025-03-25                 SEARCH-IN-SUBS(1)
+SEARCH-IN-SUBS 0.3.3              2025-03-25                 SEARCH-IN-SUBS(1)
 ```
 
 ## License

@@ -8,6 +8,19 @@
     </tr>
     <tr>
         <td>
+            <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.3.3'>0.3.3</a>
+        </td>
+        <td>
+           2025-03-25
+        </td>
+        <td>
+            <p>
+                Removed <code>conf_srt_secondary_ext</code> and <code>--edl-play-srt-secondary-ext</code> in favor of a general algorithm for finding video files corresponding to subtitle files. There is no need to define custom secondary extensions anymore. Any number of additional extensions with any contents is supported. Improving the fix of <a href='https://github.com/linguisticmind/search-in-subs/issues/4'>#4</a>.
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
             <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.3.2'>0.3.2</a>
         </td>
         <td>
@@ -57,9 +70,7 @@
                         <ul>
                             <li>The default name of a generated EDL file is now configurable: <code>conf_edl_default_name</code>.
                             <li>It is now possible to set custom secondary filename extensions for SRT files to allow <code>search-in-subs</code> to correctly match up unusually-named subtitle files with their video counterparts: <code>conf_srt_secondary_ext</code>. Also added <code>--edl-play-srt-secondary-ext</code> for setting a secondary filename extension temporarily on the command line. Fixes <a href='https://github.com/linguisticmind/search-in-subs/issues/4'>#4</a>.</li>
-                            <li>
-                                The default glob setting has been made configuration file-only since its command-line counterpart didn't really have any use. The new variable name is <code>conf_default_glob</code>.
-                            </li>
+                            <li>The default glob setting has been made configuration file-only since its command-line counterpart didn't really have any use. The new variable name is <code>conf_default_glob</code>.</li>
                         </ul>
                     </li>
                 </ul>

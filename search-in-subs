@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-declare -- version='0.3.2'
+declare -- version='0.3.3'
 
 declare -- script_source=$(realpath -- "${BASH_SOURCE[0]}")
 declare -- script_name="${script_source##*/}"
@@ -93,59 +93,13 @@ function fstr {
 }
 
 declare -- opts
-opts=$(getopt -n "$script_name" -o 't:,v,V,i,I,j,J,q,Q,r,R,c,C,e,E,s,S,h,H,m,M,n,N,w,W,p,P,k,K,b:,a:,f::,F,d,D,y,Y,o,O,u:,' -l 'search-term:,verbose,no-verbose,inverse,no-inverse,filenames-nly,no-filenames-only,quiet,no-quiet,regex,no-regex,match-case,no-match-case,exact-whitespace,no-exact-whitespace,stats,no-stats,stats-headers,stats-no-headers,stats-headers-compact,stats-headers-no-compact,stats-headers-file-numbers,stats-headers-no-file-numbers,stats-wrap-filenames,stats-no-wrap-filenames,edl-play,edl-no-play,edl-play-keep-temporary,edl-play-no-keep-temporary,edl-play-before:,edl-play-after:,edl-play-srt-secondary-ext:,edl-save::,edl-no-save,edl-save-paths:,edl-save-mkdir,edl-save-no-mkdir,edl-save-overwrite,edl-save-no-overwrite,edl-ignore-missing,edl-no-ignore-missing,edl-structure:,mpv-opts:,color::,no-color,help,version,config::,' -- "$@") || exit 1
+opts=$(getopt -n "$script_name" -o 't:,v,V,i,I,j,J,q,Q,r,R,c,C,e,E,s,S,h,H,m,M,n,N,w,W,p,P,k,K,b:,a:,f::,F,d,D,y,Y,o,O,u:,' -l 'search-term:,verbose,no-verbose,inverse,no-inverse,filenames-nly,no-filenames-only,quiet,no-quiet,regex,no-regex,match-case,no-match-case,exact-whitespace,no-exact-whitespace,stats,no-stats,stats-headers,stats-no-headers,stats-headers-compact,stats-headers-no-compact,stats-headers-file-numbers,stats-headers-no-file-numbers,stats-wrap-filenames,stats-no-wrap-filenames,edl-play,edl-no-play,edl-play-keep-temporary,edl-play-no-keep-temporary,edl-play-before:,edl-play-after:,edl-save::,edl-no-save,edl-save-paths:,edl-save-mkdir,edl-save-no-mkdir,edl-save-overwrite,edl-save-no-overwrite,edl-ignore-missing,edl-no-ignore-missing,edl-structure:,mpv-opts:,color::,no-color,help,version,config::,' -- "$@") || exit 1
 eval set -- "$opts"
 unset -v opts
-
-declare -a conf_srt_secondary_ext=(
-  'aa' 'ab' 'ae' 'af' 'ak' 'am' 'an' 'ar' 'as' 'av' 
-  'ay' 'az' 'ba' 'be' 'bg' 'bh' 'bi' 'bm' 'bn' 'bo' 
-  'br' 'bs' 'ca' 'ce' 'ch' 'co' 'cr' 'cs' 'cu' 'cv' 
-  'cy' 'da' 'de' 'dv' 'dz' 'ee' 'el' 'en' 'eo' 'es' 
-  'et' 'eu' 'fa' 'ff' 'fi' 'fj' 'fo' 'fr' 'fy' 'ga' 
-  'gd' 'gl' 'gn' 'gu' 'gv' 'ha' 'he' 'hi' 'ho' 'hr' 
-  'ht' 'hu' 'hy' 'hz' 'ia' 'id' 'ie' 'ig' 'ii' 'ik' 
-  'io' 'is' 'it' 'iu' 'ja' 'jv' 'ka' 'kg' 'ki' 'kj' 
-  'kk' 'kl' 'km' 'kn' 'ko' 'kr' 'ks' 'ku' 'kv' 'kw' 
-  'ky' 'la' 'lb' 'lg' 'li' 'ln' 'lo' 'lt' 'lu' 'lv' 
-  'mg' 'mh' 'mi' 'mk' 'ml' 'mn' 'mr' 'ms' 'mt' 'my' 
-  'na' 'nb' 'nd' 'ne' 'ng' 'nl' 'nn' 'no' 'nr' 'nv' 
-  'ny' 'oc' 'oj' 'om' 'or' 'os' 'pa' 'pi' 'pl' 'ps' 
-  'pt' 'qu' 'rm' 'rn' 'ro' 'ru' 'rw' 'sa' 'sc' 'sd' 
-  'se' 'sg' 'si' 'sk' 'sl' 'sm' 'sn' 'so' 'sq' 'sr' 
-  'ss' 'st' 'su' 'sv' 'sw' 'ta' 'te' 'tg' 'th' 'ti' 
-  'tk' 'tl' 'tn' 'to' 'tr' 'ts' 'tt' 'tw' 'ty' 'ug' 
-  'uk' 'ur' 'uz' 've' 'vi' 'vo' 'wa' 'wo' 'xh' 'yi' 
-  'yo' 'za' 'zh' 'zu'
-  'aar' 'abk' 'ave' 'afr' 'aka' 'amh' 'arg' 'ara' 'asm' 'ava' 
-  'aym' 'aze' 'bak' 'bel' 'bul' 'bih' 'bis' 'bam' 'ben' 'tib' 
-  'bod' 'tib' 'bre' 'bos' 'cat' 'che' 'ces' 'cze' 'cha' 'cos' 
-  'cre' 'cze' 'chu' 'chv' 'wel' 'cym' 'wel' 'dan' 'ger' 'deu' 
-  'ger' 'div' 'dzo' 'ewe' 'gre' 'ell' 'gre' 'eng' 'epo' 'spa' 
-  'est' 'baq' 'eus' 'baq' 'per' 'fas' 'per' 'ful' 'fin' 'fij' 
-  'fao' 'fre' 'fra' 'fre' 'fry' 'gle' 'gla' 'glg' 'grn' 'guj' 
-  'glv' 'hau' 'heb' 'hin' 'hmo' 'hrv' 'hat' 'hun' 'arm' 'hye' 
-  'arm' 'her' 'ina' 'ind' 'ile' 'ibo' 'iii' 'ipk' 'ido' 'ice' 
-  'isl' 'ice' 'ita' 'iku' 'jpn' 'jav' 'geo' 'kat' 'geo' 'kon' 
-  'kik' 'kua' 'kaz' 'kal' 'khm' 'kan' 'kor' 'kau' 'kas' 'kur' 
-  'kom' 'cor' 'kir' 'lat' 'ltz' 'lug' 'lim' 'lin' 'lao' 'lit' 
-  'lub' 'lav' 'mlg' 'mah' 'mao' 'mac' 'mkd' 'mac' 'mal' 'mon' 
-  'mar' 'mri' 'mao' 'may' 'msa' 'may' 'mlt' 'bur' 'mya' 'bur' 
-  'nau' 'nob' 'nde' 'nep' 'ndo' 'dut' 'nld' 'dut' 'nno' 'nor' 
-  'nbl' 'nav' 'nya' 'oci' 'oji' 'orm' 'ori' 'oss' 'pan' 'pli' 
-  'pol' 'pus' 'por' 'que' 'roh' 'run' 'rum' 'ron' 'rum' 'rus' 
-  'kin' 'san' 'srd' 'snd' 'sme' 'sag' 'sin' 'slo' 'slv' 'slk' 
-  'slo' 'smo' 'sna' 'som' 'alb' 'sqi' 'alb' 'srp' 'ssw' 'sot' 
-  'sun' 'swe' 'swa' 'tam' 'tel' 'tgk' 'tha' 'tir' 'tuk' 'tgl' 
-  'tsn' 'ton' 'tur' 'tso' 'tat' 'twi' 'tah' 'uig' 'ukr' 'urd' 
-  'uzb' 'ven' 'vie' 'vol' 'wln' 'wol' 'xho' 'yid' 'yor' 'zha' 
-  'chi' 'zho' 'chi' 'zul'
-)
 
 # --- BEGIN config ---
 declare -- conf_default_glob='*.srt'
 declare -- conf_edl_default_name='search_results'
-declare -a conf_srt_secondary_ext+=()
 declare -- conf_chapter_title=
 
 declare -a opt_search_term=()
@@ -215,7 +169,6 @@ while true; do
     -K | --edl-play-no-keep-temporary ) opt_edl_play_keep_temporary=; shift ;;
     -b | --edl-play-before ) opt_edl_play_before="$2"; shift 2 ;;
     -a | --edl-play-after ) opt_edl_play_after="$2"; shift 2 ;;
-    --edl-play-srt-secondary-ext ) conf_srt_secondary_ext+=("$2"); shift 2 ;;
     -f | --edl-save ) opt_edl_save=1 optdata__edl_save__file="$2"; shift 2 ;;
     -F | --edl-no-save ) opt_edl_save=; shift ;;
     --edl-save-paths ) opt_edl_save_paths="$2"; shift 2 ;;
@@ -453,11 +406,6 @@ declare -- cache_dir_edl="$cache_dir"'/edl'
 
 [[ $opt_edl_play && ! $opt_edl_save && ! -d "$cache_dir_edl" ]] && mkdir -p "$cache_dir_edl"
 
-if [[ $opt_edl_play || $opt_edl_save ]]; then 
-  declare -- confdata__srt_secondary_ext__re
-  IFS= read -rd '' confdata__srt_secondary_ext__re < <(printf '%s\0' "${conf_srt_secondary_ext[@]}" | sed -zEn 's/[]\(){}<>.*?+|^$[]/\\&/g; H; $ { x; s/^\x00//; s/\x00/|/g; p }')
-fi
-
 declare -a missing_video_files=()
 
 declare -- chapter_end=0
@@ -494,11 +442,13 @@ for (( i = 1; i <= $#; i++ )); do
 
       [[ ${!i} == /* ]] && subtitle_file="${!i}" || subtitle_file="$PWD"'/'"${!i}"
 
-      declare -a candidates
+      declare -a candidates=()
 
-      if [[ $subtitle_file =~ ^(.*)\.($confdata__srt_secondary_ext__re)\.srt$ || $subtitle_file =~ ^(.*)\.srt$ ]]; then
-        candidates=("${BASH_REMATCH[1]}"!(?(.+([^.])).srt))
-      fi
+      declare -- base="$subtitle_file"
+      until [[ ${#candidates[@]} -gt 0 || $base != *.* ]]; do
+        base="${base%.*}" candidates=("$base"!(*.srt))
+      done
+      unset -v base
 
       declare -a video_files=() audio_files=()
 

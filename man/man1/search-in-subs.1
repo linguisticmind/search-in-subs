@@ -1,4 +1,4 @@
-.TH SEARCH-IN-SUBS 1 2025-03-25 "SEARCH-IN-SUBS 0.3.2"
+.TH SEARCH-IN-SUBS 1 2025-03-25 "SEARCH-IN-SUBS 0.3.3"
 .
 .SH NAME
 .
@@ -26,7 +26,7 @@ Shell options \%'nullglob', \%'extglob' and \%'globstar' are enabled internally 
 .P
 \%\fBsearch-in-subs\fR can generate EDL files for \%\fBmpv\fR player, and play the search results using it. To use this functionality, \%\fBmpv\fR, \%\fBffmpeg\fR and \%\fBlua\fR\ (v5.4) must be installed and available on system's PATH.
 .P
-In order to generate the EDL files, a video or audio file must exist in the same directory as the subtitle file(s) on which the search is performed. The video or audio file must have the same name as the subtitle file, minus the \%'.srt' extension and potentially a secondary extension containing a language code, e.g. \%'.en.srt'. Custom secondary extensions may be added with \%\fBconf_srt_secondary_ext\fR or set temporarily on the command line with \%\fB--edl-play-srt-secondary-ext\fR. If both video and audio files are found, video files take precedence. If multiple video or audio files are found, the first one will be chosen for use in the generated EDL files.
+In order to generate the EDL files, a video or audio file must exist in the same directory as the subtitle file(s) on which the search is performed. The video or audio file must have the same name as the subtitle file, minus the \%'.srt' extension, and potentially additional extensions containing language codes or other information, e.g. \%'.en.srt'. Any number of additional extensions is allowed. If both video and audio files are found, video files take precedence. If multiple video or audio files are found, the first one will be chosen for use in the generated EDL files.
 .P
 See \%\fB--edl-*\fR options below for more information.
 .P
@@ -208,10 +208,6 @@ Add a specified amount of time before each segment when generating EDL files. \%
 Add a specified amount of time after each segment when generating EDL files. \%<value> is in seconds. Precise values with a decimal separator are allowed. The default \%<value> is 0.
 .
 .TP
-.B \%--edl-play-srt-secondary-ext\fR=<value>
-Specify a custom secondary filename extension for SRT files. See also \%\fBconf_srt_secondary_ext\fR.
-.
-.TP
 .B \%-f,\ --edl-save\fR[={<path>[/]|<path>/<name>.edl|<name>.edl}]
 Save EDL files to a specified location instead of generating temporary ones.
 .sp
@@ -383,7 +379,6 @@ lb lb .
 -K, --edl-play-no-keep-temporary	\fR"
 -b, --edl-play-before\fR=<value>	opt_edl_play_before
 -a, --edl-play-after\fR=<value>	opt_edl_play_after
---edl-play-srt-secondary-ext\fR=<value>	\fR-
 -f, --edl-save\fR[=<value>]	opt_edl_save
 	optdata__edl_save__file
 -F, --edl-no-save	\fR"
@@ -415,14 +410,6 @@ Shell options \%'nullglob', \%'extglob' and \%'globstar' are enabled internally 
 .TP
 .B \%conf_edl_default_name
 The default name for a generated EDL file. The default value is \%'search_results'.
-.
-.TP
-.B \%conf_srt_secondary_ext
-Secondary filename extensions for SRT files. The default value includes standard language codes.
-.sp
-Since there are a lot of language codes, the default value is not included in the configuration file generated with \%\fB--config\fR. Instead, a template for adding to the default array is generated. 
-.sp
-See also \%\fB--edl-play-srt-secondary-ext\fR. It adds values to this array temporarily from the command line.
 .
 .TP
 .B \%conf_chapter_title
