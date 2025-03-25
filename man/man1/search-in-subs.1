@@ -1,4 +1,4 @@
-.TH SEARCH-IN-SUBS 1 2025-03-24 "SEARCH-IN-SUBS 0.3.1"
+.TH SEARCH-IN-SUBS 1 2025-03-25 "SEARCH-IN-SUBS 0.3.2"
 .
 .SH NAME
 .
@@ -424,6 +424,56 @@ Since there are a lot of language codes, the default value is not included in th
 .sp
 See also \%\fB--edl-play-srt-secondary-ext\fR. It adds values to this array temporarily from the command line.
 .
+.TP
+.B \%conf_chapter_title
+A generated EDL's chapter title. The value is a string with placeholders. See also PLACEHOLDER FORMAT.
+.sp
+If set to an empty string (''), the result is equivalent to using the value of '%{text_abbr}', but with a slight performance increase. The default value is ''.
+.sp
+The following placeholders are supported:
+.
+.RS
+.TP
+%{file_base}
+Base name of the video file.
+.TP
+%{file_edl}
+Path to the video file as it appears in the generated EDL.
+.TP
+%{file_rel}
+Path to the video file relative to the current working directory.
+.TP
+%{file_abs}
+Absolute path to the video file.
+.TP
+%{n}
+Subtitle number as it appears in the SRT file.
+.TP
+%{timecodes_raw}
+Timecodes as they appear in the SRT file.
+.TP
+%{timecode_start}
+Opening timecode in the \fBmpv\fR format.
+.TP
+%{timecode_start_raw}
+Opening timecode as it appears in the SRT file.
+.TP
+%{timecode_end}
+Closing timecode in the \fBmpv\fR format.
+.TP
+%{timecode_end_raw}
+Closing timecode as it appears in the SRT file.
+.TP
+%{text_raw}
+Subtitle text as it appears in the SRT file. Formatting tags such as \%<i></i> are removed.
+.TP
+%{text_long}
+Like %{text_raw}, but with newlines replaced with spaces.
+.TP
+%{text_abbr}
+Like %{text_raw}, but only showing the first line of the subtitle.
+.RE
+.
 .SH EXIT STATUS
 .
 .TP
@@ -508,6 +558,40 @@ l l .
 <Unmatched>|Total number of files that did not have matches.
 <Matched %>|Percentage of files that had matches.
 .TE
+.
+.SH PLACEHOLDER FORMAT
+.
+.TP
+(1)
+\%%<name>
+.sp
+or
+.TP
+.TP
+(2)
+\%%{<name>:-<fallback>:+<override>}
+.sp
+\%:-<fallback> and \%:+<override> are optional and may go in any order.
+.
+.P
+\%<name> is a placeholder name.
+.P
+\%<fallback> and \%<override> are also strings with placeholders just like the entire string.
+.P
+\%<fallback> is substituted if the replacement value is unavailable.
+.P
+\%<override> is substituted instead of the replacement value allowing to, for instance, insert extra characters next to it: \%'%{date:+%{date}_}%{name}.mp4'.
+.P
+In strings with placeholders, \%'\\', \%'%', \%'{', \%':', and \%'}' are special characters. They can be escaped with backslashes \%('\\') to represent their literal values.
+.RE
+.
+.SH AUTHOR
+.P
+Alex Rogers \%<https://github.com/\:linguisticmind>
+.
+.SH HOMEPAGE
+.P
+\%<https://github.com/\:linguisticmind/\:dechapter>
 .
 .SH AUTHOR
 .P

@@ -41,6 +41,19 @@ Video tutorials:
     </tr>
     <tr>
         <td>
+            <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.3.2'>0.3.2</a>
+        </td>
+        <td>
+           2025-03-25
+        </td>
+        <td>
+            <p>
+                Added <code>conf_chapter_title</code>. This setting lets you customize chapter titles in generated mpv EDL files.
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
             <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.3.1'>0.3.1</a>
         </td>
         <td>
@@ -639,8 +652,60 @@ CONFIGURATION
               See  also  --edl-play-srt-secondary-ext.  It adds values to this
               array temporarily from the command line.
 
+       conf_chapter_title
+              A generated EDL's chapter title. The  value  is  a  string  with
+              placeholders. See also PLACEHOLDER FORMAT.
+
+              If  set to an empty string (''), the result is equivalent to us‐
+              ing the value of '%{text_abbr}', but with a  slight  performance
+              increase. The default value is ''.
+
+              The following placeholders are supported:
+
+              %{file_base}
+                     Base name of the video file.
+
+              %{file_edl}
+                     Path  to  the  video  file as it appears in the generated
+                     EDL.
+
+              %{file_rel}
+                     Path to the video file relative to  the  current  working
+                     directory.
+
+              %{file_abs}
+                     Absolute path to the video file.
+
+              %{n}   Subtitle number as it appears in the SRT file.
+
+              %{timecodes_raw}
+                     Timecodes as they appear in the SRT file.
+
+              %{timecode_start}
+                     Opening timecode in the mpv format.
+
+              %{timecode_start_raw}
+                     Opening timecode as it appears in the SRT file.
+
+              %{timecode_end}
+                     Closing timecode in the mpv format.
+
+              %{timecode_end_raw}
+                     Closing timecode as it appears in the SRT file.
+
+              %{text_raw}
+                     Subtitle  text  as it appears in the SRT file. Formatting
+                     tags such as <i></i> are removed.
+
+              %{text_long}
+                     Like %{text_raw}, but with newlines replaced with spaces.
+
+              %{text_abbr}
+                     Like %{text_raw}, but only showing the first line of  the
+                     subtitle.
+
 EXIT STATUS
-       0      Success. No errors have occured, and  at  least  one  match  was
+       0      Success.  No  errors  have  occured,  and at least one match was
               found.
 
        1      A general error has occured.
@@ -651,24 +716,24 @@ EXIT STATUS
               -O, --edl-no-ignore-missing is set.
 
 ENVIRONMENT
-       The values of VISUAL and EDITOR  environment  variables  determine  the
+       The  values  of  VISUAL  and EDITOR environment variables determine the
        text editor when opening configuration files with --config.
 
-       VISUAL  is  evaluated  first. If that is not set, then EDITOR is evalu‐
+       VISUAL is evaluated first. If that is not set, then  EDITOR  is  evalu‐
        ated. If neither is set, nano is used as the text editor.
 
 FILES
-       A configuration file can be used to  change  the  default  behavior  of
+       A  configuration  file  can  be  used to change the default behavior of
        search-in-subs.
 
-       The  configuration file's location is "$XDG_CONFIG_HOME/search-in-subs/
-       config.bash". If "XDG_CONFIG_HOME" is not set, it defaults  to  "$HOME/
+       The configuration file's location is  "$XDG_CONFIG_HOME/search-in-subs/
+       config.bash".  If  "XDG_CONFIG_HOME" is not set, it defaults to "$HOME/
        .config".
 
-       Temporary  EDL  files  that are generated when using the -p, --edl-play
+       Temporary EDL files that are generated when  using  the  -p, --edl-play
        option are stored in a cache directory.
 
-       The cache directory's location is "$XDG_CACHE_HOME/search-in-subs".  If
+       The  cache directory's location is "$XDG_CACHE_HOME/search-in-subs". If
        "XDG_CACHE_HOME" is not set, it defaults to "$HOME/.cache".
 
 STATISTICS
@@ -700,7 +765,7 @@ STATISTICS
        Unmatched   Total number of subtitles in all files that did not have matches.
        Matched %   Total percentage of subtitles in all files that had matches.
 
-       In the 'File' column of the 'Total' row, information  is  presented  in
+       In  the  'File'  column of the 'Total' row, information is presented in
        the following format:
 
        <Matched> / <Total> (<Unmatched>) <Matched %>
@@ -712,6 +777,37 @@ STATISTICS
        <Unmatched>   Total number of files that did not have matches.
        <Matched %>   Percentage of files that had matches.
 
+PLACEHOLDER FORMAT
+       (1)    %<name>
+
+              or
+
+       (2)    %{<name>:-<fallback>:+<override>}
+
+              :-<fallback> and :+<override> are optional and may go in any or‐
+              der.
+
+       <name> is a placeholder name.
+
+       <fallback>  and <override> are also strings with placeholders just like
+       the entire string.
+
+       <fallback> is substituted if the replacement value is unavailable.
+
+       <override> is substituted instead of the replacement value allowing to,
+       for     instance,    insert    extra    characters    next    to    it:
+       '%{date:+%{date}_}%{name}.mp4'.
+
+       In strings with placeholders, '\', '%', '{', ':', and '}'  are  special
+       characters.  They  can  be  escaped with backslashes ('\') to represent
+       their literal values.
+
+AUTHOR
+       Alex Rogers <https://github.com/linguisticmind>
+
+HOMEPAGE
+       <https://github.com/linguisticmind/dechapter>
+
 AUTHOR
        Alex Rogers <https://github.com/linguisticmind>
 
@@ -719,13 +815,13 @@ HOMEPAGE
        <https://github.com/linguisticmind/search-in-subs>
 
 COPYRIGHT
-       Copyright  ©  2025  Alex  Rogers.  License GPLv3+: GNU GPL version 3 or
+       Copyright © 2025 Alex Rogers. License GPLv3+:  GNU  GPL  version  3  or
        later <https://gnu.org/licenses/gpl.html>.
 
-       This is free software: you are free  to  change  and  redistribute  it.
+       This  is  free  software:  you  are free to change and redistribute it.
        There is NO WARRANTY, to the extent permitted by law.
 
-SEARCH-IN-SUBS 0.3.1              2025-03-24                 SEARCH-IN-SUBS(1)
+SEARCH-IN-SUBS 0.3.2              2025-03-25                 SEARCH-IN-SUBS(1)
 ```
 
 ## License

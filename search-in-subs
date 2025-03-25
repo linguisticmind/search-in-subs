@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-declare -- version='0.3.1'
+declare -- version='0.3.2'
 
 declare -- script_source=$(realpath -- "${BASH_SOURCE[0]}")
 declare -- script_name="${script_source##*/}"
@@ -27,6 +27,70 @@ declare -- script_dir="$(dirname -- "$script_source")"
 shopt -s extglob globstar nullglob
 
 function bat_or_cat { { type -P batcat || type -P bat; } > /dev/null && "$_" "$@" || cat; }
+
+function fstr {
+
+  { type -P lua5.4 || type -P lua; } &> /dev/null && "$_" <(printf '%s' '
+
+    if #arg == 0 then
+      io.stderr:write("fstr: fstr <str> [<name> <replacement> ...]\n")
+      io.stderr:write("version: 0.1.0\n")
+      os.exit(1)
+    end
+
+    str, replacements = arg[1], {}
+
+    for i = 2, #arg, 2 do replacements[arg[i]] =  arg[i + 1]:gsub("\\([\\%%:{}])", "%1") end
+
+    function string:fstr_match()
+
+      local name, fallback, override
+
+      i, j = self:find("^%%[%w_]+")
+      if i == nil then i, j = self:find("[^\\]%%[%w_]+"); if i ~= nil then i = i + 1 end end
+
+      if i ~= nil then name = self:sub(i + 1, j) else
+
+        if i == nil then i, j = self:gsub("\\[{}]", "__"):find("^%%%b{}") end
+        if i == nil then i, j = self:gsub("\\[{}]", "__"):find("[^\\]%%%b{}"); if i ~= nil then i = i + 1 end end
+
+        if i == nil then return false end
+
+        local rest
+        name, rest = self:sub(i + 2, j - 1):match("([%w_]+)(.*)")
+
+        repeat
+          local split = rest:find("[^\\]:")
+          if rest:sub(2, 2) == "-" then
+            fallback = rest:sub(3, split or #rest)
+          elseif rest:sub(2, 2) == "+" then
+            override = rest:sub(3, split or #rest)
+          end
+          if split ~= nil then rest = rest:sub(split + 1) else rest = "" end
+        until rest == ""
+
+      end
+
+      replacement = override or replacements[name] or fallback
+
+      if replacement ~= nil then return true else
+        io.stderr:write("fstr: unable to replace %{" .. name .. "}\n")
+        os.exit(1)
+      end
+
+    end
+
+    while str:fstr_match() do
+      str = str:sub(1, i - 1) .. replacement .. str:sub(j + 1)
+    end
+
+    str = str:gsub("\\([\\%%:{}])", "%1")
+
+    print(str)
+
+  ') "$@"
+
+}
 
 declare -- opts
 opts=$(getopt -n "$script_name" -o 't:,v,V,i,I,j,J,q,Q,r,R,c,C,e,E,s,S,h,H,m,M,n,N,w,W,p,P,k,K,b:,a:,f::,F,d,D,y,Y,o,O,u:,' -l 'search-term:,verbose,no-verbose,inverse,no-inverse,filenames-nly,no-filenames-only,quiet,no-quiet,regex,no-regex,match-case,no-match-case,exact-whitespace,no-exact-whitespace,stats,no-stats,stats-headers,stats-no-headers,stats-headers-compact,stats-headers-no-compact,stats-headers-file-numbers,stats-headers-no-file-numbers,stats-wrap-filenames,stats-no-wrap-filenames,edl-play,edl-no-play,edl-play-keep-temporary,edl-play-no-keep-temporary,edl-play-before:,edl-play-after:,edl-play-srt-secondary-ext:,edl-save::,edl-no-save,edl-save-paths:,edl-save-mkdir,edl-save-no-mkdir,edl-save-overwrite,edl-save-no-overwrite,edl-ignore-missing,edl-no-ignore-missing,edl-structure:,mpv-opts:,color::,no-color,help,version,config::,' -- "$@") || exit 1
@@ -82,6 +146,7 @@ declare -a conf_srt_secondary_ext=(
 declare -- conf_default_glob='*.srt'
 declare -- conf_edl_default_name='search_results'
 declare -a conf_srt_secondary_ext+=()
+declare -- conf_chapter_title=
 
 declare -a opt_search_term=()
 declare -- opt_verbose=
@@ -458,6 +523,8 @@ for (( i = 1; i <= $#; i++ )); do
       fi
       unset -v video_files audio_files
 
+      declare -- video_file_abs="$video_file"
+
       video_file_duration=
 
       if [[ $video_file ]]; then
@@ -490,13 +557,33 @@ for (( i = 1; i <= $#; i++ )); do
             ! ($opt_edl_ignore_missing && ${#missing_video_files[@]} -gt 0) || \
             ! $video_file_missing \
           ) ]]; then 
-      timecodes=$(<<<"$subtitle" sed -nE '2 { s/\x1b\[[[:digit:];]+m//g; p }')
-      chapter_title=$(<<<"$subtitle" sed -nE '3 { s/\x1b\[[[:digit:];]+m//g; p }')
+      if [[ ${subtitle//$'\x1b['*([^m])'m'/} =~ ^([^$'\n']*)$'\n'*(([^$'\n']*)' --> '([^$'\n']*))$'\n'(([^$'\n']*).*)$ ]]; then
+        declare -A subtitle_data=(
+          [file_base]="${video_file##*/}"
+          [file_edl]="$video_file"
+          [file_rel]="${video_file_abs#$PWD/}"
+          [file_abs]="$video_file_abs"
+          [n]="${BASH_REMATCH[1]}"
+          [timecodes_raw]="${BASH_REMATCH[2]}"
+          [timecode_start]="${BASH_REMATCH[3]/,/.}"
+          [timecode_start_raw]="${BASH_REMATCH[3]}"
+          [timecode_end]="${BASH_REMATCH[4]/,/.}"
+          [timecode_end_raw]="${BASH_REMATCH[4]}"
+          [text_raw]="${BASH_REMATCH[5]}"
+          [text_long]="${BASH_REMATCH[5]//$'\n'/ }"
+          [text_abbr]="${BASH_REMATCH[6]}"
+        )
+      fi
+      if [[ $conf_chapter_title ]]; then
+        chapter_title="$(eval set -- "${subtitle_data[@]@K}"; fstr "$conf_chapter_title" "$@")"
+      else
+        chapter_title="${subtitle_data[text_abbr]}"
+      fi
       chapter_start="$chapter_end"
-      chapter_end=$((chapter_start + $(calc_segment_length "$timecodes" ${video_file_duration:+"$video_file_duration"})))
+      chapter_end=$((chapter_start + $(calc_segment_length "${subtitle_data[timecodes_raw]}" ${video_file_duration:+"$video_file_duration"})))
       chapters+=("$(printf '[CHAPTER]\nTIMEBASE=1/1000\nSTART=%s\nEND=%s\ntitle=%s' "$chapter_start" "$chapter_end" "$chapter_title")")
-      video_edl_lines+=("$(generate_edl_line "$video_file" "$timecodes" "$chapter_title" ${video_file_duration:+"$video_file_duration"})")
-      subtitles_edl_lines+=("$(generate_edl_line "$subtitle_file" "$timecodes" "$chapter_title" ${video_file_duration:+"$video_file_duration"})")
+      video_edl_lines+=("$(generate_edl_line "$video_file" "${subtitle_data[timecodes_raw]}" "$chapter_title" ${video_file_duration:+"$video_file_duration"})")
+      subtitles_edl_lines+=("$(generate_edl_line "$subtitle_file" "${subtitle_data[timecodes_raw]}" "$chapter_title" ${video_file_duration:+"$video_file_duration"})")
     fi
 
     [[ $opt_stats ]] && ((stats_number_subtitles_matched[${!i}]++))

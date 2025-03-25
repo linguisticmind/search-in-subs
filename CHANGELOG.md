@@ -8,6 +8,19 @@
     </tr>
     <tr>
         <td>
+            <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.3.2'>0.3.2</a>
+        </td>
+        <td>
+           2025-03-25
+        </td>
+        <td>
+            <p>
+                Added <code>conf_chapter_title</code>. This setting lets you customize chapter titles in generated mpv EDL files.
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
             <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.3.1'>0.3.1</a>
         </td>
         <td>
