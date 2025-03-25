@@ -446,7 +446,7 @@ for (( i = 1; i <= $#; i++ )); do
 
       declare -- base="$subtitle_file"
       until [[ ${#candidates[@]} -gt 0 || $base != *.* ]]; do
-        base="${base%.*}" candidates=("$base"!(*.srt))
+        base="${base%.*}" candidates=("$base"'.'!(srt|*.srt))
       done
       unset -v base
 
