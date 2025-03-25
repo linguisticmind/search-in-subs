@@ -15,7 +15,7 @@
         </td>
         <td>
             <p>
-                Added <code>conf_chapter_title</code>. This setting lets you customize chapter titles in generated mpv EDL files.
+                Added <code>conf_chapter_title</code>. This setting lets you customize chapter titles in generated mpv EDL files. Idea from discussion <a href='https://github.com/linguisticmind/search-in-subs/discussions/8'>#8</a>.
             </p>
         </td>
     </tr>
