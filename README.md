@@ -41,6 +41,19 @@ Video tutorials:
     </tr>
     <tr>
         <td>
+            <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.3.5'>0.3.5</a>
+        </td>
+        <td>
+           2025-03-26
+        </td>
+        <td>
+            <p>
+                Bug fix: The <code>--no-color</code> option now works properly.
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
             <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.3.4'>0.3.4</a>
         </td>
         <td>
