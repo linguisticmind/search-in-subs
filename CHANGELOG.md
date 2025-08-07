@@ -8,6 +8,22 @@
     </tr>
     <tr>
         <td>
+            <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.3.6'>0.3.6</a>
+        </td>
+        <td>
+           2025-08-07
+        </td>
+        <td>
+            <p>
+                Bug fix: Now the terminal width gets determined properly.
+            </p>
+            <p>
+                Man page: Fixed a minor error.
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
             <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.3.5'>0.3.5</a>
         </td>
         <td>

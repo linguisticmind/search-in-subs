@@ -41,133 +41,17 @@ Video tutorials:
     </tr>
     <tr>
         <td>
-            <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.3.5'>0.3.5</a>
+            <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.3.6'>0.3.6</a>
         </td>
         <td>
-           2025-03-26
-        </td>
-        <td>
-            <p>
-                Bug fix: The <code>--no-color</code> option now works properly.
-            </p>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.3.4'>0.3.4</a>
-        </td>
-        <td>
-           2025-03-25
+           2025-08-07
         </td>
         <td>
             <p>
-                Bug fix: Last word of a subtitle file wasn't matching properly. Now it does.
+                Bug fix: Now the terminal width gets determined properly.
             </p>
             <p>
-                <code>conf_chapter_title</code>: Renamed <code>%{text_raw}</code> to <code>%{text_tall}</code> since that string has formatting tags stripped.
-            </p>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.3.3'>0.3.3</a>
-        </td>
-        <td>
-           2025-03-25
-        </td>
-        <td>
-            <p>
-                Removed <code>conf_srt_secondary_ext</code> and <code>--edl-play-srt-secondary-ext</code> in favor of a general algorithm for finding video files corresponding to subtitle files. There is no need to define custom secondary extensions anymore. Any number of additional extensions with any contents is supported. Improving the fix of <a href='https://github.com/linguisticmind/search-in-subs/issues/4'>#4</a>.
-            </p>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.3.2'>0.3.2</a>
-        </td>
-        <td>
-           2025-03-25
-        </td>
-        <td>
-            <p>
-                Added <code>conf_chapter_title</code>. This setting lets you customize chapter titles in generated mpv EDL files. Idea from discussion <a href='https://github.com/linguisticmind/search-in-subs/discussions/8'>#8</a>.
-            </p>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.3.1'>0.3.1</a>
-        </td>
-        <td>
-           2025-03-24
-        </td>
-        <td>
-            <p>
-                Added <code>-j, --filenames-only</code>, <code>-J, --no-filenames-only</code>. This option suppresses printing of matches, only printing the names of the files where matches were found.
-            </p>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.3.0'>0.3.0</a>
-        </td>
-        <td>
-            2025-03-23
-        </td>
-        <td>
-            <p>
-                <p>
-                    <strong>We are at 0.3.0!</strong>
-                </p>
-                <ul>
-                    <li>The new <code>--config</code> option makes configuring <code>search-in-subs</code> more convenient by adding the ability to generate a configuration file and open it for editing.</li>
-                    <li><code>-f, --edl-save-files-relative</code>, <code>-F, --edl-save-files-absolute</code>, <code>--edl-no-save-files</code> were reorganized as <code>-f, --edl-save</code>, <code>-F, --edl-no-save</code>, and <code>--edl-save-paths</code>.</li>
-                    <li><code>--color</code> now takes an optional argument with the value of <code>'always'</code>, <code>'auto'</code>, or <code>'never'</code>. In the <code>'auto'</code> mode, colorization is applied only if stdout of <code>search-in-subs</code> is connected to a terminal.</li>
-                    <li><code>--help</code> now opens the man page.</li>
-                    <li>Various improvements to the man mage were made, including the addition of a new <code>CONFIGURATION</code> section.</li>
-                    <li>
-                        <p>
-                            Introducing <i>configuration file-only parameters</i>. These are settings that can only be set in the configuration file, and don't have a command-line counterpart.
-                        </p>
-                        <ul>
-                            <li>The default name of a generated EDL file is now configurable: <code>conf_edl_default_name</code>.
-                            <li><del>It is now possible to set custom secondary filename extensions for SRT files to allow <code>search-in-subs</code> to correctly match up unusually-named subtitle files with their video counterparts: <code>conf_srt_secondary_ext</code>. Also added <code>--edl-play-srt-secondary-ext</code> for setting a secondary filename extension temporarily on the command line. Fixes <a href='https://github.com/linguisticmind/search-in-subs/issues/4'>#4</a>.</del> See v0.3.3.</li>
-                            <li>The default glob setting has been made configuration file-only since its command-line counterpart didn't really have any use. The new variable name is <code>conf_default_glob</code>.</li>
-                        </ul>
-                    </li>
-                </ul>
-            </p>
-            <hr>
-            <p>
-                <b>ATTENTION</b>: This release introduces <strong>breaking changes</strong>. It is recommended that you back up your configuration file, generate a new one, and manually copy over your settings from the backup file into the newly-generated configuration file.
-            </p>
-            <dl>
-                <dt>
-                    What does <code>search-in-subs</code> do when it generates a configuration file?
-                </dt>
-                <dd>
-                    It takes the part of <a href='search-in-subs'>its own source code</a> demarcated by lines <code># --- BEGIN config ---</code> and <code># --- END config ---</code>, comments out non-empty lines from that part, and saves the resulting text to <code>~/.config/search-in-subs/config.bash</code>. See the <a href='https://github.com/linguisticmind/search-in-subs#manual'>man page</a> for more information about the functionality provided by the new <code>--config</code> option.
-                </dd>
-            </dl>
-            <p>
-                The suggested procedure for migrating your settings is:
-            </p>
-            <div>
-            <pre>cd ~/.config/search-in-subs
-mv -nv config.bash config.bash.bak
-search-in-subs --config</pre>
-            </div>
-            <p>
-                <code>search-in-subs</code> will generate a new configuration file and ask if you would like to open it in a text editor. Reply <code>y</code> or simply press Enter.
-            </p>
-            <p>
-                Open <code>~/.config/search-in-subs/config.bash.bak</code> in a text editor as well. If you're using <code>vim</code>, you can run <code>:tabnew ~/.config/search-in-subs/config.bash.bak</code>.
-            </p>
-            <p>
-                Then copy your settings over to the new configuration file. It should be clear from just looking at the file what goes where.
-            </p>
-            <p>
-                If you run into problems, please <a href='https://github.com/linguisticmind/search-in-subs/issues'>open an issue</a> or <a href='https://github.com/linguisticmind/search-in-subs/discussions'>ask a question</a>.
+                Man page: Fixed a minor error.
             </p>
         </td>
     </tr>
@@ -819,11 +703,10 @@ PLACEHOLDER FORMAT
        <fallback> is substituted if the replacement value is unavailable.
 
        <override> is substituted instead of the replacement value allowing to,
-       for     instance,    insert    extra    characters    next    to    it:
-       '%{date:+%{date}_}%{name}.mp4'.
+       for instance, insert extra characters next to it.
 
-       In strings with placeholders, '\', '%', '{', ':', and '}'  are  special
-       characters.  They  can  be  escaped with backslashes ('\') to represent
+       In  strings  with placeholders, '\', '%', '{', ':', and '}' are special
+       characters. They can be escaped with  backslashes  ('\')  to  represent
        their literal values.
 
 AUTHOR
@@ -839,13 +722,13 @@ HOMEPAGE
        <https://github.com/linguisticmind/search-in-subs>
 
 COPYRIGHT
-       Copyright © 2025 Alex Rogers. License GPLv3+:  GNU  GPL  version  3  or
+       Copyright  ©  2025  Alex  Rogers.  License GPLv3+: GNU GPL version 3 or
        later <https://gnu.org/licenses/gpl.html>.
 
-       This  is  free  software:  you  are free to change and redistribute it.
+       This is free software: you are free  to  change  and  redistribute  it.
        There is NO WARRANTY, to the extent permitted by law.
 
-SEARCH-IN-SUBS 0.3.4              2025-03-25                 SEARCH-IN-SUBS(1)
+SEARCH-IN-SUBS 0.3.6              2025-08-07                 SEARCH-IN-SUBS(1)
 ```
 
 ## License
