@@ -554,20 +554,20 @@ for (( i = 1; i <= $#; i++ )); do
         /^[[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3} --> [[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3}$/ {
           H
           :a $ ! { n; /^$/! { H; b a } }
+          g
+          s/^([[:digit:]]+\n[[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3} --> [[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3})\n(.*)$/\1/
           x
-          s/$/\x00/
-          h
-          s/^([[:digit:]]+\n[[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3} --> [[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3}).*$/'${opt_color:+'\x1b[2m'}'\1'${opt_color:+'\x1b[22m'}'/
-          x
-          s/^[[:digit:]]+\n[[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3} --> [[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3}\n//
+          s//\2/
           /'"$search_term_re"'/M'${optdata__match_case__inv:+'I'}' {
-            s/'"$search_term_re"'/'${opt_color:+'\x1b[7m'}'&'${opt_color:+'\x1b[27m'}'/gM'${optdata__match_case__inv:+'I'}'
+            '${opt_color:+"s/$search_term_re/\\x1b[7m&\\x1b[27m/gM${optdata__match_case__inv:+I}"}'
             s/<b>/'${opt_color:+'\x1b[1m'}'/g; s/<\/b>/'${opt_color:+'\x1b[22m'}'/g
             s/<i>/'${opt_color:+'\x1b[3m'}'/g; s/<\/i>/'${opt_color:+'\x1b[23m'}'/g
             s/<u>/'${opt_color:+'\x1b[4m'}'/g; s/<\/u>/'${opt_color:+'\x1b[24m'}'/g
             s/<s>/'${opt_color:+'\x1b[9m'}'/g; s/<\/s>/'${opt_color:+'\x1b[29m'}'/g
             H
-            x
+            g
+            '${opt_color:+'s/^([[:digit:]]+\n[[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3} --> [[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3})\n(.*)$/\x1b[2m\1\x1b[22m\n\2/'}'
+            s/$/\x00/
             p
           }
         }
