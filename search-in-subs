@@ -24,7 +24,7 @@ declare -- script_source=$(realpath -- "${BASH_SOURCE[0]}")
 declare -- script_name="${script_source##*/}"
 declare -- config_dir="${XDG_CONFIG_HOME:-$HOME/.config}"'/'"${script_source##*/}"
 declare -- cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}"'/'"${script_source##*/}"
-declare -- script_dir="$(dirname -- "$script_source")"
+declare -- script_dir=$(dirname -- "$script_source")
 
 shopt -s extglob globstar nullglob
 
