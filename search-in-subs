@@ -199,7 +199,7 @@ while true; do
     --version ) printf '%s\n' "$version"; exit ;;
     --config ) opt_config="${2:-auto}"; shift 2 ;;
     -- ) shift; break ;;
-    * ) printf '[%s] %s\n' "$script_name" 'Internal error: unable to parse option `'"$1"'`.' >&2; exit 1 ;;
+    * ) printf '%s\n' "Internal error: unable to parse argument ${1@Q}." >&2; exit 1 ;;
   esac
 done
 
