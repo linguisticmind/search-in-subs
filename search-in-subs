@@ -252,7 +252,7 @@ if [[ $opt_config ]]; then
       if [[ -f $config_file ]]; then
         while read -ep "Are you sure you want to delete the configuration file ${config_file@Q}? [y/N] "; do
           case $REPLY in
-            [Yy] ) rm -v "$config_file"; (shopt -s dotglob; set -- "$config_dir"'/'*; [[ $# -eq 0 ]]) && rmdir -v "$config_dir"; break ;;
+            [Yy] ) rm -v "$config_file"; (shopt -s dotglob nullglob; set -- "$config_dir"'/'*; [[ $# -eq 0 ]]) && rmdir -v "$config_dir"; break ;;
             [Nn] | '' ) exit 1 ;;
           esac
         done
