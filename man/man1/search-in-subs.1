@@ -313,23 +313,30 @@ Open the man page.
 Print version information.
 .
 .TP
-.B \%--config\fR[={edit|generate|remove|auto}]
+.B \%--config\fR[={auto|edit|generate|remove|none}]
 Perform an action on the configuration file. See also CONFIGURATION and FILES below.
 .
 .RS
+.TP 9
+\%[auto]
+Generate a configuration file if it does not exist. If it does, open it in a text editor.
 .TP
-edit
+\%edit
 Open an existing configuration file in a text editor.
 .TP
-generate
+\%generate
 Generate a new configuration file.
 .TP
-remove
+\%remove
 Delete an existing configuration file. If the configuration directory doesn't have any other files, it is also deleted.
 .TP
-[auto]
-Generate a configuration file if it does not exist. If it does, open it in a text editor. This is the default.
+\%none
+Do not use the configuration file. Use the program in its default configuration.
 .RE
+.
+.TP
+.B \%--no-config
+Do not use the configuration file. Use the program in its default configuration. Equivalent to \fB\%--config\fR set to 'none'.
 .
 .SH CONFIGURATION
 .P
