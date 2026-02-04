@@ -28,8 +28,6 @@ declare -- script_dir=$(dirname -- "$script_source")
 
 shopt -s extglob globstar nullglob
 
-function bat_or_cat { { type -P batcat || type -P bat; } > /dev/null && "$_" "$@" || cat; }
-
 function fstr {
 
   { type -P lua5.4 || type -P lua; } &> /dev/null && "$_" <(printf '%s' '
@@ -133,10 +131,22 @@ declare -- optdata__mpv_opts__append=1
 declare -- opt_color='auto'
 # --- END config ---
 
-declare -- config_file="$config_dir"'/config.bash'
-test -f "$config_file" && source "$_"
+declare -- opt_config
 
-declare -- opt_config=
+declare -- i
+for (( i = 1; i <= $#; i++ )); do
+  case ${!i} in
+    --config ) : "$(( i + 1 ))"; test "${!_}" == 'none' && { opt_config="$_"; break; } ;;
+    --no-config ) opt_config='none'; break ;;
+    -- ) break ;;
+  esac
+done
+unset -v i
+
+declare -- config_file="$config_dir/config.bash"
+[[ ! $opt_config == 'none' ]] && test -f "$config_file" && source "$_"
+
+declare -- optc
 
 while true; do
   case $1 in
@@ -197,7 +207,8 @@ while true; do
     --no-color ) opt_color='never'; shift ;;
     --help ) { test -f "$script_dir"'/man/man1/'"$script_name"'.1' || test -f "$(man -w "$script_name" &> /dev/null)"; } && man "$_"; exit ;;
     --version ) printf '%s\n' "$version"; exit ;;
-    --config ) opt_config="${2:-auto}"; shift 2 ;;
+    --config ) optc="${optc:-$1}" opt_config="${2:-auto}"; shift 2 ;;
+    --no-config ) optc="${optc:-$1}" opt_config='none'; shift ;;
     -- ) shift; break ;;
     * ) printf '%s\n' "Internal error: unable to parse argument ${1@Q}." >&2; exit 1 ;;
   esac
@@ -210,74 +221,129 @@ case $opt_color in
   * ) printf '%s\n' "${opt_color:+$'\x1b[31m'}[$script_name] Invalid argument to ${opt_color:+$'\x1b[1m'}--color${opt_color:+$'\x1b[22m'}: ${opt_color@Q}. Allowed values are 'always', ['auto'], 'never'.${opt_color:+$'\x1b[0m'}" >&2; exit 1 ;;
 esac
 
-if [[ $opt_config ]]; then
-  function ops_config_edit { "${VISUAL:-${EDITOR:-nano}}" "$config_file"; }
-  function ops_config_generate {
-    printf '%s\n' "Generating configuration file ${config_file@Q}:"
-    [[ ! -d $config_dir ]] && mkdir -p "$config_dir"
-    sed -En '
-      /^\s*#\s+---\s+BEGIN\s+config\s+---\s*$/ {
-        n
-        :a /^\s*#\s+---\s+END\s+config\s+---\s*$/ ! { H; n; b a }
-        z
-        x
-        s/^[\t\n\v\f\r ]*//
-        s/[\t\n\v\f\r ]*$//
-        s/[\t\v\f\r ]+$//gm
-        {
-          s/\x27/\x27\\\x27\x27/g
-          s/.*/printf \x27%s\x27 \x27&\x27 | sed -E \x27\/=\\($\/ { n; :a \/^\\)$\/ ! { s\/^\/#\/; n; b a } }\x27/e
-        }
-        s/^[^#]/#&/gm
-        p
-      }
-    ' "$script_source" | tee "$config_file" | bat_or_cat --style=grid,numbers --paging=never --language=bash --color=never ${opt_color:+--color=always} &&
-    printf '%s\n' "Configuration file ${config_file@Q} successfully generated."
+function optdata__config__run {
+
+  if [[ $# -eq 0 ]]; then set -- "$config_file"; fi
+
+  function optdata__config__edit {
+    "${VISUAL:-${EDITOR:-nano}}" -- "$1"
   }
+
+  function optdata__config__generate {
+    local -- sed_script
+		IFS= read -rd '' sed_script <<- 'EOF'
+			/^\s*#\s+---\s+BEGIN\s+config\s+---\s*$/ {
+			  n
+			  :a /^\s*#\s+---\s+END\s+config\s+---\s*$/ ! { H; n; b a }
+			  z
+			  x
+			  s/^[\t\n\v\f\r ]*//
+			  s/[\t\n\v\f\r ]*$//
+			  s/[\t\v\f\r ]+$//gm
+			  {
+			    s/'/'\\''/g
+			    s/.*/printf '%s' '&' | sed -E '\/=\\($\/ { n; :a \/^\\)$\/ ! { s\/^\/#\/; n; b a } }'/e
+			  }
+			  s/^[^#]/#&/gm
+			  p
+			  q
+			}
+			$ q 1
+		EOF
+    if [[ ! -d ${1%/*} ]]; then
+      mkdir -p -- "${1%/*}" && printf '%s\n' "Created configuration directory ${_@Q}."
+    fi
+    printf '%s\n' "Generating configuration file ${1@Q}."
+    sed -En -- "$sed_script" "$script_source" | 
+      tee -- "$1" |
+      if { type -P batcat || type -P bat; } > /dev/null; then
+        "$_" \
+          --no-config \
+          --style=numbers \
+          --paging=never \
+          --language=bash \
+          --color=never ${opt_color:+--color=always}
+      else
+        cat -n
+      fi &&
+        printf '%s\n' "Configuration file ${1@Q} successfully generated."
+  }
+
   case $opt_config in
-    edit ) [[ -f $config_file ]] && ops_config_edit || printf '%s\n' "No configuration file ${config_file@Q} to edit. Use --config=generate to generate it." >&2 ;;
-    generate )
-      if [[ -f $config_file ]]; then
-        while read -ep "Configuration file ${config_file@Q} already exists. Do you want to overwrite it? [y/N] "; do
-          case $REPLY in
-            [Yy] ) ops_config_generate; break ;;
-            [Nn] | '' ) exit 1 ;;
-          esac
-        done
-      else
-        ops_config_generate
-      fi
-    ;;
-    remove )
-      if [[ -f $config_file ]]; then
-        while read -ep "Are you sure you want to delete the configuration file ${config_file@Q}? [y/N] "; do
-          case $REPLY in
-            [Yy] ) rm -v "$config_file"; (shopt -s dotglob nullglob; set -- "$config_dir"'/'*; [[ $# -eq 0 ]]) && rmdir -v "$config_dir"; break ;;
-            [Nn] | '' ) exit 1 ;;
-          esac
-        done
-      else
-        printf '%s\n' "Configuration file ${config_file@Q} does not exist." >&2
-        exit 1
-      fi
-    ;;
     auto )
-      if [[ -f $config_file ]]; then
-        ops_config_edit
+      if [[ -f $1 ]]; then
+        optdata__config__edit "$1"; exit
       else
-        ops_config_generate
-        while read -ep "Would you like to open it in a text editor? [Y/n] "; do
+        while read -ep "Configuration file ${1@Q} does not exist. Would you like to generate it? [Y/n] "; do
           case $REPLY in
-            [Yy] | '' ) ops_config_edit; break ;;
+            [Yy] | '' ) break ;;
             [Nn] ) exit 1 ;;
           esac
         done
+        optdata__config__generate "$1"
+        while read -ep "Would you like to open it in a text editor? [Y/n] "; do
+          case $REPLY in
+            [Yy] | '' ) break ;;
+            [Nn] ) exit 1 ;;
+          esac
+        done
+        optdata__config__edit "$1"
+        exit
       fi
     ;;
-    * ) printf '%s\n' "${opt_color:+$'\x1b[31m'}[$script_name] Invalid argument to ${opt_color:+$'\x1b[1m'}--config${opt_color:+$'\x1b[22m'}: ${opt_config@Q}. Allowed values are 'edit', 'generate', 'remove', ['auto'].${opt_color:+$'\x1b[0m'}" >&2; exit 1 ;;
+    edit )
+      if [[ -f $1 ]]; then
+        optdata__config__edit "$1"; exit
+      else
+        printf '%s\n' "No configuration file ${1@Q} to edit. Use ‘--config=generate’ to generate one."
+        exit 1
+      fi
+    ;;
+    generate )
+      if [[ -f $1 ]]; then
+        while read -ep "Configuration file ${1@Q} already exists. Would you like to overwrite it? [y/N] "; do
+          case $REPLY in
+            [Yy] ) break ;;
+            [Nn] | '' ) exit 1 ;;
+          esac
+        done
+        optdata__config__generate "$1"
+        exit
+      else
+        optdata__config__generate "$1"; exit
+      fi
+    ;;
+    remove )
+      if [[ -f $1 ]]; then
+        while read -ep "Configuration file ${1@Q} will be deleted. Are you sure you want to proceed? [y/N] "; do
+          case $REPLY in
+            [Yy] ) break ;;
+            [Nn] | '' ) exit 1 ;;
+          esac
+        done
+        rm -- "$1" && printf '%s\n' "Deleted configuration file ${_@Q}."
+        if (shopt -s dotglob nullglob; set -- "${1%/*}/"*; [[ $# -eq 0 ]]); then
+          rmdir -- "${1%/*}" && printf '%s\n' "Deleted empty configuration directory ${_@Q}."
+        fi
+        exit
+      else
+        printf '%s\n' "Configuration file ${1@Q} does not exist."
+        exit 1
+      fi
+    ;;
   esac
-  exit
-fi
+
+}
+
+case $optc in
+  --config | --no-config )
+    case $opt_config in
+      auto | edit | generate | remove ) optdata__config__run ;;
+      none ) ;;
+      * ) printf '%s\n' "${opt_color:+$'\x1b[31m'}[$script_name] Invalid argument to ${opt_color:+$'\x1b[1m'}--config${opt_color:+$'\x1b[22m'}: ${opt_config@Q}. Allowed values are ['auto'], 'edit', 'generate', 'remove', 'none'.${opt_color:+$'\x1b[0m'}" >&2; exit 1 ;;
+    esac
+  ;;
+esac
 
 case $opt_edl_save_paths in
   relative | absolute ) ;;
@@ -1010,3 +1076,5 @@ if [[ $play_edl ]]; then
   fi
 
 fi
+
+# vim: set list listchars=tab\:␉· tabstop=2 :
