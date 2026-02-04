@@ -481,7 +481,7 @@ declare -- chapter_end=0
 declare -- i
 for (( i = 1; i <= $#; i++ )); do
 
-  [[ -d "${!i}" ]] && set -- "${@:1:$((i - 1))}" "${!i%%+(/)}"/$conf_default_glob "${@:$((i + 1))}"
+  [[ -d "${!i}" ]] && set -- "${@:1:$(( i - 1 ))}" "${!i%%+(/)}"/$conf_default_glob "${@:$(( i + 1 ))}"
 
   video_file_missing=
 
@@ -489,13 +489,13 @@ for (( i = 1; i <= $#; i++ )); do
     printf '%s\n' "${opt_color:+$'\x1b[33m'}[$script_name] File ${!i@Q} does not exist. Skipping.${opt_color:+$'\x1b[0m'}" >&2
     had_errors=1
     shift
-    ((i--))
+    (( i-- ))
     continue
   elif [[ ! -f "${!i}" ]]; then
     printf '%s\n' "${opt_color:+$'\x1b[33m'}[$script_name] ${!i@Q} is not a file. Skipping.${opt_color:+$'\x1b[0m'}" >&2
     had_errors=1
     shift
-    ((i--))
+    (( i-- ))
     continue
   fi
 
@@ -597,13 +597,13 @@ for (( i = 1; i <= $#; i++ )); do
         chapter_title="${subtitle_data[text_abbr]}"
       fi
       chapter_start="$chapter_end"
-      chapter_end=$((chapter_start + $(calc_segment_length "${subtitle_data[timecodes_raw]}" ${video_file_duration:+"$video_file_duration"})))
+      chapter_end=$(( chapter_start + $(calc_segment_length "${subtitle_data[timecodes_raw]}" ${video_file_duration:+"$video_file_duration"}) ))
       chapters+=("$(printf '[CHAPTER]\nTIMEBASE=1/1000\nSTART=%s\nEND=%s\ntitle=%s' "$chapter_start" "$chapter_end" "$chapter_title")")
       video_edl_lines+=("$(generate_edl_line "$video_file" "${subtitle_data[timecodes_raw]}" "$chapter_title" ${video_file_duration:+"$video_file_duration"})")
       subtitles_edl_lines+=("$(generate_edl_line "$subtitle_file" "${subtitle_data[timecodes_raw]}" "$chapter_title" ${video_file_duration:+"$video_file_duration"})")
     fi
 
-    [[ $opt_stats ]] && ((stats_number_subtitles_matched[${!i}]++))
+    [[ $opt_stats ]] && (( stats_number_subtitles_matched[${!i}]++ ))
 
     [[ ! $opt_quiet && ! $opt_inverse && ! $file_has_matches ]] &&
       printf ${opt_color:+'\x1b[38;5;34m'}'%s'${opt_color:+'\x1b[39m'}'\n'${optdata__filenames_only__inv:+'\n'} "${!i}" 
@@ -653,7 +653,7 @@ for (( i = 1; i <= $#; i++ )); do
   fi
 
   if [[ $opt_stats ]]; then
-    stats_number_subtitles_unmatched[${!i}]=$((${stats_number_subtitles_total[${!i}]} - ${stats_number_subtitles_matched[${!i}]}))
+    stats_number_subtitles_unmatched[${!i}]=$(( stats_number_subtitles_total[${!i}] - stats_number_subtitles_matched[${!i}] ))
     stats_percentage_subtitles_matched[${!i}]=$(printf '%d / %d * 100\n' "${stats_number_subtitles_matched[${!i}]}" "${stats_number_subtitles_total[${!i}]}" | bc -l)
   fi
 
@@ -777,20 +777,20 @@ if [[ $opt_stats ]]; then
 
   for file; do
 
-    [[ ${stats_number_subtitles_matched[$file]} -gt 0 ]] && ((stats_totals[number_files_matched]++))
+    [[ ${stats_number_subtitles_matched[$file]} -gt 0 ]] && (( stats_totals[number_files_matched]++ ))
     if [[ ${stats_number_subtitles_matched[$file]} ]]; then
-      stats_totals[number_subtitles_matched]=$((${stats_totals[number_subtitles_matched]} + ${stats_number_subtitles_matched[$file]}))
+      stats_totals[number_subtitles_matched]=$(( stats_totals[number_subtitles_matched] + stats_number_subtitles_matched[$file] ))
     fi
     if [[ ${stats_number_subtitles_total[$file]} ]]; then
-      stats_totals[number_subtitles_total]=$((${stats_totals[number_subtitles_total]} + ${stats_number_subtitles_total[$file]}))
+      stats_totals[number_subtitles_total]=$(( stats_totals[number_subtitles_total] + stats_number_subtitles_total[$file] ))
     fi
     if [[ ${stats_number_subtitles_unmatched[$file]} ]]; then
-      stats_totals[number_subtitles_unmatched]=$((${stats_totals[number_subtitles_unmatched]} + ${stats_number_subtitles_unmatched[$file]}))
+      stats_totals[number_subtitles_unmatched]=$(( stats_totals[number_subtitles_unmatched] + stats_number_subtitles_unmatched[$file] ))
     fi
 
   done
 
-  stats_totals[number_files_unmatched]=$((${stats_totals[number_files_total]} - ${stats_totals[number_files_matched]}))
+  stats_totals[number_files_unmatched]=$(( stats_totals[number_files_total] - stats_totals[number_files_matched] ))
   if [[ ${stats_totals[number_files_total]} != 0 ]]; then
     stats_totals[percentage_files_matched]=$(printf '%d / %d * 100\n' "${stats_totals[number_files_matched]}" "${stats_totals[number_files_total]}" | bc -l)
   fi
@@ -807,13 +807,13 @@ if [[ $opt_stats ]]; then
   stats_averages[percentage_subtitles_matched]=
 
   if [[ ${stats_totals[number_files_matched]} != 0 ]]; then
-    stats_averages[number_subtitles_matched]=$((${stats_totals[number_subtitles_matched]} / ${stats_totals[number_files_matched]}))
+    stats_averages[number_subtitles_matched]=$(( stats_totals[number_subtitles_matched] / stats_totals[number_files_matched] ))
   fi
   if [[ ${stats_totals[number_files_total]} != 0 ]]; then
-    stats_averages[number_subtitles_total]=$((${stats_totals[number_subtitles_total]} / ${stats_totals[number_files_total]}))
+    stats_averages[number_subtitles_total]=$(( stats_totals[number_subtitles_total] / stats_totals[number_files_total] ))
   fi
   if [[ ${stats_averages[number_subtitles_matched]} ]]; then
-    stats_averages[number_subtitles_unmatched]=$((${stats_averages[number_subtitles_total]} - ${stats_averages[number_subtitles_matched]}))
+    stats_averages[number_subtitles_unmatched]=$(( stats_averages[number_subtitles_total] - stats_averages[number_subtitles_matched] ))
     stats_averages[percentage_subtitles_matched]=$(printf '%d / %d * 100\n' "${stats_averages[number_subtitles_matched]}" "${stats_averages[number_subtitles_total]}" | bc -l)
   fi
 
@@ -826,7 +826,7 @@ if [[ $opt_stats ]]; then
     file_number_format_width=7
 
     if [[ ${#stats_totals[number_files_total]} -gt 6 ]]; then # `6` because, except for the file numbers, the longest string of text that ever appears in the left vertical header of the stats table is 'Average', which is 7 characters long. The subtracted 1 is for the dot that follows the number.
-      file_number_format_width=$((${#stats_totals[number_files_total]} + 1))
+      file_number_format_width=$(( ${#stats_totals[number_files_total]} + 1 ))
     fi
 
     table_headings[file]='Files'
