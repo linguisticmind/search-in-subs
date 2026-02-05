@@ -261,10 +261,6 @@ Do not omit segments with missing videos when generating EDL files.
 If set, an error message is shown listing subtitle files for which no corresponding video file could be identified, In this case, no EDL files are generated, and \fBsearch-in-subs\fR exits with exit status 3.
 .
 .TP
-.B \%-u,\ --edl-structure\fR=<value>
-Determines the structure of the set of generated EDL files. \%<value> can be \%'flat', \%'subdir', \%'subdir_hidden', \%'subdir_except_chapters' or \%'subdir_hidden_except_chapters'. The default \%<value> is \%'flat'.
-.
-.TP
 .B \%--mpv-opts\fR=[:[:]]<opts>
 Options to \%\fBmpv\fR player.
 .sp
@@ -396,7 +392,6 @@ lb lb .
 -Y, --edl-save-no-overwrite	\fR"
 -o, --edl-ignore-missing	opt_edl_ignore_missing
 -O, --edl-no-ignore-missing	\fR"
--u, --edl-structure\fR=<value>	opt_edl_structure
 --mpv-opts\fR=<value>	opt_mpv_opts
 	optdata__mpv_opts__append
 --color\fR[=<value>]	opt_color
