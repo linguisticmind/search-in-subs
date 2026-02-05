@@ -619,6 +619,7 @@ for (( i = 1; i <= $#; i++ )); do
             s/<i>/'${opt_color:+'\x1b[3m'}'/g; s/<\/i>/'${opt_color:+'\x1b[23m'}'/g
             s/<u>/'${opt_color:+'\x1b[4m'}'/g; s/<\/u>/'${opt_color:+'\x1b[24m'}'/g
             s/<s>/'${opt_color:+'\x1b[9m'}'/g; s/<\/s>/'${opt_color:+'\x1b[29m'}'/g
+            s/<[^>]*>//g
             H
             g
             '${opt_color:+'s/^([[:digit:]]+\n[[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3} --> [[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3})\n(.*)$/\x1b[2m\1\x1b[22m\n\2/'}'
