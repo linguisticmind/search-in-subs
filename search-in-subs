@@ -93,7 +93,7 @@ function fstr {
 }
 
 declare -- opts
-opts=$(getopt -n "$script_name" -o 't:,v,V,i,I,j,J,q,Q,r,R,c,C,e,E,s,S,h,H,m,M,n,N,w,W,p,P,k,K,b:,a:,f::,F,d,D,y,Y,o,O,u:,' -l 'search-term:,verbose,no-verbose,inverse,no-inverse,filenames-nly,no-filenames-only,quiet,no-quiet,regex,no-regex,match-case,no-match-case,exact-whitespace,no-exact-whitespace,stats,no-stats,stats-headers,stats-no-headers,stats-headers-compact,stats-headers-no-compact,stats-headers-file-numbers,stats-headers-no-file-numbers,stats-wrap-filenames,stats-no-wrap-filenames,edl-play,edl-no-play,edl-play-keep-temporary,edl-play-no-keep-temporary,edl-play-before:,edl-play-after:,edl-save::,edl-no-save,edl-save-paths:,edl-save-mkdir,edl-save-no-mkdir,edl-save-overwrite,edl-save-no-overwrite,edl-ignore-missing,edl-no-ignore-missing,edl-structure:,mpv-opts:,color::,no-color,help,version,config::,' -- "$@") || exit 1
+opts=$(getopt -n "$script_name" -o 't:,v,V,i,I,j,J,q,Q,r,R,c,C,e,E,s,S,h,H,m,M,n,N,w,W,p,P,k,K,b:,a:,f::,F,d,D,y,Y,o,O,' -l 'search-term:,verbose,no-verbose,inverse,no-inverse,filenames-nly,no-filenames-only,quiet,no-quiet,regex,no-regex,match-case,no-match-case,exact-whitespace,no-exact-whitespace,stats,no-stats,stats-headers,stats-no-headers,stats-headers-compact,stats-headers-no-compact,stats-headers-file-numbers,stats-headers-no-file-numbers,stats-wrap-filenames,stats-no-wrap-filenames,edl-play,edl-no-play,edl-play-keep-temporary,edl-play-no-keep-temporary,edl-play-before:,edl-play-after:,edl-save::,edl-no-save,edl-save-paths:,edl-save-mkdir,edl-save-no-mkdir,edl-save-overwrite,edl-save-no-overwrite,edl-ignore-missing,edl-no-ignore-missing,mpv-opts:,color::,no-color,help,version,config::,' -- "$@") || exit 1
 eval set -- "$opts"
 unset -v opts
 
@@ -125,7 +125,6 @@ declare -- opt_edl_save_paths='relative'
 declare -- opt_edl_save_mkdir=
 declare -- opt_edl_save_overwrite=
 declare -- opt_edl_ignore_missing=1
-declare -- opt_edl_structure='flat'
 declare -a opt_mpv_opts=()
 declare -- optdata__mpv_opts__append=1
 declare -- opt_color='auto'
@@ -190,7 +189,6 @@ while true; do
     -Y | --edl-save-no-overwrite ) opt_edl_save_overwrite=; shift ;;
     -o | --edl-ignore-missing ) opt_edl_ignore_missing=1; shift ;;
     -O | --edl-no-ignore-missing ) opt_edl_ignore_missing=; shift ;;
-    -u | --edl-structure ) opt_edl_structure="$2"; shift 2 ;;
     --mpv-opts )
       [[ $2 =~ ^(:{0,2})(.*)$ ]]
       case ${BASH_REMATCH[1]} in
@@ -372,17 +370,6 @@ if [[ $opt_edl_save ]]; then
 
 fi
 
-declare -- edl_subdir= edl_chapters_in_subdir=
-
-case $opt_edl_structure in
-  flat ) edl_subdir= edl_chapters_in_subdir=;;
-  subdir ) edl_subdir="$edl_name"'.files' edl_chapters_in_subdir=1;;
-  subdir_hidden ) edl_subdir='.'"$edl_name"'.files' edl_chapters_in_subdir=1;;
-  subdir_except_chapters ) edl_subdir="$edl_name"'.files' edl_chapters_in_subdir=;;
-  subdir_hidden_except_chapters ) edl_subdir='.'"$edl_name"'.files' edl_chapters_in_subdir=;;
-  * ) printf '%s\n' "${opt_color:+$'\x1b[31m'}[$script_name] Invalid argument to ${opt_color:+$'\x1b[1m'}-u, --edl-structure${opt_color:+$'\x1b[22m'}: ${opt_edl_structure@Q}. Allowed values are 'flat', 'subdir', 'subdir_hidden', 'subdir_except_chapters', 'subdir_hidden_except_chapters'.${opt_color:+$'\x1b[0m'}" >&2; exit 1 ;;
-esac
-
 if [[ ! $opt_search_term ]]; then
   printf '%s\n' "${opt_color:+$'\x1b[31m'}[$script_name] No search term was specified. Use ${opt_color:+$'\x1b[1m'}-t, --search-term${opt_color:+$'\x1b[22m'} to specify one or more search terms.${opt_color:+$'\x1b[0m'}" >&2
   exit 1
@@ -550,8 +537,8 @@ for (( i = 1; i <= $#; i++ )); do
         [[ $opt_edl_play_after != 0 ]] && video_file_duration=$(printf '%.3f' "$(ffprobe -v 'error' -show_entries 'format=duration' -of 'default=noprint_wrappers=1:nokey=1' "$video_file")")
 
         if [[ $opt_edl_save && $opt_edl_save_paths == 'relative' ]]; then
-          video_file=$(realpath --no-symlinks --relative-to="$edl_path"${edl_subdir:+/"$edl_subdir"} "$video_file")
-          subtitle_file=$(realpath --no-symlinks --relative-to="$edl_path"${edl_subdir:+/"$edl_subdir"} "$subtitle_file")
+          video_file=$(realpath --no-symlinks --relative-to="$edl_path" "$video_file")
+          subtitle_file=$(realpath --no-symlinks --relative-to="$edl_path" "$subtitle_file")
         fi
 
       else
@@ -696,16 +683,14 @@ if [[ $had_matches && ( $opt_edl_play || $opt_edl_save ) ]]; then
     fi
 
     edl_main_edl="$edl_dest_dir"'/'"$edl_name"
-    edl_video_edl="$edl_dest_dir"'/'${edl_subdir:+"$edl_subdir"/}"${edl_name%.edl}"'-video.edl'
-    edl_subtitles_edl="$edl_dest_dir"'/'${edl_subdir:+"$edl_subdir"/}"${edl_name%.edl}"'-subtitles.edl'
-    edl_chapters_ffmetadata="$edl_dest_dir"'/'${edl_subdir:+${edl_chapters_in_subdir:+"$edl_subdir"/}}"${edl_name%.edl}"'-chapters.ffmetadata'
+    edl_chapters_ffmetadata="$edl_dest_dir"'/'"${edl_name%.edl}"'-chapters.ffmetadata'
 
     if [[ $opt_edl_save && \
           ! $opt_edl_save_overwrite ]]; then
 
       existing_files=()
       
-      for file in "$edl_main_edl" ${edl_subdir:+"$edl_dest_dir"/"$edl_subdir"} "$edl_video_edl" "$edl_subtitles_edl" "$edl_chapters_ffmetadata"; do
+      for file in "$edl_main_edl" "$edl_chapters_ffmetadata"; do
         [[ -e "$file" ]] && existing_files+=("$file")
       done
 
@@ -718,36 +703,21 @@ if [[ $had_matches && ( $opt_edl_play || $opt_edl_save ) ]]; then
 
     fi
 
-    [[ $edl_subdir && ! -d "$edl_dest_dir"'/'"$edl_subdir" ]] && mkdir "$edl_dest_dir"'/'"$edl_subdir"
-
     unset -v edl_dest_dir
 
     {
 
-      printf '%s\n\n' '# mpv EDL v0'
-      printf '%s\n' \
-        '!no_chapters' \
-        "$("$lua_bin" <(printf '%s\n' 'print(string.format("%%%s%%%s", #arg[1], arg[1]))') ${edl_subdir:+"$edl_subdir"/}"${edl_name%.edl}"'-video.edl')" \
-        '!new_stream' \
-        '!no_chapters' \
-        "$("$lua_bin" <(printf '%s\n' 'print(string.format("%%%s%%%s", #arg[1], arg[1]))') ${edl_subdir:+"$edl_subdir"/}"${edl_name%.edl}"'-subtitles.edl')"
+      printf '%s\n' '# mpv EDL v0'
+      printf '\n'
+      printf '%s\n' '!no_chapters'
+      printf '%s\n' "${video_edl_lines[@]}"
+      printf '\n'
+      printf '%s\n' '!new_stream'
+      printf '%s\n' '!no_chapters'
+      printf '%s\n' "${subtitles_edl_lines[@]}"
 
     } > "$edl_main_edl"
 
-    {
-
-      printf '%s\n\n' '# mpv EDL v0'
-      printf '%s\n' "${video_edl_lines[@]}"
-
-    } > "$edl_video_edl"
-
-    {
-
-      printf '%s\n\n' '# mpv EDL v0'
-      printf '%s\n' "${subtitles_edl_lines[@]}"
-
-    } > "$edl_subtitles_edl"
-   
     {
     
       printf '%s\n\n' ';FFMETADATA1'
