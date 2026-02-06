@@ -208,16 +208,8 @@ Add a specified amount of time before each segment when generating EDL files. \%
 Add a specified amount of time after each segment when generating EDL files. \%<value> is in seconds. Precise values with a decimal separator are allowed. The default \%<value> is 0.
 .
 .TP
-.B \%-f,\ --edl-save\fR[={<path>[/]|<path>/<name>.edl|<name>.edl}]
+.B \%-f,\ --edl-save\fR=<path>
 Save EDL files to a specified location instead of generating temporary ones.
-.sp
-If \%<path> is not given, the EDL files are saved to the current working directory. If \%<name> is not given, the name set by \%\fBconf_edl_default_name\fR will be used.
-.sp
-A '.edl' extension after \%<name> is required because it serves to distinguish a directory called \%"<name>" from a name of an EDL file. To save to a directory whose name ends in \%'.edl' (without specifying \%"<name>.edl"), add a trailing forward slash \%('/') after \%<path>.
-.
-.TP
-.B \%-F,\ --edl-no-save
-Do not save EDL files, but generate temporary files instead. This is the default.
 .
 .TP
 .B \%--edl-save-paths\fR=<value>
@@ -382,9 +374,7 @@ lb lb .
 -K, --edl-play-no-keep-temporary	\fR"
 -b, --edl-play-before\fR=<value>	opt_edl_play_before
 -a, --edl-play-after\fR=<value>	opt_edl_play_after
--f, --edl-save\fR[=<value>]	opt_edl_save
-	optdata__edl_save__file
--F, --edl-no-save	\fR"
+-f, --edl-save\fR=<value>	opt_edl_save
 --edl-save-paths\fR=<value>	opt_edl_save_paths
 -d, --edl-save-mkdir	opt_edl_save_mkdir
 -D, --edl-save-no-mkdir	\fR"
