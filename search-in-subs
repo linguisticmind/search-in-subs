@@ -93,7 +93,7 @@ function fstr {
 }
 
 declare -- opts
-opts=$(getopt -n "$script_name" -o 't:,v,V,i,I,j,J,q,Q,r,R,c,C,e,E,s,S,h,H,m,M,n,N,w,W,p,P,k,K,b:,a:,f:,d,D,y,Y,o,O,' -l 'search-term:,verbose,no-verbose,inverse,no-inverse,filenames-nly,no-filenames-only,quiet,no-quiet,regex,no-regex,match-case,no-match-case,exact-whitespace,no-exact-whitespace,stats,no-stats,stats-headers,stats-no-headers,stats-headers-compact,stats-headers-no-compact,stats-headers-file-numbers,stats-headers-no-file-numbers,stats-wrap-filenames,stats-no-wrap-filenames,edl-play,edl-no-play,edl-play-keep-temporary,edl-play-no-keep-temporary,edl-play-before:,edl-play-after:,edl-save:,edl-save-paths:,edl-save-mkdir,edl-save-no-mkdir,edl-save-overwrite,edl-save-no-overwrite,edl-ignore-missing,edl-no-ignore-missing,mpv-opts:,color::,no-color,help,version,config::,' -- "$@") || exit 1
+opts=$(getopt -n "$script_name" -o 't:,v,V,i,I,j,J,q,Q,r,R,c,C,e,E,s,S,h,H,m,M,n,N,w,W,p,P,k,K,b:,a:,f:,d,D,y,Y,o,O,' -l 'search-term:,verbose,no-verbose,inverse,no-inverse,filenames-nly,no-filenames-only,quiet,no-quiet,regex,no-regex,match-case,no-match-case,exact-whitespace,no-exact-whitespace,stats,no-stats,stats-headers,stats-no-headers,stats-headers-compact,stats-headers-no-compact,stats-headers-file-numbers,stats-headers-no-file-numbers,stats-wrap-filenames,stats-no-wrap-filenames,edl-play,edl-no-play,edl-play-keep-temporary,edl-play-no-keep-temporary,edl-play-before:,edl-play-after:,edl-save:,edl-save-paths:,edl-save-mkdir,edl-save-no-mkdir,edl-save-overwrite,edl-save-no-overwrite,edl-ignore-missing,edl-no-ignore-missing,mpv-opts:,color::,no-color,help,version,config::,no-config,' -- "$@") || exit 1
 eval set -- "$opts"
 unset -v opts
 
