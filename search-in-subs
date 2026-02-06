@@ -93,13 +93,12 @@ function fstr {
 }
 
 declare -- opts
-opts=$(getopt -n "$script_name" -o 't:,v,V,i,I,j,J,q,Q,r,R,c,C,e,E,s,S,h,H,m,M,n,N,w,W,p,P,k,K,b:,a:,f::,F,d,D,y,Y,o,O,' -l 'search-term:,verbose,no-verbose,inverse,no-inverse,filenames-nly,no-filenames-only,quiet,no-quiet,regex,no-regex,match-case,no-match-case,exact-whitespace,no-exact-whitespace,stats,no-stats,stats-headers,stats-no-headers,stats-headers-compact,stats-headers-no-compact,stats-headers-file-numbers,stats-headers-no-file-numbers,stats-wrap-filenames,stats-no-wrap-filenames,edl-play,edl-no-play,edl-play-keep-temporary,edl-play-no-keep-temporary,edl-play-before:,edl-play-after:,edl-save::,edl-no-save,edl-save-paths:,edl-save-mkdir,edl-save-no-mkdir,edl-save-overwrite,edl-save-no-overwrite,edl-ignore-missing,edl-no-ignore-missing,mpv-opts:,color::,no-color,help,version,config::,' -- "$@") || exit 1
+opts=$(getopt -n "$script_name" -o 't:,v,V,i,I,j,J,q,Q,r,R,c,C,e,E,s,S,h,H,m,M,n,N,w,W,p,P,k,K,b:,a:,f::,d,D,y,Y,o,O,' -l 'search-term:,verbose,no-verbose,inverse,no-inverse,filenames-nly,no-filenames-only,quiet,no-quiet,regex,no-regex,match-case,no-match-case,exact-whitespace,no-exact-whitespace,stats,no-stats,stats-headers,stats-no-headers,stats-headers-compact,stats-headers-no-compact,stats-headers-file-numbers,stats-headers-no-file-numbers,stats-wrap-filenames,stats-no-wrap-filenames,edl-play,edl-no-play,edl-play-keep-temporary,edl-play-no-keep-temporary,edl-play-before:,edl-play-after:,edl-save:,edl-save-paths:,edl-save-mkdir,edl-save-no-mkdir,edl-save-overwrite,edl-save-no-overwrite,edl-ignore-missing,edl-no-ignore-missing,mpv-opts:,color::,no-color,help,version,config::,' -- "$@") || exit 1
 eval set -- "$opts"
 unset -v opts
 
 # --- BEGIN config ---
 declare -- conf_default_glob='*.srt'
-declare -- conf_edl_default_name='search_results'
 declare -- conf_chapter_title=
 
 declare -a opt_search_term=()
@@ -120,7 +119,6 @@ declare -- opt_edl_play_keep_temporary=
 declare -- opt_edl_play_before=0
 declare -- opt_edl_play_after=0
 declare -- opt_edl_save=
-declare -- optdata__edl_save__file=
 declare -- opt_edl_save_paths='relative'
 declare -- opt_edl_save_mkdir=
 declare -- opt_edl_save_overwrite=
@@ -180,8 +178,7 @@ while true; do
     -K | --edl-play-no-keep-temporary ) opt_edl_play_keep_temporary=; shift ;;
     -b | --edl-play-before ) opt_edl_play_before="$2"; shift 2 ;;
     -a | --edl-play-after ) opt_edl_play_after="$2"; shift 2 ;;
-    -f | --edl-save ) opt_edl_save=1 optdata__edl_save__file="$2"; shift 2 ;;
-    -F | --edl-no-save ) opt_edl_save=; shift ;;
+    -f | --edl-save ) opt_edl_save="$2"; shift 2 ;;
     --edl-save-paths ) opt_edl_save_paths="$2"; shift 2 ;;
     -d | --edl-save-mkdir ) opt_edl_save_mkdir=1; shift ;;
     -D | --edl-save-no-mkdir ) opt_edl_save_mkdir=; shift ;;
@@ -348,26 +345,11 @@ case $opt_edl_save_paths in
   * ) printf '%s\n' "${opt_color:+$'\x1b[31m'}[$script_name] Invalid argument to ${opt_color:+$'\x1b[1m'}--edl-save-paths${opt_color:+$'\x1b[22m'}: ${opt_edl_save_paths@Q}. Allowed values are 'relative', 'absolute'.${opt_color:+$'\x1b[0m'}" >&2; exit 1 ;;
 esac
 
-declare -- edl_path= edl_name="$conf_edl_default_name"'.edl'
+declare -- edl_path= edl_name='search_results.edl'
 
 if [[ $opt_edl_save ]]; then
-
-  case $optdata__edl_save__file in
-    '' ) ;;
-    */*.edl )
-      edl_path="${optdata__edl_save__file%/*}" edl_path="${edl_path:-/}"
-      edl_name="${optdata__edl_save__file##*/}"
-    ;;
-    *.edl ) 
-      edl_name="${optdata__edl_save__file##*/}"
-    ;;
-    !(*.edl) )
-      edl_path="${optdata__edl_save__file%%+(/)}" edl_path="${edl_path:-/}"
-    ;;
-  esac
-
-  [[ ! $edl_path ]] && edl_path="$PWD"
-
+  edl_path=$(dirname -- "$opt_edl_save")
+  edl_name=$(basename -- "$opt_edl_save")
 fi
 
 if [[ ! $opt_search_term ]]; then
