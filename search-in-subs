@@ -20,11 +20,11 @@ declare -- version='0.3.6'
 
 (:)
 
-declare -- script_source=$(realpath -- "${BASH_SOURCE[0]}")
-declare -- script_name="${script_source##*/}"
-declare -- config_dir="${XDG_CONFIG_HOME:-$HOME/.config}"'/'"${script_source##*/}"
-declare -- cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}"'/'"${script_source##*/}"
+declare -- script_source=$(realpath -- "$BASH_SOURCE")
 declare -- script_dir=$(dirname -- "$script_source")
+declare -- script_name="${script_source##*/}"
+declare -- config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/$script_name"
+declare -- cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/$script_name"
 
 shopt -s extglob globstar nullglob
 
@@ -201,7 +201,7 @@ while true; do
     ;;
     --color ) opt_color="${2:-auto}"; shift 2 ;;
     --no-color ) opt_color='never'; shift ;;
-    --help ) { test -f "$script_dir"'/man/man1/'"$script_name"'.1' || test -f "$(man -w "$script_name" &> /dev/null)"; } && man "$_"; exit ;;
+    --help ) { test -f "$script_dir/man/man1/$script_name.1" || test -f "$(man -w "$script_name" &> /dev/null)"; } && man "$_"; exit ;;
     --version ) printf '%s\n' "$version"; exit ;;
     --config ) optc="${optc:-$1}" opt_config="${2:-auto}"; shift 2 ;;
     --no-config ) optc="${optc:-$1}" opt_config='none'; shift ;;
@@ -371,7 +371,7 @@ declare -- search_term
 for search_term in "${opt_search_term[@]}"; do
   [[ ! $opt_regex ]] && search_term="$(<<<"$search_term" sed -E 's/[](){}<>.*?+|^$\/[]/\\&/g')"
   [[ ! $opt_exact_whitespace ]] && search_term="${search_term// /[[:space:]]+}" 
-  search_term_re+="$search_term"'|'
+  search_term_re+="$search_term|"
 done
 unset -v search_term
 
@@ -440,7 +440,7 @@ function calc_segment_length {
 
 }
 
-declare -- cache_dir_edl="$cache_dir"'/edl'
+declare -- cache_dir_edl="$cache_dir/edl"
 
 [[ $opt_edl_play && ! $opt_edl_save && ! -d "$cache_dir_edl" ]] && mkdir -p "$cache_dir_edl"
 
@@ -478,13 +478,13 @@ for (( i = 1; i <= $#; i++ )); do
 
       declare -- video_file subtitle_file
 
-      [[ ${!i} == /* ]] && subtitle_file="${!i}" || subtitle_file="$PWD"'/'"${!i}"
+      [[ ${!i} == /* ]] && subtitle_file="${!i}" || subtitle_file="$PWD/${!i}"
 
       declare -a candidates=()
 
       declare -- base="$subtitle_file"
       until [[ ${#candidates[@]} -gt 0 || $base != *.* ]]; do
-        base="${base%.*}" candidates=("$base"'.'!(srt|*.srt))
+        base="${base%.*}" candidates=("$base."!(srt|*.srt))
       done
       unset -v base
 
@@ -631,7 +631,7 @@ for (( i = 1; i <= $#; i++ )); do
 done
 unset -v i
 
-function clear_cache_edl { (shopt -s dotglob; compgen -G "$cache_dir_edl"'/*' > /dev/null && rm -r "$cache_dir_edl"/*) }
+function clear_cache_edl { (shopt -s dotglob; compgen -G "$cache_dir_edl/*" > /dev/null && rm -r "$cache_dir_edl"/*) }
 
 if [[ $had_matches && ( $opt_edl_play || $opt_edl_save ) ]]; then
 
@@ -666,8 +666,8 @@ if [[ $had_matches && ( $opt_edl_play || $opt_edl_save ) ]]; then
 
     fi
 
-    edl_main_edl="$edl_dest_dir"'/'"$edl_name"
-    edl_chapters_ffmetadata="$edl_dest_dir"'/'"${edl_name%.edl}"'-chapters.ffmetadata'
+    edl_main_edl="$edl_dest_dir/$edl_name"
+    edl_chapters_ffmetadata="$edl_dest_dir/${edl_name%.edl}-chapters.ffmetadata"
 
     if [[ $opt_edl_save && \
           ! $opt_edl_save_overwrite ]]; then
