@@ -101,7 +101,6 @@ unset -v opts
 declare -- conf_default_glob='*.srt'
 declare -- conf_chapter_title=
 
-declare -a opt_search_term=()
 declare -- opt_verbose=
 declare -- opt_inverse=
 declare -- opt_filenames_only=
@@ -118,7 +117,6 @@ declare -- opt_edl_play=
 declare -- opt_edl_play_keep_temporary=
 declare -- opt_edl_play_before=0
 declare -- opt_edl_play_after=0
-declare -- opt_edl_save=
 declare -- opt_edl_save_paths='relative'
 declare -- opt_edl_save_mkdir=
 declare -- opt_edl_save_overwrite=
@@ -142,6 +140,9 @@ unset -v i
 
 declare -- config_file="$config_dir/config.bash"
 [[ ! $opt_config == 'none' ]] && test -f "$config_file" && source "$_"
+
+declare -a opt_search_term=()
+declare -- opt_edl_save=
 
 declare -- optc
 
