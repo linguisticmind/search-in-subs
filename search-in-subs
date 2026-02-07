@@ -382,8 +382,6 @@ declare -- optdata__filenames_only__inv=
 declare -- optdata__match_case__inv=
 [[ ! $opt_match_case ]] && optdata__match_case__inv=1
 
-declare -- sed_script_cleanup='1 s/^\xef\xbb\xbf//; s/\r$//; s/\s+$//' # Remove byte order mark, carriage returns, and trailing whitespace
-
 declare -A \
   stats_number_subtitles_total \
   stats_number_subtitles_matched \
@@ -470,7 +468,7 @@ for (( i = 1; i <= $#; i++ )); do
   fi
 
   if [[ $opt_stats ]]; then
-    stats_number_subtitles_total[${!i}]=$(sed -nE -e "$sed_script_cleanup" -e '/^[[:digit:]]+$/ p' "${!i}" | wc -l)
+    stats_number_subtitles_total[${!i}]=$(sed -En '1 s/^\xef\xbb\xbf//; s/\r$//; /^[[:digit:]]+$/ p' "${!i}" | wc -l)
     stats_number_subtitles_matched[${!i}]=0
   fi
 
@@ -584,35 +582,49 @@ for (( i = 1; i <= $#; i++ )); do
 
   done < <(
 
-    sed -E "$sed_script_cleanup" "${!i}" | sed -nE '
+    {
 
-      /^[[:digit:]]+$/ {
-        h
-        n
-        /^[[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3} --> [[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3}$/ {
-          H
-          :a $ ! { n; /^$/! { H; b a } }
-          g
-          s/^([[:digit:]]+\n[[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3} --> [[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3})\n(.*)$/\1/
-          x
-          s//\2/
-          /'"$search_term_re"'/M'${optdata__match_case__inv:+'I'}' {
-            '${opt_color:+"s/$search_term_re/\\x1b[7m&\\x1b[27m/gM${optdata__match_case__inv:+I}"}'
-            s/<b>/'${opt_color:+'\x1b[1m'}'/g; s/<\/b>/'${opt_color:+'\x1b[22m'}'/g
-            s/<i>/'${opt_color:+'\x1b[3m'}'/g; s/<\/i>/'${opt_color:+'\x1b[23m'}'/g
-            s/<u>/'${opt_color:+'\x1b[4m'}'/g; s/<\/u>/'${opt_color:+'\x1b[24m'}'/g
-            s/<s>/'${opt_color:+'\x1b[9m'}'/g; s/<\/s>/'${opt_color:+'\x1b[29m'}'/g
-            s/<[^>]*>//g
-            H
-            g
-            '${opt_color:+'s/^([[:digit:]]+\n[[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3} --> [[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3})\n(.*)$/\x1b[2m\1\x1b[22m\n\2/'}'
-            s/$/\x00/
-            p
-          }
-        }
-      }
+			sed -Ef '/dev/fd/3' -- "${!i}" 3<<- 'EOF'
+			
+				1 s/^\xef\xbb\xbf//
+				s/\r$//
+				s/\s+$//
+			
+			EOF
 
-    '
+    } | { 
+
+			sed -Enf '/dev/fd/3' 3<<- EOF
+				
+				/^[[:digit:]]+\$/ {
+				  h
+				  n
+				  /^[[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3} --> [[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3}\$/ {
+				    H
+				    :a \$ ! { n; /^\$/! { H; b a } }
+				    g
+				    s/^([[:digit:]]+\\n[[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3} --> [[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3})\\n(.*)\$/\\1/
+				    x
+				    s//\\2/
+				    /$search_term_re/M${optdata__match_case__inv:+"I"} {
+				      ${opt_color:+"s/$search_term_re/\\x1b[7m&\\x1b[27m/gM${optdata__match_case__inv:+"I"}"}
+				      s/<b>/${opt_color:+"\\x1b[1m"}/g; s/<\\/b>/${opt_color:+"\\x1b[22m"}/g
+				      s/<i>/${opt_color:+"\\x1b[3m"}/g; s/<\\/i>/${opt_color:+"\\x1b[23m"}/g
+				      s/<u>/${opt_color:+"\\x1b[4m"}/g; s/<\\/u>/${opt_color:+"\\x1b[24m"}/g
+				      s/<s>/${opt_color:+"\\x1b[9m"}/g; s/<\\/s>/${opt_color:+"\\x1b[29m"}/g
+				      s/<[^>]*>//g
+				      H
+				      g
+				      ${opt_color:+"s/^([[:digit:]]+\\n[[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3} --> [[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3})\\n(.*)\$/\\x1b[2m\\1\\x1b[22m\\n\\2/"}
+				      s/\$/\\x00/
+				      p
+				    }
+				  }
+				}
+				
+			EOF
+
+    }
 
   )
 
