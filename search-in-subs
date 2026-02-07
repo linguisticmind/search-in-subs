@@ -365,17 +365,17 @@ if [[ $# -eq 0 ]]; then
   exit 1
 fi
 
-declare -- search_term_re=
+declare -- optdata__search_term__re=
 
-declare -- search_term
-for search_term in "${opt_search_term[@]}"; do
-  [[ ! $opt_regex ]] && search_term="$(<<<"$search_term" sed -E 's/[](){}<>.*?+|^$\/[]/\\&/g')"
-  [[ ! $opt_exact_whitespace ]] && search_term="${search_term// /[[:space:]]+}" 
-  search_term_re+="$search_term|"
+declare -- term
+for term in "${opt_search_term[@]}"; do
+  [[ ! $opt_regex ]] && term=$(printf '%s' "$term" | sed -E 's/[](){}<>.*?+|^$\/[]/\\&/g')
+  [[ ! $opt_exact_whitespace ]] && term="${term// /[[:space:]]+}" 
+  optdata__search_term__re+="$term|"
 done
-unset -v search_term
+unset -v term
 
-search_term_re="${search_term_re%|}"
+optdata__search_term__re="${optdata__search_term__re%|}"
 
 declare -- optdata__filenames_only__inv=
 [[ ! $opt_filenames_only ]] && optdata__filenames_only__inv=1
@@ -606,8 +606,8 @@ for (( i = 1; i <= $#; i++ )); do
 				    s/^([[:digit:]]+\\n[[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3} --> [[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2},[[:digit:]]{3})\\n(.*)\$/\\1/
 				    x
 				    s//\\2/
-				    /$search_term_re/M${optdata__match_case__inv:+"I"} {
-				      ${opt_color:+"s/$search_term_re/\\x1b[7m&\\x1b[27m/gM${optdata__match_case__inv:+"I"}"}
+				    /$optdata__search_term__re/M${optdata__match_case__inv:+"I"} {
+				      ${opt_color:+"s/$optdata__search_term__re/\\x1b[7m&\\x1b[27m/gM${optdata__match_case__inv:+"I"}"}
 				      s/<b>/${opt_color:+"\\x1b[1m"}/g; s/<\\/b>/${opt_color:+"\\x1b[22m"}/g
 				      s/<i>/${opt_color:+"\\x1b[3m"}/g; s/<\\/i>/${opt_color:+"\\x1b[23m"}/g
 				      s/<u>/${opt_color:+"\\x1b[4m"}/g; s/<\\/u>/${opt_color:+"\\x1b[24m"}/g
