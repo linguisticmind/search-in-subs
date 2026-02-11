@@ -8,6 +8,36 @@
     </tr>
     <tr>
         <td>
+            <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.4.0'>0.4.0</a>
+        </td>
+        <td>
+           2026-02-11
+        </td>
+        <td>
+            <p>
+                mpv EDL generation: eliminated the need for generating multiple EDL files. Only a single EDL file and a chapters file are now generated. The <code>-u, --structure</code> option has thus been removed as well.
+            </p>
+            <p>
+                Cleaned up subtitle output: all tags that cannot be converted to ANSI escape sequences are now removed (e.g. <code>&lt;font&gt;</code>).
+            </p>
+            <p>
+                Added <code>--no-config</code> / <code>--config=none</code>.
+            </p>
+            <p>
+                Simplified saving of EDL files:
+                <ul>
+                    <li><code>-f, --edl-save</code> now takes a required argument setting a path to the EDL file.</li>
+                    <li>Removed option: <code>-F, --edl-no-save</code>.</li>
+                    <li>Removed configuration variables: <code>conf_edl_default_name</code>, <code>optdata__edl_save__file</code>.</li>
+                </ul>
+            </p>
+            <p>
+                Made <code>-t, --search-term</code> and <code>-f, --edl-save</code> non-configurable.
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
             <a href='https://github.com/linguisticmind/search-in-subs/releases/tag/v0.3.6'>0.3.6</a>
         </td>
         <td>
